@@ -16,7 +16,8 @@ export async function syncMemberList() {
   if (!WOM_GROUP_ID) return console.warn('[WOM] No WOM_GROUP_ID set');
   console.log('[WOM] Syncing member list...');
   try {
-    const { memberships } = await womFetch(`/groups/${WOM_GROUP_ID}/members`);
+    const data = await womFetch(`/groups/${WOM_GROUP_ID}/memberships`);
+const memberships = data;
     for (const m of memberships) {
       const { player } = m;
       db.prepare(`
