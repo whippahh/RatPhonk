@@ -799,17 +799,17 @@ async function loadProfile() {
         document.getElementById('qs-clog').textContent = wom.collectionLogCount.toLocaleString();
       }
 
-      // Combat level
-      const cb = (skills.attack?.level||1) + (skills.strength?.level||1) +
-                 (skills.defence?.level||1) + (skills.hitpoints?.level||10) +
-                 Math.floor((skills.prayer?.level||1)/2) +
-                 Math.floor(Math.max(
-                   (skills.ranged?.level||1)*1.5,
-                   (skills.magic?.level||1)*1.5,
-                   (skills.attack?.level||1) + (skills.strength?.level||1)
-                 )/4);
-      const combat = Math.min(126, Math.floor(cb * 0.25 + (skills.hitpoints?.level||10) * 0.125 + (skills.defence?.level||1) * 0.125));
-      document.getElementById('qs-combat').textContent = combat || '—';
+      // Combat level - correct OSRS formula
+const base = 0.25 * (
+  (skills.defence?.level||1) +
+  (skills.hitpoints?.level||10) +
+  Math.floor((skills.prayer?.level||1) / 2)
+);
+const melee = 0.325 * ((skills.attack?.level||1) + (skills.strength?.level||1));
+const range = 0.325 * (Math.floor((skills.ranged?.level||1) * 1.5));
+const mage  = 0.325 * (Math.floor((skills.magic?.level||1) * 1.5));
+const combat = Math.floor(base + Math.max(melee, range, mage));
+document.getElementById('qs-combat').textContent = combat || '—';
 
       // Total XP label
       document.getElementById('total-xp-label').textContent = 'Total XP: ' + xpFmt;
