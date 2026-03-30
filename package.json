@@ -1,0 +1,20 @@
+{
+  "name": "ratphonk-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev":   "node --watch server.js"
+  },
+  "dependencies": {
+    "fastify":            "^4.26.0",
+    "@fastify/cors":      "^9.0.0",
+    "@fastify/cookie":    "^9.3.1",
+    "@fastify/session":   "^10.8.0",
+    "better-sqlite3":     "^9.4.3",
+    "discord.js":         "^14.14.1",
+    "node-cron":          "^3.0.3",
+    "dotenv":             "^16.4.4",
+    "undici":             "^6.6.2"
+  }
+}
