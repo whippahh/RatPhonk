@@ -320,18 +320,19 @@ const start = async () => {
     startCrons();
     await syncMemberList();
     await takeSnapshots();
+
+    // One-time admin setup — remove after first run
+    if (process.env.ADMIN_RSN) {
+      const result = db.prepare(
+        "UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE"
+      ).run(process.env.ADMIN_RSN);
+      console.log(`[SETUP] Admin promoted: ${process.env.ADMIN_RSN} (${result.changes} rows updated)`);
+    }
+
   } catch (err) {
     app.log.error(err);
     process.exit(1);
   }
 };
-// One-time admin setup — remove after first run
-if (process.env.ADMIN_RSN) {
-  setTimeout(() => {
-    const result = db.prepare(
-      "UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE"
-    ).run(process.env.ADMIN_RSN);
-    console.log(`[SETUP] Admin promoted: ${process.env.ADMIN_RSN} (${result.changes} rows updated)`);
-  }, 5000);
-}
+
 start();
