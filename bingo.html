@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bingo & Comps — RAT PHONK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:      #060504;
+    --deep:       #0a0804;
+    --surface:    #100d08;
+    --raised:     #17130c;
+    --forest:     #263f22;
+    --forest-md:  #3a6634;
+    --forest-lt:  #4e8c46;
+    --glow:       #5dba4e;
+    --glow-lt:    #80d96c;
+    --glow-dim:   #2d5c28;
+    --glow-dk:    #1a3a16;
+    --gold:       #c9a94c;
+    --gold-dim:   #7c6230;
+    --gold-dk:    #3a2c10;
+    --red:        #c05050;
+    --red-dim:    #6b2828;
+    --red-dk:     #2a1010;
+    --amber:      #c8841a;
+    --amber-dim:  #6b4410;
+    --amber-dk:   #2a1a06;
+    --parch:      #b9a272;
+    --parch-md:   #8a7250;
+    --parch-dk:   #4a3820;
+    --border:     #221a0e;
+    --border-md:  #332614;
+    --text:       #c2a86e;
+    --text-dim:   #766040;
+    --text-deep:  #332818;
+    --white:      #e8dcc8;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background:var(--black); color:var(--text);
+    font-family:'IM Fell English',Georgia,serif;
+    font-size:17px; line-height:1.6; overflow-x:hidden;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    background-size:380px 380px; mix-blend-mode:overlay;
+  }
+  .page { position:relative; z-index:1; }
+
+  /* ══ NAV ══ */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200; height:54px;
+    background:linear-gradient(180deg,rgba(6,5,4,.98) 0%,rgba(10,8,4,.95) 100%);
+    border-bottom:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 30px rgba(0,0,0,.7);
+  }
+  .nav-link {
+    font-family:'Cinzel',serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--parch-md); text-decoration:none;
+    padding:0 26px; height:54px; display:flex; align-items:center;
+    border-right:1px solid var(--border);
+    transition:color .2s,background .2s; position:relative; white-space:nowrap;
+  }
+  .nav-link:first-child { border-left:1px solid var(--border); }
+  .nav-link:hover { color:var(--parch); background:rgba(255,200,80,.025); }
+  .nav-link.active { color:var(--glow); }
+  .nav-link.active::after {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+    background:var(--glow); box-shadow:0 0 8px var(--glow);
+  }
+
+  /* ══ PAGE HEADER ══ */
+  .page-header {
+    padding-top:54px;
+    background:linear-gradient(180deg,var(--deep) 0%,var(--black) 100%);
+    border-bottom:2px solid var(--border);
+    position:relative; overflow:hidden;
+  }
+  .page-header::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(38,63,34,.12) 0%,transparent 70%);
+  }
+  .bramble { position:absolute; pointer-events:none; z-index:0; width:240px; height:240px; opacity:.55; }
+  .bramble svg { width:100%; height:100%; }
+  .bramble-tl { top:54px; left:0; }
+  .bramble-tr { top:54px; right:0; transform:scaleX(-1); }
+
+  .header-inner {
+    position:relative; z-index:1;
+    max-width:1200px; margin:0 auto; padding:36px 56px 0;
+  }
+  .header-top {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    margin-bottom:28px; gap:24px;
+  }
+  .header-eyebrow {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.35em;
+    color:var(--forest-lt); text-transform:uppercase; display:block; margin-bottom:10px;
+  }
+  .header-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(30px,5vw,56px); color:var(--white);
+    letter-spacing:.04em; line-height:1.1;
+    text-shadow:0 2px 20px rgba(0,0,0,.9);
+  }
+  .header-sub { font-style:italic; font-size:16px; color:var(--text-dim); margin-top:8px; }
+
+  /* View toggle */
+  .view-toggle { display:flex; gap:2px; background:var(--surface); border:1px solid var(--border-md); padding:3px; flex-shrink:0; }
+  .vt-btn {
+    font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    padding:10px 28px; cursor:pointer;
+    background:transparent; border:none; color:var(--text-dim); transition:all .2s;
+  }
+  .vt-btn:hover { color:var(--text); }
+  .vt-btn.active { background:var(--raised); color:var(--white); border:1px solid var(--border-md); }
+  .vt-btn.active.bingo { color:var(--glow); border-color:var(--glow-dim); }
+  .vt-btn.active.comp  { color:var(--gold); border-color:var(--gold-dim); }
+
+  /* Active event strip */
+  .event-strip {
+    display:flex; gap:2px; border-top:1px solid var(--border);
+    overflow-x:auto;
+  }
+  .event-pill {
+    padding:12px 24px; border-right:1px solid var(--border);
+    display:flex; align-items:center; gap:10px; cursor:pointer;
+    transition:background .2s; flex-shrink:0; white-space:nowrap;
+  }
+  .event-pill:hover { background:rgba(255,200,80,.03); }
+  .event-pill.active-pill { background:rgba(93,186,78,.07); }
+  .ep-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .ep-dot.live  { background:var(--glow); box-shadow:0 0 7px var(--glow); animation:blink 2s infinite; }
+  .ep-dot.ended { background:var(--text-deep); }
+  .ep-dot.upcoming { background:var(--amber); box-shadow:0 0 7px var(--amber); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .ep-name { font-family:'Cinzel',serif; font-size:11px; letter-spacing:.1em; color:var(--parch-md); text-transform:uppercase; }
+  .ep-meta { font-style:italic; font-size:12px; color:var(--text-dim); }
+
+  /* ══ MAIN ══ */
+  .main { max-width:1200px; margin:0 auto; padding:36px 56px; }
+  .view { display:none; }
+  .view.active { display:block; }
+
+  /* ══ BUTTONS ══ */
+  .btn {
+    font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    padding:10px 24px; border:1px solid; cursor:pointer;
+    text-decoration:none; display:inline-flex; align-items:center; gap:7px;
+    transition:all .2s; white-space:nowrap;
+  }
+  .btn-green { background:var(--glow-dk); border-color:var(--glow-dim); color:var(--glow); }
+  .btn-green:hover { background:var(--glow-dim); color:var(--black); }
+  .btn-gold  { background:var(--gold-dk); border-color:var(--gold-dim); color:var(--gold); }
+  .btn-gold:hover { background:var(--gold-dim); color:var(--black); }
+  .btn-amber { background:var(--amber-dk); border-color:var(--amber-dim); color:var(--amber); }
+  .btn-amber:hover { background:var(--amber-dim); color:var(--black); }
+  .btn-ghost { background:transparent; border-color:var(--border-md); color:var(--text-dim); }
+  .btn-ghost:hover { border-color:var(--parch-dk); color:var(--text); }
+  .btn-red  { background:var(--red-dk); border-color:var(--red-dim); color:var(--red); }
+  .btn-red:hover { background:var(--red-dim); color:var(--white); }
+  .btn-sm { padding:5px 12px; font-size:9px; }
+
+  /* ══ BINGO VIEW ══ */
+
+  /* Section header */
+  .sec-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:24px; gap:16px;
+  }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.25em;
+    color:var(--parch-md); text-transform:uppercase;
+  }
+  .sec-rule { flex:1; height:1px; background:var(--border); }
+
+  /* Bingo board grid */
+  .bingo-layout {
+    display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start;
+  }
+
+  .bingo-board-wrap {}
+  .board-meta {
+    display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .board-title {
+    font-family:'Cinzel Decorative',serif; font-size:22px; color:var(--white); letter-spacing:.04em;
+  }
+  .board-dates { font-style:italic; font-size:13px; color:var(--text-dim); }
+  .board-prize {
+    margin-left:auto;
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.15em;
+    color:var(--gold); border:1px solid var(--gold-dim); padding:4px 12px;
+    background:var(--gold-dk); text-transform:uppercase;
+  }
+
+  /* 5×5 grid */
+  .bingo-grid {
+    display:grid; grid-template-columns:repeat(5,1fr); gap:3px;
+    margin-bottom:20px;
+  }
+
+  .tile {
+    background:var(--surface); border:1px solid var(--border);
+    padding:12px 10px; min-height:88px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; cursor:pointer; position:relative;
+    transition:border-color .2s, background .2s;
+    overflow:hidden;
+  }
+  .tile:hover { border-color:var(--border-md); background:var(--raised); }
+
+  /* Difficulty colour bar at top */
+  .tile::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .tile.easy::before   { background:var(--forest-md); }
+  .tile.medium::before { background:var(--amber); }
+  .tile.hard::before   { background:var(--red); }
+
+  /* Completed state */
+  .tile.done {
+    background:rgba(26,58,22,.55); border-color:var(--glow-dim);
+  }
+  .tile.done::after {
+    content:'✓'; position:absolute; top:6px; right:8px;
+    font-size:14px; color:var(--glow); opacity:.9;
+  }
+  .tile.done .tile-name { color:var(--glow-lt); }
+
+  /* FREE tile */
+  .tile.free { background:rgba(58,44,16,.4); border-color:var(--gold-dim); cursor:default; }
+  .tile.free::before { background:var(--gold); }
+
+  /* Pending verification */
+  .tile.pending { border-color:var(--amber-dim); background:rgba(42,26,6,.5); }
+  .tile.pending::after {
+    content:'⏳'; position:absolute; top:6px; right:8px; font-size:12px;
+  }
+
+  .tile-icon   { font-size:20px; margin-bottom:5px; line-height:1; }
+  .tile-name   { font-family:'Cinzel',serif; font-size:9.5px; letter-spacing:.08em; color:var(--parch-md); text-transform:uppercase; line-height:1.3; }
+  .tile-sub    { font-style:italic; font-size:10px; color:var(--text-deep); margin-top:3px; line-height:1.2; }
+  .tile-team   { font-family:'Cinzel',serif; font-size:9px; color:var(--glow); margin-top:4px; letter-spacing:.06em; }
+
+  /* Bingo lines highlight */
+  .tile.bingo-line { box-shadow:inset 0 0 0 2px var(--glow); }
+
+  /* Board legend */
+  .board-legend {
+    display:flex; gap:16px; flex-wrap:wrap;
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  }
+  .legend-item { display:flex; align-items:center; gap:6px; color:var(--text-dim); }
+  .legend-dot { width:10px; height:3px; }
+  .legend-dot.easy   { background:var(--forest-md); }
+  .legend-dot.medium { background:var(--amber); }
+  .legend-dot.hard   { background:var(--red); }
+
+  /* Sidebar */
+  .bingo-sidebar {}
+
+  .sidebar-block {
+    background:var(--surface); border:1px solid var(--border); margin-bottom:12px;
+    position:relative;
+  }
+  .sidebar-block::before,.sidebar-block::after {
+    content:''; position:absolute; width:10px; height:10px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none;
+  }
+  .sidebar-block::before { top:0; left:0; border-width:1px 0 0 1px; }
+  .sidebar-block::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  .sb-head {
+    background:var(--raised); border-bottom:1px solid var(--border);
+    padding:10px 16px; font-family:'Cinzel',serif; font-size:10px;
+    letter-spacing:.2em; color:var(--parch-md); text-transform:uppercase;
+  }
+  .sb-body { padding:14px 16px; }
+
+  /* Teams list */
+  .team-row {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 0; border-bottom:1px solid rgba(34,26,14,.6);
+  }
+  .team-row:last-child { border-bottom:none; }
+  .team-color {
+    width:10px; height:10px; border-radius:50%; flex-shrink:0;
+    box-shadow:0 0 6px currentColor;
+  }
+  .team-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); letter-spacing:.06em; flex:1; }
+  .team-tiles {
+    font-family:'Cinzel Decorative',serif; font-size:16px; color:var(--parch-md);
+  }
+  .team-row.leading .team-tiles { color:var(--gold); }
+
+  /* Recent submissions */
+  .sub-row {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:9px 0; border-bottom:1px solid rgba(34,26,14,.6); font-size:13px;
+  }
+  .sub-row:last-child { border-bottom:none; }
+  .sub-status { font-size:14px; flex-shrink:0; margin-top:1px; }
+  .sub-info {}
+  .sub-tile { font-family:'Cinzel',serif; font-size:11px; color:var(--parch-md); letter-spacing:.06em; }
+  .sub-meta { font-style:italic; font-size:11px; color:var(--text-dim); margin-top:1px; }
+
+  /* Tile suggestion form */
+  .suggest-form { padding:14px 16px; }
+  .fg { margin-bottom:12px; }
+  .fl { display:block; font-family:'Cinzel',serif; font-size:9px; letter-spacing:.22em; color:var(--parch-dk); text-transform:uppercase; margin-bottom:5px; }
+  .fi,.fs {
+    width:100%; background:var(--raised); border:1px solid var(--border);
+    color:var(--white); font-family:'JetBrains Mono',monospace; font-size:13px;
+    padding:8px 12px; outline:none; transition:border-color .2s; border-radius:0;
+  }
+  .fi:focus,.fs:focus { border-color:var(--border-md); }
+  .fi::placeholder { color:var(--text-deep); }
+  .fs { appearance:none; cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23332614'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;
+  }
+  .fs option { background:var(--raised); }
+
+  /* ══ COMPETITIONS VIEW ══ */
+  .comp-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:16px; margin-bottom:36px;
+  }
+
+  .comp-card {
+    background:var(--surface); border:1px solid var(--border);
+    position:relative; overflow:hidden;
+    transition:border-color .2s;
+  }
+  .comp-card:hover { border-color:var(--border-md); }
+
+  /* Top accent by type */
+  .comp-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .comp-card.xp::before   { background:var(--glow); }
+  .comp-card.level::before { background:var(--gold); }
+  .comp-card.kc::before    { background:var(--amber); }
+  .comp-card.gp::before    { background:var(--gold-dim); }
+  .comp-card.custom::before{ background:var(--parch-md); }
+
+  .comp-card-head {
+    padding:16px 20px 12px; border-bottom:1px solid var(--border);
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .comp-type-badge {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:.15em;
+    text-transform:uppercase; padding:2px 8px; border:1px solid; flex-shrink:0;
+  }
+  .comp-card.xp    .comp-type-badge { border-color:var(--glow-dim);  color:var(--glow); }
+  .comp-card.level .comp-type-badge { border-color:var(--gold-dim);  color:var(--gold); }
+  .comp-card.kc    .comp-type-badge { border-color:var(--amber-dim); color:var(--amber); }
+  .comp-card.gp    .comp-type-badge { border-color:var(--gold-dim);  color:var(--gold-dim); }
+  .comp-card.custom .comp-type-badge { border-color:var(--border-md); color:var(--parch-md); }
+
+  .comp-name {
+    font-family:'Cinzel Decorative',serif; font-size:17px;
+    color:var(--white); letter-spacing:.03em; line-height:1.2; margin-bottom:4px;
+  }
+  .comp-goal { font-style:italic; font-size:13px; color:var(--text-dim); }
+
+  .comp-status {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.12em;
+    text-transform:uppercase; padding:3px 9px; border:1px solid; flex-shrink:0;
+  }
+  .comp-status.live    { border-color:var(--glow-dim); color:var(--glow); background:var(--glow-dk); }
+  .comp-status.upcoming { border-color:var(--amber-dim); color:var(--amber); background:var(--amber-dk); }
+  .comp-status.ended   { border-color:var(--border-md); color:var(--text-dim); }
+
+  .comp-card-body { padding:16px 20px; }
+
+  /* Participants / teams list */
+  .comp-entries { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+
+  .comp-entry {
+    display:grid; grid-template-columns:24px 1fr auto;
+    align-items:center; gap:10px;
+  }
+  .ce-rank {
+    font-family:'Cinzel Decorative',serif; font-size:15px;
+    color:var(--text-deep); text-align:center;
+  }
+  .comp-entry.p1 .ce-rank { color:var(--gold); text-shadow:0 0 10px rgba(201,169,76,.5); }
+  .comp-entry.p2 .ce-rank { color:var(--parch-md); }
+  .comp-entry.p3 .ce-rank { color:#6b4830; }
+
+  .ce-info {}
+  .ce-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); letter-spacing:.06em; }
+  .comp-entry.p1 .ce-name { color:var(--white); }
+  .ce-sub  { font-style:italic; font-size:11px; color:var(--text-dim); margin-top:1px; }
+
+  .ce-val  { font-family:'Cinzel Decorative',serif; font-size:16px; color:var(--glow); text-align:right; }
+  .comp-entry.p1 .ce-val { color:var(--glow-lt); font-size:18px; }
+
+  /* Progress bar for comp entries */
+  .ce-bar-wrap { grid-column:2/-1; height:2px; background:var(--border); margin-top:-6px; margin-bottom:2px; }
+  .ce-bar { height:100%; background:var(--forest-md); opacity:.7; transition:width 1.1s cubic-bezier(.16,1,.3,1); }
+  .comp-entry.p1 .ce-bar { background:var(--glow); opacity:.9; }
+
+  .comp-card-foot {
+    padding:10px 20px; border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+    font-style:italic; font-size:12px; color:var(--text-dim);
+  }
+  .comp-prize {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.1em;
+    color:var(--gold); text-transform:uppercase;
+  }
+
+  /* Team comp — members list */
+  .team-comp-row {
+    display:grid; grid-template-columns:24px auto 1fr auto;
+    align-items:center; gap:10px; padding:8px 0;
+    border-bottom:1px solid rgba(34,26,14,.5);
+  }
+  .team-comp-row:last-child { border-bottom:none; }
+  .tcr-rank { font-family:'Cinzel Decorative',serif; font-size:15px; color:var(--text-deep); }
+  .team-comp-row.t1 .tcr-rank { color:var(--gold); }
+  .team-comp-row.t2 .tcr-rank { color:var(--parch-md); }
+  .tcr-color { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .tcr-name { font-family:'Cinzel',serif; font-size:12px; color:var(--text); }
+  .team-comp-row.t1 .tcr-name { color:var(--white); }
+  .tcr-val { font-family:'Cinzel Decorative',serif; font-size:16px; color:var(--gold-dim); text-align:right; }
+  .team-comp-row.t1 .tcr-val { color:var(--gold); }
+
+  /* Create comp form */
+  .create-comp-wrap {
+    background:var(--surface); border:1px solid var(--border); margin-bottom:24px;
+    position:relative;
+  }
+  .create-comp-wrap::before,.create-comp-wrap::after {
+    content:''; position:absolute; width:14px; height:14px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none; z-index:1;
+  }
+  .create-comp-wrap::before { top:0; left:0; border-width:1px 0 0 1px; }
+  .create-comp-wrap::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  .ccw-head {
+    background:var(--raised); border-bottom:1px solid var(--border);
+    padding:14px 20px; font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:.2em; color:var(--parch-md); text-transform:uppercase;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  }
+  .ccw-body { padding:20px; display:none; }
+  .ccw-body.open { display:block; }
+
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-full { grid-column:1/-1; }
+  .form-three { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+
+  /* ══ MODALS ══ */
+  .modal-backdrop {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.78); z-index:500;
+    align-items:center; justify-content:center;
+  }
+  .modal-backdrop.open { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border-md);
+    width:min(520px,92vw); box-shadow:0 24px 80px rgba(0,0,0,.85); max-height:90vh; overflow-y:auto;
+  }
+  .modal-head {
+    padding:16px 20px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; background:var(--surface); z-index:1;
+  }
+  .modal-title { font-family:'Cinzel',serif; font-size:13px; letter-spacing:.15em; color:var(--parch); text-transform:uppercase; }
+  .modal-close { background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; line-height:1; }
+  .modal-close:hover { color:var(--text); }
+  .modal-body { padding:20px; }
+  .modal-foot { padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+  /* Tile detail modal */
+  .tile-detail-icon { font-size:42px; text-align:center; margin-bottom:12px; }
+  .tile-detail-name { font-family:'Cinzel Decorative',serif; font-size:22px; color:var(--white); text-align:center; margin-bottom:6px; }
+  .tile-detail-diff { text-align:center; margin-bottom:16px; }
+  .diff-badge {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.15em; text-transform:uppercase;
+    padding:3px 12px; border:1px solid; display:inline-block;
+  }
+  .diff-badge.easy   { border-color:var(--forest-md); color:var(--glow); }
+  .diff-badge.medium { border-color:var(--amber-dim); color:var(--amber); }
+  .diff-badge.hard   { border-color:var(--red-dim); color:var(--red); }
+  .tile-desc { font-style:italic; font-size:15px; color:var(--text-dim); text-align:center; margin-bottom:20px; }
+  .completed-by {
+    background:var(--raised); border:1px solid var(--border);
+    padding:14px 16px; margin-bottom:16px;
+  }
+  .cb-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:.2em; color:var(--text-deep); text-transform:uppercase; margin-bottom:8px; }
+  .cb-entry { display:flex; align-items:center; gap:10px; font-size:14px; padding:4px 0; }
+  .cb-name { font-family:'Cinzel',serif; font-size:13px; color:var(--glow-lt); letter-spacing:.06em; flex:1; }
+  .cb-team { font-style:italic; font-size:12px; color:var(--text-dim); }
+  .cb-date { font-style:italic; font-size:12px; color:var(--text-dim); }
+
+  /* Screenshot proof upload area */
+  .proof-upload {
+    border:2px dashed var(--border-md); padding:24px;
+    text-align:center; cursor:pointer; transition:border-color .2s;
+    margin-top:16px;
+  }
+  .proof-upload:hover { border-color:var(--parch-dk); }
+  .proof-upload-icon { font-size:28px; margin-bottom:8px; }
+  .proof-upload-text { font-style:italic; font-size:14px; color:var(--text-dim); }
+
+  /* ══ TOASTS ══ */
+  .toast-wrap { position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column; gap:8px; z-index:999; }
+  .toast {
+    padding:12px 18px; border:1px solid; font-size:12px; letter-spacing:.05em;
+    display:flex; align-items:center; gap:10px; max-width:320px;
+    animation:toastIn .3s ease forwards; font-family:'JetBrains Mono',monospace;
+  }
+  .toast.success { background:var(--glow-dk); border-color:var(--glow-dim); color:var(--glow); }
+  .toast.error   { background:var(--red-dk);  border-color:var(--red-dim);  color:var(--red); }
+  .toast.info    { background:var(--raised);  border-color:var(--border-md); color:var(--parch); }
+  @keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ══ REVEAL ══ */
+  .reveal { opacity:0; transform:translateY(14px); transition:opacity .65s ease,transform .65s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+
+  /* ══ FOOTER ══ */
+  footer {
+    padding:26px 56px; border-top:2px solid var(--border); background:var(--deep);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ft-logo { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.2em; color:var(--text-dim); }
+  .ft-note { font-style:italic; font-size:12px; color:var(--text-deep); }
+
+  @media(max-width:960px){
+    nav { overflow-x:auto; justify-content:flex-start; }
+    .nav-link { padding:0 16px; font-size:9.5px; }
+    .header-inner { padding:24px 24px 0; }
+    .header-top { flex-direction:column; align-items:flex-start; }
+    .main { padding:24px 20px; }
+    .bingo-layout { grid-template-columns:1fr; }
+    .comp-grid { grid-template-columns:1fr; }
+    .form-grid,.form-three { grid-template-columns:1fr; }
+    footer { flex-direction:column; gap:10px; text-align:center; padding:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="ratphonk_final.html" class="nav-link">Home</a>
+  <a href="leaderboards.html"   class="nav-link">Leaderboards</a>
+  <a href="#"                   class="nav-link active">Bingo &amp; Comps</a>
+  <a href="#"                   class="nav-link">Event Calendar</a>
+  <a href="#"                   class="nav-link">Rat Profiles</a>
+  <a href="ledger.html"         class="nav-link">The Ledger</a>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="bramble bramble-tl"><svg viewBox="0 0 240 240" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C10,40 2,88 10,130 C15,162 4,190 17,226" stroke="#1c1309" stroke-width="1.8"/>
+    <path d="M0,0 C44,17 97,7 144,16 C174,22 200,13 238,23" stroke="#1c1309" stroke-width="1.8"/>
+    <path d="M0,11 C26,53 13,105 22,152" stroke="#271a0c" stroke-width="1.1"/>
+    <path d="M11,0 C51,28 104,17 154,23" stroke="#271a0c" stroke-width="1.1"/>
+    <path d="M5,34 L0,28 M5,34 L0,41" stroke="#332010" stroke-width=".8"/>
+    <path d="M8,65 L2,59 M8,65 L2,72" stroke="#332010" stroke-width=".8"/>
+    <path d="M34,6 L29,1 M34,6 L40,2" stroke="#332010" stroke-width=".8"/>
+    <path d="M68,11 L62,5 M68,11 L74,6" stroke="#332010" stroke-width=".8"/>
+    <path d="M108,17 L102,10 M108,17 L114,12" stroke="#332010" stroke-width=".8"/>
+  </g></svg></div>
+  <div class="bramble bramble-tr"><svg viewBox="0 0 240 240" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C10,40 2,88 10,130 C15,162 4,190 17,226" stroke="#1c1309" stroke-width="1.8"/>
+    <path d="M0,0 C44,17 97,7 144,16 C174,22 200,13 238,23" stroke="#1c1309" stroke-width="1.8"/>
+    <path d="M0,11 C26,53 13,105 22,152" stroke="#271a0c" stroke-width="1.1"/>
+    <path d="M11,0 C51,28 104,17 154,23" stroke="#271a0c" stroke-width="1.1"/>
+    <path d="M5,34 L0,28 M5,34 L0,41" stroke="#332010" stroke-width=".8"/>
+    <path d="M34,6 L29,1 M34,6 L40,2" stroke="#332010" stroke-width=".8"/>
+    <path d="M68,11 L62,5 M68,11 L74,6" stroke="#332010" stroke-width=".8"/>
+  </g></svg></div>
+
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <span class="header-eyebrow">Rat Phonk · Events</span>
+        <h1 class="header-title">Bingo &amp; Competitions</h1>
+        <p class="header-sub">Team bingo boards, solo races, and clan-wide competitions.</p>
+      </div>
+      <div class="view-toggle">
+        <button class="vt-btn active bingo" onclick="setView('bingo',this)">🎯 Bingo</button>
+        <button class="vt-btn comp"         onclick="setView('comp',this)">⚔ Competitions</button>
+      </div>
+    </div>
+
+    <!-- Active events strip -->
+    <div class="event-strip">
+      <div class="event-pill active-pill" onclick="setView('bingo',document.querySelector('.vt-btn'))">
+        <div class="ep-dot live"></div>
+        <div><div class="ep-name">Spring Bingo 2025</div><div class="ep-meta">Ends 14 Apr · 3 teams</div></div>
+      </div>
+      <div class="event-pill" onclick="setView('comp',document.querySelectorAll('.vt-btn')[1])">
+        <div class="ep-dot live"></div>
+        <div><div class="ep-name">Slayer XP Race</div><div class="ep-meta">Live · 8 racers</div></div>
+      </div>
+      <div class="event-pill" onclick="setView('comp',document.querySelectorAll('.vt-btn')[1])">
+        <div class="ep-dot upcoming"></div>
+        <div><div class="ep-name">Vorkath KC Race</div><div class="ep-meta">Starts 7 Apr · sign-ups open</div></div>
+      </div>
+      <div class="event-pill">
+        <div class="ep-dot ended"></div>
+        <div><div class="ep-name">Winter Bingo 2024</div><div class="ep-meta">Ended · Team Chaos won</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ══ BINGO VIEW ══ -->
+  <div class="view active" id="view-bingo">
+
+    <div class="bingo-layout">
+
+      <!-- LEFT: Board -->
+      <div>
+        <div class="board-meta reveal">
+          <div>
+            <div class="board-title">Spring Bingo 2025</div>
+            <div class="board-dates">28 Mar – 14 Apr 2025 &nbsp;·&nbsp; 3 teams of 4</div>
+          </div>
+          <div class="board-prize">🏆 Prize Pool: 300M</div>
+        </div>
+
+        <div class="bingo-grid reveal" id="bingo-grid"></div>
+
+        <div class="board-legend reveal">
+          <div class="legend-item"><div class="legend-dot easy"></div> Easy</div>
+          <div class="legend-item"><div class="legend-dot medium"></div> Medium</div>
+          <div class="legend-item"><div class="legend-dot hard"></div> Hard</div>
+          <div class="legend-item" style="color:var(--glow)">✓ Completed</div>
+          <div class="legend-item" style="color:var(--amber)">⏳ Pending</div>
+        </div>
+
+        <!-- Tile suggestion section -->
+        <div style="margin-top:32px;" class="reveal">
+          <div class="sec-head">
+            <span class="sec-title">Suggest a Tile</span>
+            <div class="sec-rule"></div>
+            <span style="font-style:italic;font-size:13px;color:var(--text-dim)">For the next board</span>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);padding:20px 24px;">
+            <div class="form-grid">
+              <div class="fg">
+                <label class="fl">Tile Name</label>
+                <input class="fi" id="sug-name" type="text" placeholder="e.g. Get a Zulrah unique">
+              </div>
+              <div class="fg">
+                <label class="fl">Tile Type</label>
+                <select class="fs" id="sug-type">
+                  <option value="">Select type</option>
+                  <option>Drop a specific item</option>
+                  <option>Reach a level</option>
+                  <option>Hit a KC milestone</option>
+                  <option>Complete a challenge</option>
+                  <option>Any pet drop</option>
+                  <option>Collection log slot count</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="fl">Difficulty</label>
+                <select class="fs" id="sug-diff">
+                  <option>Easy</option>
+                  <option>Medium</option>
+                  <option>Hard</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="fl">Notes (optional)</label>
+                <input class="fi" id="sug-notes" type="text" placeholder="Any extra rules or context">
+              </div>
+            </div>
+            <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+              <button class="btn btn-green" onclick="submitSuggestion()">Submit Suggestion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <div class="bingo-sidebar reveal">
+
+        <!-- Teams standings -->
+        <div class="sidebar-block">
+          <div class="sb-head">Team Standings</div>
+          <div class="sb-body">
+            <div class="team-row leading">
+              <div class="team-color" style="color:#c9a94c;background:#c9a94c"></div>
+              <div class="team-name">Team Chaos</div>
+              <div class="team-tiles">9 <span style="font-size:11px;color:var(--text-dim)">tiles</span></div>
+            </div>
+            <div class="team-row">
+              <div class="team-color" style="color:#5dba4e;background:#5dba4e"></div>
+              <div class="team-name">Team Anarchy</div>
+              <div class="team-tiles">6 <span style="font-size:11px;color:var(--text-dim)">tiles</span></div>
+            </div>
+            <div class="team-row">
+              <div class="team-color" style="color:#c05050;background:#c05050"></div>
+              <div class="team-name">Team Mayhem</div>
+              <div class="team-tiles">4 <span style="font-size:11px;color:var(--text-dim)">tiles</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team members -->
+        <div class="sidebar-block">
+          <div class="sb-head">Team Rosters</div>
+          <div class="sb-body" style="padding:10px 16px">
+            <div style="margin-bottom:12px;">
+              <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Team Chaos</div>
+              <div style="font-size:13px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px">
+                <span style="color:var(--text)">R4TKING</span> ·
+                <span style="color:var(--text)">skullcrushr</span> ·
+                <span style="color:var(--text)">vorkath_btw</span> ·
+                <span style="color:var(--text)">raid_lord</span>
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--glow);text-transform:uppercase;margin-bottom:6px;">Team Anarchy</div>
+              <div style="font-size:13px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px">
+                <span style="color:var(--text)">goblinhuntr</span> ·
+                <span style="color:var(--text)">im_sleepy99</span> ·
+                <span style="color:var(--text)">Ratashasam</span> ·
+                <span style="color:var(--text)">ratcaller</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:6px;">Team Mayhem</div>
+              <div style="font-size:13px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px">
+                <span style="color:var(--text)">phonkmaster</span> ·
+                <span style="color:var(--text)">theratking</span> ·
+                <span style="color:var(--text)">ratgrinder</span> ·
+                <span style="color:var(--text)">newratty</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent submissions -->
+        <div class="sidebar-block">
+          <div class="sb-head">Recent Submissions</div>
+          <div class="sb-body">
+            <div class="sub-row">
+              <div class="sub-status">✅</div>
+              <div class="sub-info">
+                <div class="sub-tile">99 Slayer</div>
+                <div class="sub-meta">R4TKING · Team Chaos · 1h ago</div>
+              </div>
+            </div>
+            <div class="sub-row">
+              <div class="sub-status">⏳</div>
+              <div class="sub-info">
+                <div class="sub-tile">Zulrah unique</div>
+                <div class="sub-meta">goblinhuntr · Team Anarchy · 3h ago</div>
+              </div>
+            </div>
+            <div class="sub-row">
+              <div class="sub-status">✅</div>
+              <div class="sub-info">
+                <div class="sub-tile">100 Vorkath KC</div>
+                <div class="sub-meta">vorkath_btw · Team Chaos · 5h ago</div>
+              </div>
+            </div>
+            <div class="sub-row">
+              <div class="sub-status">❌</div>
+              <div class="sub-info">
+                <div class="sub-tile">Dragon Warhammer</div>
+                <div class="sub-meta">theratking · Team Mayhem · 1d ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit proof -->
+        <div class="sidebar-block">
+          <div class="sb-head">Submit Tile Proof</div>
+          <div class="suggest-form">
+            <div class="fg">
+              <label class="fl">Tile</label>
+              <select class="fs" id="proof-tile">
+                <option>Select completed tile...</option>
+                <option>99 Slayer</option>
+                <option>Twisted bow</option>
+                <option>Any pet drop</option>
+                <option>500 Zulrah KC</option>
+              </select>
+            </div>
+            <div class="proof-upload" onclick="toast('Screenshot upload coming with backend integration.','info')">
+              <div class="proof-upload-icon">📷</div>
+              <div class="proof-upload-text">Click to attach screenshot<br><span style="font-size:11px">PNG/JPG · Must show date in RuneLite</span></div>
+            </div>
+            <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+              <button class="btn btn-amber" onclick="submitProof()">Submit for Review</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COMPETITIONS VIEW ══ -->
+  <div class="view" id="view-comp">
+
+    <!-- Create Competition (admin) -->
+    <div class="create-comp-wrap reveal">
+      <div class="ccw-head" onclick="toggleCreate()">
+        <span>+ Create Competition</span>
+        <span id="create-arrow" style="font-size:18px;color:var(--text-dim)">▼</span>
+      </div>
+      <div class="ccw-body" id="create-body">
+        <div class="form-grid">
+          <div class="fg form-full">
+            <label class="fl">Competition Name</label>
+            <input class="fi" id="cc-name" type="text" placeholder="e.g. Slayer XP Race — April 2025">
+          </div>
+          <div class="fg">
+            <label class="fl">Type</label>
+            <select class="fs" id="cc-type">
+              <option value="xp">XP Race</option>
+              <option value="level">Level Race</option>
+              <option value="kc">KC Race</option>
+              <option value="gp">GP Race</option>
+              <option value="custom">Custom Goal</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Format</label>
+            <select class="fs" id="cc-format">
+              <option value="solo">Individual Race</option>
+              <option value="team">Team Race</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Goal / Target</label>
+            <input class="fi" id="cc-goal" type="text" placeholder="e.g. 99 Slayer · 1000 Vorkath KC · 50M XP">
+          </div>
+          <div class="fg">
+            <label class="fl">Prize</label>
+            <input class="fi" id="cc-prize" type="text" placeholder="e.g. 100M GP split">
+          </div>
+          <div class="fg">
+            <label class="fl">Start Date</label>
+            <input class="fi" id="cc-start" type="date">
+          </div>
+          <div class="fg">
+            <label class="fl">End Date (optional)</label>
+            <input class="fi" id="cc-end" type="date">
+          </div>
+          <div class="fg form-full">
+            <label class="fl">Skill / Boss (for auto-tracking via WOM)</label>
+            <input class="fi" id="cc-track" type="text" placeholder="e.g. slayer · vorkath · overall">
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn btn-ghost" onclick="toggleCreate()">Cancel</button>
+          <button class="btn btn-gold" onclick="createComp()">Create Competition</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live competitions -->
+    <div class="sec-head reveal">
+      <span class="sec-title">🔴 Live Now</span>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="comp-grid reveal">
+
+      <!-- Solo XP Race -->
+      <div class="comp-card xp">
+        <div class="comp-card-head">
+          <div>
+            <div class="comp-name">Slayer XP Race</div>
+            <div class="comp-goal">First to 200M Slayer XP</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="comp-type-badge">XP Race</span>
+            <span class="comp-status live">● Live</span>
+          </div>
+        </div>
+        <div class="comp-card-body">
+          <div class="comp-entries" id="xp-race-entries"></div>
+        </div>
+        <div class="comp-card-foot">
+          <span>Ends 30 Apr 2025</span>
+          <span class="comp-prize">🏆 100M to winner</span>
+        </div>
+      </div>
+
+      <!-- Team KC Race -->
+      <div class="comp-card kc">
+        <div class="comp-card-head">
+          <div>
+            <div class="comp-name">Corp Beast War</div>
+            <div class="comp-goal">Team with most Corporeal Beast KC by April 30th</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="comp-type-badge">KC Race · Teams</span>
+            <span class="comp-status live">● Live</span>
+          </div>
+        </div>
+        <div class="comp-card-body">
+          <div id="kc-race-entries"></div>
+        </div>
+        <div class="comp-card-foot">
+          <span>Ends 30 Apr 2025</span>
+          <span class="comp-prize">🏆 200M split</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Upcoming competitions -->
+    <div class="sec-head reveal" style="margin-top:8px">
+      <span class="sec-title">⏳ Upcoming</span>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="comp-grid reveal">
+
+      <!-- Level Race -->
+      <div class="comp-card level">
+        <div class="comp-card-head">
+          <div>
+            <div class="comp-name">Vorkath KC Race</div>
+            <div class="comp-goal">First to 1,000 Vorkath KC</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="comp-type-badge">KC Race</span>
+            <span class="comp-status upcoming">⏳ 7 Apr</span>
+          </div>
+        </div>
+        <div class="comp-card-body">
+          <div style="font-style:italic;font-size:14px;color:var(--text-dim);padding:8px 0">
+            Sign-ups open. 6 members registered so far.
+          </div>
+          <button class="btn btn-amber" style="width:100%;justify-content:center" onclick="toast('Signed up for Vorkath KC Race!','success')">Sign Up</button>
+        </div>
+        <div class="comp-card-foot">
+          <span>Starts 7 Apr 2025</span>
+          <span class="comp-prize">🏆 50M GP</span>
+        </div>
+      </div>
+
+      <!-- Custom goal -->
+      <div class="comp-card custom">
+        <div class="comp-card-head">
+          <div>
+            <div class="comp-name">Collection Log Sprint</div>
+            <div class="comp-goal">Most collection log slots gained in 2 weeks</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="comp-type-badge">Custom</span>
+            <span class="comp-status upcoming">⏳ 14 Apr</span>
+          </div>
+        </div>
+        <div class="comp-card-body">
+          <div style="font-style:italic;font-size:14px;color:var(--text-dim);padding:8px 0">
+            Sign-ups open. 4 members registered.
+          </div>
+          <button class="btn btn-amber" style="width:100%;justify-content:center" onclick="toast('Signed up for Collection Log Sprint!','success')">Sign Up</button>
+        </div>
+        <div class="comp-card-foot">
+          <span>Starts 14 Apr · 2 weeks</span>
+          <span class="comp-prize">🏆 Bragging rights</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Past competitions -->
+    <div class="sec-head reveal" style="margin-top:8px">
+      <span class="sec-title">📜 Past Competitions</span>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="comp-grid reveal">
+      <div class="comp-card xp">
+        <div class="comp-card-head">
+          <div>
+            <div class="comp-name">Winter XP Race</div>
+            <div class="comp-goal">Most overall XP gained in January</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="comp-type-badge">XP Race</span>
+            <span class="comp-status ended">Ended</span>
+          </div>
+        </div>
+        <div class="comp-card-body">
+          <div class="comp-entries">
+            <div class="comp-entry p1">
+              <div class="ce-rank">I</div>
+              <div class="ce-info"><div class="ce-name">🏆 vorkath_btw</div><div class="ce-sub">Winner</div></div>
+              <div class="ce-val" style="color:var(--gold)">312M</div>
+            </div>
+            <div class="comp-entry p2">
+              <div class="ce-rank">II</div>
+              <div class="ce-info"><div class="ce-name">R4TKING</div></div>
+              <div class="ce-val" style="color:var(--parch-md)">287M</div>
+            </div>
+          </div>
+        </div>
+        <div class="comp-card-foot">
+          <span>Ended 31 Jan 2025</span>
+          <span class="comp-prize" style="color:var(--text-dim)">🏆 Paid out</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  <div class="ft-logo">Rat Phonk · OSRS Clan</div>
+  <div class="ft-note">Tile proofs reviewed by officers within 24h</div>
+</footer>
+</div>
+
+<!-- TILE DETAIL MODAL -->
+<div class="modal-backdrop" id="tile-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="tile-modal-title">Tile Detail</span>
+      <button class="modal-close" onclick="closeModal('tile-modal')">×</button>
+    </div>
+    <div class="modal-body" id="tile-modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('tile-modal')">Close</button>
+      <button class="btn btn-amber" id="tile-submit-btn" onclick="closeModal('tile-modal');toast('Proof submission opened.','info')">Submit Proof</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ══ BINGO TILES DATA ══
+const TILES = [
+  // Row 1
+  {name:'Any Pet Drop',       icon:'🐾', diff:'hard',   type:'pet',   done:false, pending:false, team:null,    desc:'Obtain any PvM or Skilling pet.'},
+  {name:'Twisted Bow',        icon:'🏹', diff:'hard',   type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'29 Mar'},  desc:'Drop the Twisted bow from Chambers of Xeric.'},
+  {name:'99 Slayer',          icon:'💀', diff:'medium', type:'level', done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'30 Mar'},  desc:'Reach level 99 Slayer.'},
+  {name:'Zulrah Unique',      icon:'🐍', diff:'medium', type:'drop',  done:false, pending:true,  team:null,    desc:'Obtain any unique drop from Zulrah.'},
+  {name:'500 Vorkath KC',     icon:'🐲', diff:'medium', type:'kc',    done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Reach 500 Vorkath kills.'},
+  // Row 2
+  {name:'Dragon Warhammer',   icon:'🔨', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Drop the Dragon Warhammer from Lizardman Shamans.'},
+  {name:'GWD Unique',         icon:'⚔',  diff:'medium', type:'drop',  done:true,  pending:false, team:'Anarchy', completedBy:{name:'goblinhuntr',date:'29 Mar'}, desc:'Any unique drop from God Wars Dungeon.'},
+  {name:'Full Barrows Set',   icon:'🪬',  diff:'medium', type:'challenge', done:false, pending:false, team:null, desc:'Complete a full Barrows armour set (any).'},
+  {name:'99 Farming',         icon:'🌾', diff:'easy',   type:'level', done:true,  pending:false, team:'Anarchy', completedBy:{name:'im_sleepy99',date:'28 Mar'}, desc:'Reach level 99 Farming.'},
+  {name:'Cerberus Crystal',   icon:'💎', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a crystal from Cerberus (Primordial, Pegasian, or Eternal).'},
+  // Row 3
+  {name:'100 CoX KC',         icon:'💠', diff:'easy',   type:'kc',    done:true,  pending:false, team:'Chaos', completedBy:{name:'raid_lord',date:'29 Mar'}, desc:'Reach 100 Chambers of Xeric kills.'},
+  {name:'Whip Drop',          icon:'⚡', diff:'easy',   type:'drop',  done:true,  pending:false, team:'Mayhem', completedBy:{name:'phonkmaster',date:'28 Mar'}, desc:'Drop an Abyssal Whip from Abyssal Demons.'},
+  {name:'FREE',               icon:'⭐', diff:'easy',   type:'free',  done:true,  pending:false, team:null,    desc:'Free tile — automatically complete.', free:true},
+  {name:'1200 Total Level',   icon:'📊', diff:'easy',   type:'level', done:true,  pending:false, team:'Anarchy', completedBy:{name:'ratcaller',date:'29 Mar'}, desc:'Reach 1200 Total Level.'},
+  {name:'Elysian Sigil',      icon:'🛡',  diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Drop the Elysian sigil from Corporeal Beast.'},
+  // Row 4
+  {name:'Scythe of Vitur',    icon:'🩸', diff:'hard',   type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'skullcrushr',date:'30 Mar'}, desc:'Obtain a Scythe of vitur from Theatre of Blood.'},
+  {name:'99 Magic',           icon:'🔮', diff:'easy',   type:'level', done:false, pending:false, team:null,    desc:'Reach level 99 Magic.'},
+  {name:'Any Jar',            icon:'🫙',  diff:'easy',   type:'drop',  done:true,  pending:false, team:'Mayhem', completedBy:{name:'theratking',date:'29 Mar'}, desc:'Obtain any "jar" drop from a boss.'},
+  {name:'ToB Unique',         icon:'🔴', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Any unique from Theatre of Blood.'},
+  {name:'200 Zulrah KC',      icon:'🐍', diff:'easy',   type:'kc',    done:true,  pending:false, team:'Anarchy', completedBy:{name:'Ratashasam',date:'30 Mar'}, desc:'Reach 200 Zulrah kills.'},
+  // Row 5
+  {name:'Clue Scroll Unique', icon:'📜', diff:'medium', type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a unique item worth 5M+ from a clue scroll.'},
+  {name:'Zenyte Shard',       icon:'💜', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a Zenyte shard from Demonic Gorillas.'},
+  {name:'Spirit Seed',        icon:'🌱', diff:'medium', type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a Spirit seed from any boss.'},
+  {name:'1400 Clog Slots',    icon:'📖', diff:'hard',   type:'clog',  done:false, pending:false, team:null,    desc:'Reach 1,400 Collection Log slots.'},
+  {name:'Vorkath Unique',     icon:'🐲', diff:'medium', type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Obtain any unique drop from Vorkath.'},
+];
+
+// Check which rows/cols/diags are complete bingo lines
+function getBingoLines() {
+  const lines = new Set();
+  // Rows
+  for (let r=0;r<5;r++) {
+    if([0,1,2,3,4].every(c=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(c=>lines.add(r*5+c));
+  }
+  // Cols
+  for (let c=0;c<5;c++) {
+    if([0,1,2,3,4].every(r=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(r=>lines.add(r*5+c));
+  }
+  // Diag
+  if([0,6,12,18,24].every(i=>TILES[i].done)) [0,6,12,18,24].forEach(i=>lines.add(i));
+  if([4,8,12,16,20].every(i=>TILES[i].done)) [4,8,12,16,20].forEach(i=>lines.add(i));
+  return lines;
+}
+
+function renderBoard() {
+  const grid = document.getElementById('bingo-grid');
+  const lines = getBingoLines();
+  grid.innerHTML = TILES.map((t,i) => {
+    let cls = `tile ${t.diff}`;
+    if (t.free)    cls += ' free';
+    else if (t.done)    cls += ' done';
+    else if (t.pending) cls += ' pending';
+    if (lines.has(i))   cls += ' bingo-line';
+    const teamCol = t.team === 'Chaos' ? 'var(--gold)' : t.team === 'Anarchy' ? 'var(--glow)' : 'var(--red)';
+    return `
+      <div class="${cls}" onclick="openTile(${i})">
+        <div class="tile-icon">${t.icon}</div>
+        <div class="tile-name">${t.name}</div>
+        ${t.done && t.team ? `<div class="tile-team" style="color:${teamCol}">${t.team}</div>` : ''}
+        ${t.pending ? `<div class="tile-sub">Pending...</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function openTile(i) {
+  const t = TILES[i];
+  document.getElementById('tile-modal-title').textContent = t.name;
+  const done = t.done, pending = t.pending;
+  const submitBtn = document.getElementById('tile-submit-btn');
+  submitBtn.style.display = (done || t.free) ? 'none' : 'inline-flex';
+
+  let completedHtml = '';
+  if (t.done && t.completedBy) {
+    const teamCol = t.team === 'Chaos' ? 'var(--gold)' : t.team === 'Anarchy' ? 'var(--glow)' : 'var(--red)';
+    completedHtml = `
+      <div class="completed-by">
+        <div class="cb-label">Completed by</div>
+        <div class="cb-entry">
+          <span class="cb-name">${t.completedBy.name}</span>
+          <span class="cb-team" style="color:${teamCol}">Team ${t.team}</span>
+          <span class="cb-date">${t.completedBy.date}</span>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('tile-modal-body').innerHTML = `
+    <div class="tile-detail-icon">${t.icon}</div>
+    <div class="tile-detail-name">${t.name}</div>
+    <div class="tile-detail-diff"><span class="diff-badge ${t.diff}">${t.diff.charAt(0).toUpperCase()+t.diff.slice(1)}</span></div>
+    <div class="tile-desc">${t.desc}</div>
+    ${completedHtml}
+    ${pending ? `<div style="font-family:'Cinzel',serif;font-size:11px;color:var(--amber);letter-spacing:.1em;text-align:center;border:1px solid var(--amber-dim);padding:8px;background:var(--amber-dk)">⏳ Proof submitted — awaiting officer review</div>` : ''}
+  `;
+  document.getElementById('tile-modal').classList.add('open');
+}
+
+// ══ XP RACE DATA ══
+const XP_RACE = [
+  {name:'vorkath_btw', val:'148.2M', raw:148200000, sub:'Slayer grind'},
+  {name:'R4TKING',     val:'134.8M', raw:134800000, sub:'Mixed skills'},
+  {name:'skullcrushr', val:'112.1M', raw:112100000, sub:'Agility focus'},
+  {name:'goblinhuntr', val:'98.4M',  raw:98400000,  sub:'Farming runs'},
+  {name:'im_sleepy99', val:'84.2M',  raw:84200000,  sub:'Prayer grind'},
+];
+
+const KC_RACE_TEAMS = [
+  {name:'Team Chaos',   color:'#c9a94c', val:'841', raw:841},
+  {name:'Team Anarchy', color:'#5dba4e', val:'612', raw:612},
+  {name:'Team Mayhem',  color:'#c05050', val:'488', raw:488},
+];
+
+function renderCompEntries() {
+  const top = XP_RACE[0].raw;
+  document.getElementById('xp-race-entries').innerHTML = XP_RACE.map((e,i) => {
+    const cls = i===0?'p1':i===1?'p2':i===2?'p3':'';
+    const pct = Math.round((e.raw/top)*100);
+    return `
+      <div class="comp-entry ${cls}">
+        <div class="ce-rank">${['I','II','III','IV','V'][i]}</div>
+        <div class="ce-info"><div class="ce-name">${e.name}</div><div class="ce-sub">${e.sub}</div></div>
+        <div class="ce-val">${e.val}</div>
+        <div class="ce-bar-wrap"><div class="ce-bar" style="width:0%" data-w="${pct}%"></div></div>
+      </div>`;
+  }).join('');
+
+  const kcTop = KC_RACE_TEAMS[0].raw;
+  document.getElementById('kc-race-entries').innerHTML = KC_RACE_TEAMS.map((t,i) => `
+    <div class="team-comp-row ${i===0?'t1':i===1?'t2':''}">
+      <div class="tcr-rank">${['I','II','III'][i]}</div>
+      <div class="tcr-color" style="background:${t.color};box-shadow:0 0 6px ${t.color}"></div>
+      <div class="tcr-name">${t.name}</div>
+      <div class="tcr-val">${t.val} KC</div>
+    </div>`).join('');
+}
+
+// ══ VIEWS ══
+function setView(v, btn) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) { btn.classList.add('active'); btn.classList.add(v==='bingo'?'bingo':'comp'); }
+  setTimeout(animateBars, 200);
+}
+
+function animateBars() {
+  document.querySelectorAll('[data-w]').forEach(b=>{ b.style.width=b.dataset.w; });
+}
+
+// ══ MODALS ══
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-backdrop').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+// ══ CREATE COMP TOGGLE ══
+function toggleCreate() {
+  const body=document.getElementById('create-body');
+  const arrow=document.getElementById('create-arrow');
+  const open=body.classList.toggle('open');
+  arrow.textContent=open?'▲':'▼';
+}
+
+function createComp() {
+  const name=document.getElementById('cc-name').value.trim();
+  if(!name){toast('Competition name required.','error');return;}
+  toggleCreate();
+  toast('✓ Competition "'+name+'" created.','success');
+}
+
+// ══ FORMS ══
+function submitSuggestion() {
+  const name=document.getElementById('sug-name').value.trim();
+  if(!name){toast('Tile name required.','error');return;}
+  document.getElementById('sug-name').value='';
+  document.getElementById('sug-notes').value='';
+  toast('✓ Tile suggestion submitted for admin review.','success');
+}
+
+function submitProof() {
+  const tile=document.getElementById('proof-tile').value;
+  if(tile.startsWith('Select')){toast('Please select a tile.','error');return;}
+  toast('⏳ Proof submitted for "'+tile+'" — officers will review within 24h.','info');
+}
+
+// ══ TOASTS ══
+function toast(msg,type='info') {
+  const wrap=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className='toast '+type; el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); },3500);
+}
+
+// ══ SCROLL REVEAL ══
+const obs=new IntersectionObserver(
+  es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }),
+  {threshold:0.08}
+);
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ══ INIT ══
+renderBoard();
+renderCompEntries();
+setTimeout(animateBars,600);
+</script>
+</body>
+</html>

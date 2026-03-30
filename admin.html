@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — RAT PHONK</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #080807;
+    --panel:      #0f0e0b;
+    --surface:    #151310;
+    --raised:     #1c1915;
+    --border:     #2a2318;
+    --border-lt:  #3a3025;
+    --glow:       #5dba4e;
+    --glow-dim:   #2d5c28;
+    --glow-dk:    #1a3a16;
+    --gold:       #c9a94c;
+    --gold-dim:   #7c6230;
+    --red:        #c05050;
+    --red-dim:    #6b2828;
+    --red-dk:     #3a1414;
+    --amber:      #c8841a;
+    --amber-dim:  #6b4410;
+    --parch:      #b9a272;
+    --parch-dim:  #7a6040;
+    --text:       #c2a86e;
+    --text-dim:   #6a5838;
+    --text-muted: #2e2416;
+    --white:      #e8dcc8;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ══ TOP BAR ══ */
+  .topbar {
+    height: 48px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 0;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+  }
+
+  .topbar-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--parch);
+    text-decoration: none;
+    margin-right: 32px;
+    white-space: nowrap;
+  }
+  .topbar-brand span { color: var(--glow); }
+
+  .topbar-sep { width: 1px; height: 28px; background: var(--border); margin: 0 20px; }
+
+  .topbar-badge {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid var(--glow-dim);
+    color: var(--glow);
+    background: var(--glow-dk);
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .topbar-avatar {
+    width: 26px; height: 26px;
+    background: var(--raised);
+    border: 1px solid var(--border-lt);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  .topbar-link {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .topbar-link:hover { color: var(--parch); }
+
+  /* ══ LAYOUT ══ */
+  .layout {
+    display: flex;
+    flex: 1;
+    margin-top: 48px;
+    min-height: calc(100vh - 48px);
+  }
+
+  /* ══ SIDEBAR ══ */
+  .sidebar {
+    width: 200px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    flex-shrink: 0;
+    position: fixed;
+    top: 48px;
+    bottom: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-heading {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 16px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+  .nav-item:hover { background: rgba(255,200,80,0.03); color: var(--text); }
+  .nav-item.active { color: var(--white); background: rgba(93,186,78,0.07); border-left-color: var(--glow); }
+
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 1px 6px;
+    background: var(--red-dim);
+    color: var(--red);
+    border-radius: 0;
+    min-width: 20px;
+    text-align: center;
+  }
+  .nav-badge.green { background: var(--glow-dk); color: var(--glow); }
+  .nav-badge.amber { background: var(--amber-dim); color: var(--amber); }
+
+  /* ══ MAIN ══ */
+  .main {
+    margin-left: 200px;
+    flex: 1;
+    padding: 28px 32px;
+    min-width: 0;
+  }
+
+  /* ══ PAGE HEADER ══ */
+  .page-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 20px;
+  }
+  .page-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: var(--white);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 11px; color: var(--text-dim); letter-spacing: 0.05em; }
+
+  /* ══ STAT CARDS ══ */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.green::before  { background: var(--glow); }
+  .stat-card.red::before    { background: var(--red); }
+  .stat-card.amber::before  { background: var(--amber); }
+  .stat-card.gold::before   { background: var(--gold); }
+
+  .sc-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .sc-value {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .sc-value.green { color: var(--glow); }
+  .sc-value.red   { color: var(--red); }
+  .sc-value.amber { color: var(--amber); }
+  .sc-value.gold  { color: var(--gold); }
+  .sc-note { font-size: 11px; color: var(--text-dim); }
+
+  /* ══ SECTION BLOCKS ══ */
+  .block {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .block-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--parch);
+    text-transform: uppercase;
+  }
+  .block-actions { display: flex; gap: 8px; align-items: center; }
+
+  /* ══ BUTTONS ══ */
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 7px 16px;
+    border: 1px solid;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-green  { background: var(--glow-dk); border-color: var(--glow-dim); color: var(--glow); }
+  .btn-green:hover  { background: var(--glow-dim); color: var(--bg); }
+  .btn-red    { background: var(--red-dk); border-color: var(--red-dim); color: var(--red); }
+  .btn-red:hover    { background: var(--red-dim); color: var(--white); }
+  .btn-amber  { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+  .btn-amber:hover  { background: var(--amber); color: var(--bg); }
+  .btn-ghost  { background: transparent; border-color: var(--border-lt); color: var(--text-dim); }
+  .btn-ghost:hover  { border-color: var(--parch-dim); color: var(--text); }
+  .btn-sm { padding: 4px 10px; font-size: 10px; }
+
+  /* ══ APPLICATION QUEUE ══ */
+  .app-list { padding: 0; }
+
+  .app-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    transition: background 0.15s;
+  }
+  .app-row:last-child { border-bottom: none; }
+  .app-row:hover { background: rgba(255,200,80,0.02); }
+
+  .app-info {}
+  .app-rsn {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--white);
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+  .app-meta { font-size: 11px; color: var(--text-dim); }
+  .app-meta span { color: var(--parch-dim); }
+
+  .app-style {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border: 1px solid var(--border-lt);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .app-wom {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .app-wom .lvl { font-family: 'Cinzel', serif; font-size: 14px; color: var(--parch); }
+
+  .app-age {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .app-btns { display: flex; gap: 6px; }
+
+  /* Status tags */
+  .status {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .status.pending  { border-color: var(--amber-dim); color: var(--amber); background: rgba(107,68,16,0.3); }
+  .status.approved { border-color: var(--glow-dim);  color: var(--glow);  background: rgba(26,58,22,0.3); }
+  .status.rejected { border-color: var(--red-dim);   color: var(--red);   background: rgba(58,20,20,0.3); }
+
+  /* ══ MEMBER TABLE ══ */
+  .member-table { width: 100%; border-collapse: collapse; }
+  .member-table th {
+    text-align: left;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .member-table th.r { text-align: right; }
+
+  .member-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(42,35,24,0.5);
+    vertical-align: middle;
+  }
+  .member-table tr:last-child td { border-bottom: none; }
+  .member-table tbody tr { transition: background 0.15s; }
+  .member-table tbody tr:hover { background: rgba(255,200,80,0.025); }
+
+  .td-rsn {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--white);
+    letter-spacing: 0.06em;
+  }
+  .td-discord { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .role-badge {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 9px;
+    border: 1px solid;
+  }
+  .role-badge.admin   { border-color: var(--gold-dim);  color: var(--gold);  }
+  .role-badge.officer { border-color: var(--glow-dim);  color: var(--glow);  }
+  .role-badge.member  { border-color: var(--border-lt); color: var(--text-dim); }
+
+  .td-num {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--parch);
+    text-align: right;
+  }
+  .td-date { font-size: 11px; color: var(--text-dim); text-align: right; }
+
+  .td-actions { text-align: right; }
+  .action-row { display: flex; gap: 6px; justify-content: flex-end; }
+
+  /* Role select */
+  .role-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    outline: none;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .role-select:focus { border-color: var(--border-lt); }
+
+  /* ══ EVENT FORM ══ */
+  .event-form { padding: 24px 20px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-full { grid-column: 1 / -1; }
+
+  .fg { display: flex; flex-direction: column; gap: 6px; }
+  .fl {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .fi, .fs, .fta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    border-radius: 0;
+    width: 100%;
+  }
+  .fi:focus, .fs:focus, .fta:focus { border-color: var(--border-lt); }
+  .fi::placeholder { color: var(--text-muted); }
+  .fta { resize: vertical; min-height: 80px; }
+  .fs {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%232a2318'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+  .fs option { background: var(--surface); }
+
+  .form-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* ══ EVENT LIST ══ */
+  .event-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    transition: background 0.15s;
+  }
+  .event-row:last-child { border-bottom: none; }
+  .event-row:hover { background: rgba(255,200,80,0.02); }
+
+  .event-type-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .event-type-dot.boss    { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .event-type-dot.social  { background: var(--glow); box-shadow: 0 0 6px var(--glow); }
+  .event-type-dot.pk      { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .event-type-dot.skill   { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
+  .event-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--white);
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .event-detail { font-size: 11px; color: var(--text-dim); }
+
+  .event-date {
+    font-size: 12px;
+    color: var(--parch-dim);
+    white-space: nowrap;
+    text-align: right;
+  }
+  .event-rsvp {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .event-rsvp strong { color: var(--glow); }
+
+  /* ══ TABS ══ */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    color: var(--text-dim);
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--white); border-bottom-color: var(--glow); }
+
+  /* ══ SEARCH / FILTER ══ */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 7px 12px;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--border-lt); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  /* ══ EMPTY STATE ══ */
+  .empty {
+    padding: 48px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ══ TOAST ══ */
+  .toast-wrap {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 999;
+  }
+  .toast {
+    padding: 12px 18px;
+    border: 1px solid;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 10px;
+    animation: toastIn 0.3s ease forwards;
+    max-width: 320px;
+  }
+  .toast.success { background: var(--glow-dk); border-color: var(--glow-dim); color: var(--glow); }
+  .toast.error   { background: var(--red-dk);  border-color: var(--red-dim);  color: var(--red); }
+  .toast.info    { background: var(--surface); border-color: var(--border-lt); color: var(--parch); }
+  @keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ══ MODAL ══ */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border-lt);
+    width: min(500px, 90vw);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+  }
+  .modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; letter-spacing: 0.12em; color: var(--parch);
+    text-transform: uppercase;
+  }
+  .modal-close {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 18px; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 20px; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  .reject-note { margin-top: 14px; }
+
+  /* ══ SECTION VISIBILITY ══ */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ══ SCROLLBAR ══ */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-lt); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--parch-dk); }
+
+  @media(max-width:800px) {
+    .sidebar { display:none; }
+    .main { margin-left:0; padding:16px; }
+    .stat-row { grid-template-columns:1fr 1fr; }
+    .form-grid { grid-template-columns:1fr; }
+    .form-grid.three { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="ratphonk_final.html" class="topbar-brand">RAT <span>PHONK</span></a>
+  <div class="topbar-sep"></div>
+  <span class="topbar-badge">Admin Panel</span>
+  <div class="topbar-right">
+    <a href="ratphonk_final.html" class="topbar-link">← View Site</a>
+    <div class="topbar-sep"></div>
+    <div class="topbar-user">
+      <div class="topbar-avatar">🐀</div>
+      R4TKING
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Overview</div>
+      <button class="nav-item active" onclick="showSection('overview', this)">
+        <span class="nav-icon">⬛</span> Dashboard
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Recruitment</div>
+      <button class="nav-item" onclick="showSection('applications', this)">
+        <span class="nav-icon">📋</span> Applications
+        <span class="nav-badge" id="app-count-badge">3</span>
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Clan</div>
+      <button class="nav-item" onclick="showSection('members', this)">
+        <span class="nav-icon">👥</span> Members
+      </button>
+      <button class="nav-item" onclick="showSection('events', this)">
+        <span class="nav-icon">📅</span> Events
+        <span class="nav-badge amber">2</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="section active" id="sec-overview">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Sunday, 29 March 2026 &nbsp;·&nbsp; All times UTC</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card amber">
+          <div class="sc-label">Pending Applications</div>
+          <div class="sc-value amber" id="ov-apps">3</div>
+          <div class="sc-note">Awaiting review</div>
+        </div>
+        <div class="stat-card green">
+          <div class="sc-label">Active Members</div>
+          <div class="sc-value">47</div>
+          <div class="sc-note">+2 this week</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="sc-label">Events This Month</div>
+          <div class="sc-value gold">6</div>
+          <div class="sc-note">2 upcoming</div>
+        </div>
+        <div class="stat-card red">
+          <div class="sc-label">Inactive Members</div>
+          <div class="sc-value red">4</div>
+          <div class="sc-note">>14 days no gains</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="block">
+        <div class="block-head">
+          <span class="block-title">Quick Actions</span>
+        </div>
+        <div style="padding:16px 20px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-amber" onclick="showSection('applications', document.querySelector('.nav-item:nth-child(1)'))">
+            📋 Review Applications (3)
+          </button>
+          <button class="btn btn-green" onclick="showSection('events', document.querySelectorAll('.nav-item')[3]); openCreateEvent()">
+            + Create Event
+          </button>
+          <button class="btn btn-ghost" onclick="showSection('members', document.querySelectorAll('.nav-item')[2])">
+            👥 Manage Members
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="block">
+        <div class="block-head">
+          <span class="block-title">Recent Activity</span>
+        </div>
+        <div style="padding:0">
+          <div class="app-row" style="grid-template-columns:auto 1fr auto">
+            <span style="color:var(--glow);font-size:11px;">✓</span>
+            <span style="font-size:12px;color:var(--text-dim)"><span style="color:var(--parch)">R4TKING</span> approved application for <span style="color:var(--white)">NewRatty</span></span>
+            <span style="font-size:11px;color:var(--text-muted)">2h ago</span>
+          </div>
+          <div class="app-row" style="grid-template-columns:auto 1fr auto">
+            <span style="color:var(--amber);font-size:11px;">★</span>
+            <span style="font-size:12px;color:var(--text-dim)"><span style="color:var(--parch)">R4TKING</span> promoted <span style="color:var(--white)">skullcrushr</span> to Officer</span>
+            <span style="font-size:11px;color:var(--text-muted)">1d ago</span>
+          </div>
+          <div class="app-row" style="grid-template-columns:auto 1fr auto; border-bottom:none">
+            <span style="color:var(--red);font-size:11px;">✕</span>
+            <span style="font-size:12px;color:var(--text-dim)"><span style="color:var(--parch)">skullcrushr</span> rejected application for <span style="color:var(--white)">xXnoob99Xx</span></span>
+            <span style="font-size:11px;color:var(--text-muted)">2d ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ APPLICATIONS ══ -->
+    <div class="section" id="sec-applications">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Applications</div>
+          <div class="page-sub">Review pending recruitment applications</div>
+        </div>
+        <div class="filter-bar">
+          <input class="search-input" type="text" placeholder="Search RSN..." oninput="filterApps(this.value)">
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="block">
+        <div class="tabs">
+          <button class="tab active" onclick="switchAppTab('pending', this)">Pending <span id="pending-count">(3)</span></button>
+          <button class="tab" onclick="switchAppTab('approved', this)">Approved</button>
+          <button class="tab" onclick="switchAppTab('rejected', this)">Rejected</button>
+        </div>
+
+        <!-- PENDING -->
+        <div id="app-tab-pending" class="app-list">
+          <div class="app-row" data-rsn="RatSlayer99">
+            <div class="app-info">
+              <div class="app-rsn">RatSlayer99</div>
+              <div class="app-meta">Referred by <span>vorkath_btw</span> &nbsp;·&nbsp; "PvM main, 2.1k total"</div>
+            </div>
+            <div class="app-style">PVM / Bossing</div>
+            <div class="app-wom">
+              <div class="lvl">2,141</div>
+              <div>Total Level</div>
+            </div>
+            <div class="app-age">2h ago</div>
+            <div class="app-btns">
+              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'RatSlayer99')">✓ Approve</button>
+              <button class="btn btn-red btn-sm" onclick="openRejectModal('RatSlayer99')">✕ Reject</button>
+            </div>
+          </div>
+          <div class="app-row" data-rsn="PhonkRat">
+            <div class="app-info">
+              <div class="app-rsn">PhonkRat</div>
+              <div class="app-meta">Referred by <span>R4TKING</span> &nbsp;·&nbsp; "wildy pker, been grinding revs"</div>
+            </div>
+            <div class="app-style">PK / Wilderness</div>
+            <div class="app-wom">
+              <div class="lvl">1,847</div>
+              <div>Total Level</div>
+            </div>
+            <div class="app-age">8h ago</div>
+            <div class="app-btns">
+              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'PhonkRat')">✓ Approve</button>
+              <button class="btn btn-red btn-sm" onclick="openRejectModal('PhonkRat')">✕ Reject</button>
+            </div>
+          </div>
+          <div class="app-row" data-rsn="IronRatty">
+            <div class="app-info">
+              <div class="app-rsn">IronRatty</div>
+              <div class="app-meta">Referred by <span>goblinhuntr</span> &nbsp;·&nbsp; "ironman, want to watch raids"</div>
+            </div>
+            <div class="app-style">Ironman (observer)</div>
+            <div class="app-wom">
+              <div class="lvl">1,622</div>
+              <div>Total Level</div>
+            </div>
+            <div class="app-age">1d ago</div>
+            <div class="app-btns">
+              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'IronRatty')">✓ Approve</button>
+              <button class="btn btn-red btn-sm" onclick="openRejectModal('IronRatty')">✕ Reject</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPROVED (hidden) -->
+        <div id="app-tab-approved" class="app-list" style="display:none">
+          <div class="app-row" style="grid-template-columns:1fr auto auto">
+            <div class="app-info">
+              <div class="app-rsn">NewRatty</div>
+              <div class="app-meta">Referred by <span>skullcrushr</span></div>
+            </div>
+            <span class="status approved">Approved</span>
+            <div class="app-age">2h ago</div>
+          </div>
+          <div class="app-row" style="grid-template-columns:1fr auto auto; border-bottom:none">
+            <div class="app-info">
+              <div class="app-rsn">RatGrinder</div>
+              <div class="app-meta">Referred by <span>R4TKING</span></div>
+            </div>
+            <span class="status approved">Approved</span>
+            <div class="app-age">3d ago</div>
+          </div>
+        </div>
+
+        <!-- REJECTED (hidden) -->
+        <div id="app-tab-rejected" class="app-list" style="display:none">
+          <div class="app-row" style="grid-template-columns:1fr auto auto; border-bottom:none">
+            <div class="app-info">
+              <div class="app-rsn">xXnoob99Xx</div>
+              <div class="app-meta">No referral &nbsp;·&nbsp; Reason: <span style="color:var(--red)">Unverifiable RSN</span></div>
+            </div>
+            <span class="status rejected">Rejected</span>
+            <div class="app-age">2d ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MEMBERS ══ -->
+    <div class="section" id="sec-members">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Members</div>
+          <div class="page-sub">47 active members &nbsp;·&nbsp; 4 inactive</div>
+        </div>
+        <div class="filter-bar">
+          <input class="search-input" type="text" placeholder="Search RSN...">
+          <select class="role-select">
+            <option value="">All Roles</option>
+            <option>Admin</option>
+            <option>Officer</option>
+            <option>Member</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="block">
+        <table class="member-table">
+          <thead>
+            <tr>
+              <th>RSN / Discord</th>
+              <th>Role</th>
+              <th class="r">Total Level</th>
+              <th class="r">Joined</th>
+              <th class="r">Last Active</th>
+              <th class="r">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="td-rsn">R4TKING</div><div class="td-discord">ratking#0001</div></td>
+              <td><span class="role-badge admin">Admin</span></td>
+              <td class="td-num">2,277</td>
+              <td class="td-date">Jan 2023</td>
+              <td class="td-date" style="color:var(--glow)">Today</td>
+              <td class="td-actions"><div class="action-row">
+                <select class="role-select" onchange="changeRole('R4TKING', this.value)" style="width:90px">
+                  <option selected>Admin</option><option>Officer</option><option>Member</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="editRSN('R4TKING')">Edit RSN</button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><div class="td-rsn">skullcrushr</div><div class="td-discord">skull#4421</div></td>
+              <td><span class="role-badge officer">Officer</span></td>
+              <td class="td-num">2,214</td>
+              <td class="td-date">Jan 2023</td>
+              <td class="td-date" style="color:var(--glow)">Today</td>
+              <td class="td-actions"><div class="action-row">
+                <select class="role-select" onchange="changeRole('skullcrushr', this.value)" style="width:90px">
+                  <option>Admin</option><option selected>Officer</option><option>Member</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="editRSN('skullcrushr')">Edit RSN</button>
+                <button class="btn btn-red btn-sm" onclick="banMember('skullcrushr')">Ban</button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><div class="td-rsn">vorkath_btw</div><div class="td-discord">vork#8812</div></td>
+              <td><span class="role-badge member">Member</span></td>
+              <td class="td-num">2,189</td>
+              <td class="td-date">Mar 2023</td>
+              <td class="td-date" style="color:var(--glow)">Today</td>
+              <td class="td-actions"><div class="action-row">
+                <select class="role-select" onchange="changeRole('vorkath_btw', this.value)" style="width:90px">
+                  <option>Admin</option><option>Officer</option><option selected>Member</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="editRSN('vorkath_btw')">Edit RSN</button>
+                <button class="btn btn-red btn-sm" onclick="banMember('vorkath_btw')">Ban</button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><div class="td-rsn">goblinhuntr</div><div class="td-discord">goblin#3301</div></td>
+              <td><span class="role-badge member">Member</span></td>
+              <td class="td-num">2,104</td>
+              <td class="td-date">Apr 2023</td>
+              <td class="td-date" style="color:var(--glow)">Yesterday</td>
+              <td class="td-actions"><div class="action-row">
+                <select class="role-select" onchange="changeRole('goblinhuntr', this.value)" style="width:90px">
+                  <option>Admin</option><option>Officer</option><option selected>Member</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="editRSN('goblinhuntr')">Edit RSN</button>
+                <button class="btn btn-red btn-sm" onclick="banMember('goblinhuntr')">Ban</button>
+              </div></td>
+            </tr>
+            <tr>
+              <td><div class="td-rsn">im_sleepy99</div><div class="td-discord">sleepy#7744</div></td>
+              <td><span class="role-badge member">Member</span></td>
+              <td class="td-num">1,988</td>
+              <td class="td-date">Jun 2023</td>
+              <td class="td-date" style="color:var(--red)">16d ago</td>
+              <td class="td-actions"><div class="action-row">
+                <select class="role-select" onchange="changeRole('im_sleepy99', this.value)" style="width:90px">
+                  <option>Admin</option><option>Officer</option><option selected>Member</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="editRSN('im_sleepy99')">Edit RSN</button>
+                <button class="btn btn-red btn-sm" onclick="banMember('im_sleepy99')">Ban</button>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ EVENTS ══ -->
+    <div class="section" id="sec-events">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Events</div>
+          <div class="page-sub">Manage clan events and schedule</div>
+        </div>
+        <button class="btn btn-green" onclick="openCreateEvent()">+ Create Event</button>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="block">
+        <div class="block-head">
+          <span class="block-title">Upcoming</span>
+          <span style="font-size:11px;color:var(--text-dim)">2 scheduled</span>
+        </div>
+        <div>
+          <div class="event-row">
+            <div class="event-type-dot boss"></div>
+            <div>
+              <div class="event-name">Raid Night</div>
+              <div class="event-detail">Theatre of Blood · Halvistor · Max 8 attendees</div>
+            </div>
+            <div class="event-date">Tue 1 Apr &nbsp;·&nbsp; 22:00 UTC</div>
+            <div class="event-rsvp"><strong>6</strong> / 8 going</div>
+            <div class="action-row">
+              <button class="btn btn-ghost btn-sm" onclick="editEvent('Raid Night')">Edit</button>
+              <button class="btn btn-red btn-sm" onclick="cancelEvent('Raid Night')">Cancel</button>
+            </div>
+          </div>
+          <div class="event-row" style="border-bottom:none">
+            <div class="event-type-dot pk"></div>
+            <div>
+              <div class="event-name">Wilderness Trip</div>
+              <div class="event-detail">Revenant Caves · Open attendance</div>
+            </div>
+            <div class="event-date">Sat 5 Apr &nbsp;·&nbsp; 20:00 UTC</div>
+            <div class="event-rsvp"><strong>11</strong> going</div>
+            <div class="action-row">
+              <button class="btn btn-ghost btn-sm" onclick="editEvent('Wilderness Trip')">Edit</button>
+              <button class="btn btn-red btn-sm" onclick="cancelEvent('Wilderness Trip')">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past -->
+      <div class="block">
+        <div class="block-head">
+          <span class="block-title">Past Events</span>
+        </div>
+        <div>
+          <div class="event-row">
+            <div class="event-type-dot social"></div>
+            <div>
+              <div class="event-name">Weekly Bingo Kickoff</div>
+              <div class="event-detail">Skilling Bingo · 3 week competition</div>
+            </div>
+            <div class="event-date">Mon 24 Mar &nbsp;·&nbsp; 19:00 UTC</div>
+            <div class="event-rsvp"><strong>22</strong> attended</div>
+            <div class="action-row">
+              <button class="btn btn-ghost btn-sm" style="opacity:.5;cursor:default">Ended</button>
+            </div>
+          </div>
+          <div class="event-row" style="border-bottom:none">
+            <div class="event-type-dot boss"></div>
+            <div>
+              <div class="event-name">Cox Mass</div>
+              <div class="event-detail">Chambers of Xeric · 10 man teams</div>
+            </div>
+            <div class="event-date">Fri 21 Mar &nbsp;·&nbsp; 21:00 UTC</div>
+            <div class="event-rsvp"><strong>18</strong> attended</div>
+            <div class="action-row">
+              <button class="btn btn-ghost btn-sm" style="opacity:.5;cursor:default">Ended</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CREATE EVENT MODAL -->
+<div class="modal-backdrop" id="event-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Create Event</span>
+      <button class="modal-close" onclick="closeModal('event-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="event-form" style="padding:0">
+        <div class="form-grid">
+          <div class="fg form-full">
+            <label class="fl">Event Name</label>
+            <input class="fi" type="text" placeholder="e.g. Raid Night" id="ev-name">
+          </div>
+          <div class="fg">
+            <label class="fl">Type</label>
+            <select class="fs" id="ev-type">
+              <option value="boss">Bossing / Raids</option>
+              <option value="pk">PK Trip</option>
+              <option value="skill">Skilling</option>
+              <option value="social">Social / Other</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Max Attendees</label>
+            <input class="fi" type="number" placeholder="Leave blank for unlimited" id="ev-max">
+          </div>
+          <div class="fg">
+            <label class="fl">Date</label>
+            <input class="fi" type="date" id="ev-date">
+          </div>
+          <div class="fg">
+            <label class="fl">Time (UTC)</label>
+            <input class="fi" type="time" id="ev-time">
+          </div>
+          <div class="fg form-full">
+            <label class="fl">Location / Details</label>
+            <input class="fi" type="text" placeholder="e.g. Theatre of Blood, Halvistor world" id="ev-loc">
+          </div>
+          <div class="fg form-full">
+            <label class="fl">Description (optional)</label>
+            <textarea class="fta" placeholder="Any extra info for members..." id="ev-desc"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('event-modal')">Cancel</button>
+      <button class="btn btn-green" onclick="createEvent()">Create Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-backdrop" id="reject-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Reject Application</span>
+      <button class="modal-close" onclick="closeModal('reject-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">
+        Rejecting application for <strong id="reject-rsn-display" style="color:var(--white)"></strong>.
+        This cannot be undone.
+      </p>
+      <div class="fg reject-note">
+        <label class="fl">Reason (optional — for internal records)</label>
+        <input class="fi" type="text" placeholder="e.g. Couldn't verify referral, low total level..." id="reject-reason">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('reject-modal')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmReject()">Confirm Rejection</button>
+    </div>
+  </div>
+</div>
+
+<!-- RSN EDIT MODAL -->
+<div class="modal-backdrop" id="rsn-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Edit RSN</span>
+      <button class="modal-close" onclick="closeModal('rsn-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">
+        Changing RSN for <strong id="rsn-edit-member" style="color:var(--white)"></strong>.
+        Make sure the new RSN exists on Wise Old Man.
+      </p>
+      <div class="fg">
+        <label class="fl">New RSN</label>
+        <input class="fi" type="text" placeholder="Exact new RSN" id="new-rsn-input" maxlength="12">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('rsn-modal')">Cancel</button>
+      <button class="btn btn-amber" onclick="confirmRSNEdit()">Save RSN</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ── SECTION NAV ──
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ── APP TABS ──
+function switchAppTab(tab, btn) {
+  ['pending','approved','rejected'].forEach(t => {
+    document.getElementById('app-tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── FILTER APPS ──
+function filterApps(val) {
+  document.querySelectorAll('.app-row[data-rsn]').forEach(row => {
+    const rsn = row.dataset.rsn.toLowerCase();
+    row.style.display = rsn.includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ── APPROVE APP ──
+let pendingCount = 3;
+function approveApp(btn, rsn) {
+  const row = btn.closest('.app-row');
+  row.style.transition = 'opacity 0.3s';
+  row.style.opacity = '0';
+  setTimeout(() => {
+    row.remove();
+    pendingCount--;
+    document.getElementById('pending-count').textContent = '(' + pendingCount + ')';
+    document.getElementById('app-count-badge').textContent = pendingCount;
+    document.getElementById('ov-apps').textContent = pendingCount;
+    if (pendingCount === 0) document.getElementById('app-count-badge').style.display = 'none';
+  }, 300);
+  toast('✓ ' + rsn + ' approved. Discord invite generated.', 'success');
+}
+
+// ── REJECT MODAL ──
+let rejectTarget = null;
+function openRejectModal(rsn) {
+  rejectTarget = rsn;
+  document.getElementById('reject-rsn-display').textContent = rsn;
+  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-modal').classList.add('open');
+}
+function confirmReject() {
+  const rsn = rejectTarget;
+  closeModal('reject-modal');
+  const row = [...document.querySelectorAll('.app-row[data-rsn]')]
+    .find(r => r.dataset.rsn === rsn);
+  if (row) {
+    row.style.transition = 'opacity 0.3s';
+    row.style.opacity = '0';
+    setTimeout(() => {
+      row.remove();
+      pendingCount--;
+      document.getElementById('pending-count').textContent = '(' + pendingCount + ')';
+      document.getElementById('app-count-badge').textContent = pendingCount;
+      document.getElementById('ov-apps').textContent = pendingCount;
+    }, 300);
+  }
+  toast('✕ ' + rsn + ' application rejected.', 'error');
+}
+
+// ── ROLE CHANGE ──
+function changeRole(rsn, role) {
+  toast('★ ' + rsn + ' role updated to ' + role + '.', 'info');
+}
+
+// ── BAN ──
+function banMember(rsn) {
+  if (!confirm('Ban ' + rsn + '? This will remove them from the clan.')) return;
+  toast('⚠ ' + rsn + ' has been removed from the clan.', 'error');
+}
+
+// ── RSN EDIT ──
+let rsnEditTarget = null;
+function editRSN(rsn) {
+  rsnEditTarget = rsn;
+  document.getElementById('rsn-edit-member').textContent = rsn;
+  document.getElementById('new-rsn-input').value = '';
+  document.getElementById('rsn-modal').classList.add('open');
+}
+function confirmRSNEdit() {
+  const newRSN = document.getElementById('new-rsn-input').value.trim();
+  if (!newRSN) return;
+  closeModal('rsn-modal');
+  toast('✓ RSN updated: ' + rsnEditTarget + ' → ' + newRSN, 'success');
+}
+
+// ── EVENTS ──
+function openCreateEvent() {
+  document.getElementById('event-modal').classList.add('open');
+}
+function createEvent() {
+  const name = document.getElementById('ev-name').value.trim();
+  if (!name) { toast('Event name is required.', 'error'); return; }
+  closeModal('event-modal');
+  toast('✓ Event "' + name + '" created and posted.', 'success');
+}
+function editEvent(name) { toast('Editing "' + name + '" — coming soon.', 'info'); }
+function cancelEvent(name) {
+  if (!confirm('Cancel "' + name + '"?')) return;
+  toast('Event "' + name + '" cancelled.', 'error');
+}
+
+// ── MODALS ──
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ── TOASTS ──
+function toast(msg, type = 'info') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.3s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+</script>
+</body>
+</html>

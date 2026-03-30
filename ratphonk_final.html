@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAT PHONK — OSRS Clan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #060604;
+    --stone-dark:  #0c0a07;
+    --stone-mid:   #121008;
+    --stone-warm:  #1a1610;
+    --forest:      #284e23;
+    --forest-lt:   #3f7236;
+    --glow:        #5cb84a;
+    --glow-bright: #78d464;
+    --glow-dim:    #2a5e22;
+    --gold:        #c4a445;
+    --gold-dim:    #78600a;
+    --parchment:   #b5a06a;
+    --parch-lt:    #cdb87e;
+    --parch-dim:   #705c38;
+    --parch-dk:    #42300e;
+    --border:      #221a0a;
+    --border-lt:   #342818;
+    --text:        #bca86a;
+    --text-dim:    #705c38;
+    --text-muted:  #302214;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* Subtle stone grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.052'/%3E%3C/svg%3E");
+    background-size: 350px 350px;
+    mix-blend-mode: overlay;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  /* ══════════════════════════════════════════
+     NAV
+  ══════════════════════════════════════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(6,6,4,0.98) 0%, rgba(10,9,6,0.95) 100%);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 1px 0 rgba(255,200,80,0.03);
+  }
+
+  .nav-link {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--parch-dim);
+    text-decoration: none;
+    padding: 0 24px; height: 52px;
+    display: flex; align-items: center;
+    border-right: 1px solid var(--border);
+    transition: color 0.2s, background 0.2s;
+    position: relative; white-space: nowrap;
+  }
+  .nav-link:first-child { border-left: 1px solid var(--border); }
+  .nav-link:hover { color: var(--parchment); background: rgba(255,200,80,0.025); }
+  .nav-link.active { color: var(--glow); }
+  .nav-link.active::after {
+    content: '';
+    position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+    background: var(--glow);
+    box-shadow: 0 0 12px var(--glow), 0 0 24px var(--glow-dim);
+  }
+
+  /* ══════════════════════════════════════════
+     HERO
+  ══════════════════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    padding-top: 52px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+
+  /* Deep vignette */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse 80% 80% at 50% 42%, transparent 20%, rgba(6,6,4,0.72) 100%);
+  }
+
+  /* Green ambient glow */
+  .hero-glow {
+    position: absolute;
+    top: 8%; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 900px;
+    background: radial-gradient(ellipse, rgba(40,78,35,0.20) 0%, transparent 58%);
+    pointer-events: none; z-index: 0;
+    animation: ambient 6s ease-in-out infinite;
+  }
+  @keyframes ambient {
+    0%,100% { opacity: 0.75; transform: translateX(-50%) scale(1);    }
+    50%      { opacity: 1;    transform: translateX(-50%) scale(1.08); }
+  }
+
+  /* ── BRAMBLES ── */
+  .bramble {
+    position: absolute;
+    pointer-events: none; z-index: 3;
+    width: 420px; height: 420px;
+  }
+  .bramble svg { width: 100%; height: 100%; }
+  .bramble-tl { top: 52px; left: 0; }
+  .bramble-tr { top: 52px; right: 0;  transform: scaleX(-1); }
+  .bramble-bl { bottom: 0; left: 0;   transform: scaleY(-1); }
+  .bramble-br { bottom: 0; right: 0;  transform: scale(-1,-1); }
+
+  /* ── FLOATING PANELS ── */
+  .float-l {
+    position: absolute; left: 32px; top: 50%; transform: translateY(-48%);
+    z-index: 10;
+    opacity: 0; animation: slideL 0.9s cubic-bezier(0.16,1,0.3,1) 1.6s forwards;
+  }
+  .float-r {
+    position: absolute; right: 32px; top: 50%; transform: translateY(-48%);
+    z-index: 10;
+    opacity: 0; animation: slideR 0.9s cubic-bezier(0.16,1,0.3,1) 1.6s forwards;
+  }
+  @keyframes slideL {
+    from { opacity:0; transform:translateY(-48%) translateX(-16px); }
+    to   { opacity:1; transform:translateY(-48%) translateX(0); }
+  }
+  @keyframes slideR {
+    from { opacity:0; transform:translateY(-48%) translateX(16px); }
+    to   { opacity:1; transform:translateY(-48%) translateX(0); }
+  }
+
+  .panel {
+    width: 216px;
+    background: rgba(6,6,4,0.90);
+    border: 1px solid var(--border-lt);
+    position: relative;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,200,80,0.04);
+  }
+  /* Corner ticks */
+  .panel::before, .panel::after {
+    content:''; position:absolute; width:9px; height:9px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none;
+  }
+  .panel::before { top:0;    left:0;  border-width:1px 0 0 1px; }
+  .panel::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  .panel-head {
+    background: rgba(26,22,16,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 9px 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px; letter-spacing: 0.25em;
+    color: var(--parch-dim); text-transform: uppercase;
+  }
+  .panel-body { padding: 13px 14px; }
+
+  .pvp-row {
+    display: grid; grid-template-columns: 16px 18px 1fr auto;
+    align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid var(--border);
+  }
+  .pvp-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .pvp-rank { font-family:'Cinzel',serif; font-size:10px; color:var(--text-dim); }
+  .pvp-icon { font-size: 13px; }
+  .pvp-name { font-size: 13px; color: var(--text); }
+  .pvp-kc   { font-family:'Cinzel',serif; font-size:12px; color:var(--glow); text-align:right; }
+
+  .ev-live {
+    display: inline-block; width:6px; height:6px; border-radius:50%;
+    background: var(--glow); box-shadow: 0 0 8px var(--glow);
+    margin-right: 7px; vertical-align: middle;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .ev-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 17px; color: var(--parchment); line-height: 1.2; margin: 6px 0 4px;
+  }
+  .ev-detail { font-style: italic; font-size: 13px; color: var(--text-dim); }
+
+  /* ── HERO INNER ── */
+  .hero-inner {
+    position: relative; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 10px 48px 64px; width: 100%;
+  }
+
+  /* Logo */
+  .logo-wrap {
+    position: relative;
+    width: min(500px, 66vw);
+    opacity: 0;
+    animation: riseIn 1.5s cubic-bezier(0.16,1,0.3,1) 0s forwards;
+  }
+  .logo-wrap img {
+    width: 100%; display: block;
+    filter:
+      drop-shadow(0 0 40px rgba(40,90,35,0.85))
+      drop-shadow(0 0 90px rgba(40,85,35,0.45))
+      drop-shadow(0 30px 70px rgba(0,0,0,1));
+  }
+
+  /* Halo glow — sits over the halo ring in the image */
+  .glow-halo {
+    position: absolute;
+    top: 5%; left: 50%; transform: translateX(-50%);
+    width: 145px; height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(90,200,70,1) 0%, rgba(90,200,70,0) 70%);
+    pointer-events: none;
+    animation: halo 2.8s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes halo {
+    0%,100% { opacity:0.5; transform:translateX(-50%) scale(1);    }
+    50%      { opacity:0.9; transform:translateX(-50%) scale(1.18); }
+  }
+
+  /* Eyes glow — sits over the glowing eye slots */
+  .glow-eyes {
+    position: absolute;
+    top: 37%; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 16px;
+    background: radial-gradient(ellipse, rgba(90,200,70,0.7) 0%, transparent 70%);
+    pointer-events: none;
+    animation: eyes 3.2s ease-in-out 0.4s infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes eyes {
+    0%,100% { opacity:0.5; }
+    55%      { opacity:1; }
+  }
+
+  /* Gem glow — the small gem on the chest */
+  .glow-gem {
+    position: absolute;
+    top: 63%; left: 50%; transform: translateX(-50%);
+    width: 22px; height: 10px;
+    background: radial-gradient(ellipse, rgba(90,200,70,0.8) 0%, transparent 70%);
+    pointer-events: none;
+    animation: eyes 4s ease-in-out 1s infinite;
+    mix-blend-mode: screen;
+  }
+
+  /* Hero text */
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(24px, 3.8vw, 52px);
+    font-weight: 700;
+    color: var(--parch-lt);
+    letter-spacing: 0.04em; line-height: 1.15;
+    text-shadow: 0 2px 28px rgba(0,0,0,1), 0 0 60px rgba(40,78,35,0.25);
+    margin-top: 2px;
+    opacity: 0; animation: fadeUp 0.9s ease 1s forwards;
+  }
+  .hero-title .g {
+    color: var(--glow);
+    text-shadow: 0 0 30px rgba(92,184,74,0.7), 0 2px 20px rgba(0,0,0,0.9);
+  }
+
+  .hero-sub {
+    font-style: italic; font-size: 17px; color: var(--text-dim);
+    margin: 12px 0 32px;
+    opacity: 0; animation: fadeUp 0.9s ease 1.12s forwards;
+  }
+
+  .hero-btns {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.9s ease 1.24s forwards;
+  }
+
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 13px 34px; text-decoration: none; border: 2px solid;
+    position: relative; overflow: hidden; transition: all 0.25s; display: inline-block;
+    cursor: pointer;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%);
+  }
+  .btn-green {
+    background: var(--forest); border-color: var(--glow); color: var(--glow-bright);
+    box-shadow: 0 0 16px rgba(40,78,35,0.5), inset 0 1px 0 rgba(92,184,74,0.15);
+  }
+  .btn-green:hover {
+    background: var(--forest-lt); color: var(--bg);
+    box-shadow: 0 0 32px rgba(92,184,74,0.55);
+  }
+  .btn-stone {
+    background: rgba(26,22,16,0.88); border-color: var(--border-lt); color: var(--parchment);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+  }
+  .btn-stone:hover { border-color: var(--parch-dim); background: rgba(36,30,18,0.95); }
+
+  /* ══════════════════════════════════════════
+     STATS STRIP
+  ══════════════════════════════════════════ */
+  .stats-strip {
+    background: var(--stone-warm);
+    border-top: 1px solid var(--border-lt);
+    border-bottom: 1px solid var(--border-lt);
+    padding: 0 56px; display: flex; overflow-x: auto;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .stat-blk {
+    padding: 20px 44px 20px 0; margin-right: 44px;
+    border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .stat-blk:last-child { border-right: none; margin-right: 0; }
+  .stat-label {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.3em;
+    color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;
+  }
+  .stat-val {
+    font-family: 'Cinzel Decorative', serif; font-size: 25px;
+    color: var(--parchment); line-height: 1;
+  }
+  .stat-val .u { font-size: 13px; color: var(--parch-dim); margin-left: 2px; }
+  .stat-note { font-style: italic; font-size: 12px; color: var(--forest-lt); margin-top: 2px; }
+
+  /* ══════════════════════════════════════════
+     SECTIONS
+  ══════════════════════════════════════════ */
+  section { padding: 80px 56px; }
+
+  .s-over {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.35em;
+    color: var(--forest-lt); text-transform: uppercase; display: block; margin-bottom: 10px;
+  }
+  .s-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(25px,4vw,46px); color: var(--parch-lt); letter-spacing: 0.04em; margin-bottom: 44px;
+  }
+  .s-rule { display:flex; align-items:center; gap:12px; margin:12px 0 44px; }
+  .s-line { flex:1; max-width:110px; height:1px; background:linear-gradient(to right,transparent,var(--border-lt)); }
+  .s-line.r { background:linear-gradient(to left,transparent,var(--border-lt)); }
+  .s-gem { width:5px; height:5px; background:var(--gold-dim); transform:rotate(45deg); flex-shrink:0; }
+
+  /* ══════════════════════════════════════════
+     LEADERBOARDS
+  ══════════════════════════════════════════ */
+  .lb-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    max-width: 940px; margin: 0 auto;
+  }
+  .lb-card {
+    background: var(--stone-mid); border: 1px solid var(--border-lt); position: relative;
+  }
+  .lb-card::before, .lb-card::after {
+    content:''; position:absolute; width:11px; height:11px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none;
+  }
+  .lb-card::before { top:0; left:0; border-width:1px 0 0 1px; }
+  .lb-card::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  .lb-head {
+    background: var(--stone-warm); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .lb-head-t { font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.18em; color:var(--parchment); text-transform:uppercase; }
+  .lb-head-s { font-style:italic; font-size:12px; color:var(--text-dim); }
+
+  .lb-row {
+    display: grid; grid-template-columns: 34px 20px 1fr auto;
+    align-items: center; padding: 10px 20px;
+    border-bottom: 1px solid rgba(34,26,10,0.7); gap: 10px;
+    transition: background 0.2s;
+  }
+  .lb-row:hover { background: rgba(180,160,90,0.035); }
+  .lb-row:last-child { border-bottom: none; }
+
+  .lb-rank {
+    font-family:'Cinzel Decorative',serif; font-size:16px;
+    color:var(--text-muted); text-align:center;
+  }
+  .lb-row.r1 .lb-rank { color:var(--gold); text-shadow:0 0 14px rgba(196,164,69,0.65); }
+  .lb-row.r2 .lb-rank { color:var(--parch-dim); }
+  .lb-row.r3 .lb-rank { color:#5e4028; }
+  .lb-icon { font-size:14px; }
+  .lb-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); letter-spacing:0.05em; }
+  .lb-row.r1 .lb-name { color:var(--parch-lt); }
+  .lb-val { font-size:14px; color:var(--glow); text-align:right; }
+  .lb-val.kc { color:var(--gold-dim); }
+
+  .lb-bar-row { grid-column:2/-1; height:2px; background:var(--border); margin-top:-5px; margin-bottom:2px; }
+  .lb-bar { height:100%; background:var(--forest); opacity:0.75; transition:width 1.3s cubic-bezier(0.16,1,0.3,1); }
+  .lb-bar.gold { background: linear-gradient(to right, var(--gold-dim), var(--gold)); opacity:0.6; }
+
+  /* ══════════════════════════════════════════
+     DROP LOG
+  ══════════════════════════════════════════ */
+  .drops-section {
+    background: var(--stone-warm);
+    border-top: 1px solid var(--border-lt);
+    border-bottom: 1px solid var(--border-lt);
+  }
+  .drops-list { max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:2px; }
+
+  .drop-row {
+    background: var(--stone-mid); border: 1px solid var(--border);
+    padding: 15px 22px; display:grid; grid-template-columns:1fr auto; align-items:center; gap:20px;
+    transition: border-color 0.2s;
+  }
+  .drop-row:hover { border-color: var(--border-lt); }
+  .drop-name { font-family:'Cinzel',serif; font-size:13px; letter-spacing:0.06em; color:var(--parch-lt); margin-bottom:3px; }
+  .drop-meta { font-style:italic; font-size:15px; color:var(--text-dim); }
+  .drop-meta strong { color:var(--parch-dim); font-style:normal; }
+  .split-tag {
+    display:inline-block; font-family:'Cinzel',serif; font-size:8px; letter-spacing:0.15em;
+    padding:2px 7px; border:1px solid var(--forest); color:var(--forest-lt);
+    text-transform:uppercase; margin-left:9px; vertical-align:middle;
+  }
+  .drop-gp { font-family:'Cinzel Decorative',serif; font-size:15px; color:var(--gold); text-align:right; }
+  .drop-time { font-style:italic; font-size:12px; color:var(--text-dim); text-align:right; margin-top:2px; }
+
+  /* ══════════════════════════════════════════
+     APPLY
+  ══════════════════════════════════════════ */
+  .apply-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 70px;
+    align-items: start; max-width: 1060px; margin: 0 auto;
+  }
+  .apply-body { font-style:italic; font-size:17px; color:var(--text-dim); margin-bottom:13px; }
+  .apply-body strong { color:var(--text); font-style:normal; }
+  .req-list { margin-top:22px; list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .req-list li { font-size:16px; color:var(--text-dim); padding-left:20px; position:relative; }
+  .req-list li::before { content:'✦'; position:absolute; left:0; top:4px; font-size:9px; color:var(--forest-lt); }
+
+  .form-box {
+    background: var(--stone-mid); border: 1px solid var(--border-lt);
+    padding: 36px; position: relative;
+  }
+  .form-box::before, .form-box::after {
+    content:''; position:absolute; width:16px; height:16px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none;
+  }
+  .form-box::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
+  .form-box::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+
+  .form-heading { font-family:'Cinzel Decorative',serif; font-size:21px; color:var(--parch-lt); margin-bottom:4px; }
+  .form-note { font-style:italic; font-size:13px; color:var(--text-dim); margin-bottom:26px; }
+
+  .fg { margin-bottom:19px; }
+  .fl {
+    display:block; font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.28em;
+    color:var(--parch-dim); text-transform:uppercase; margin-bottom:6px;
+  }
+  .fi, .fsel {
+    width:100%; background:var(--stone-warm); border:1px solid var(--border);
+    color:var(--text); font-family:'IM Fell English',serif; font-size:16px;
+    padding:10px 13px; outline:none; transition:border-color 0.2s; border-radius:0;
+  }
+  .fi:focus, .fsel:focus { border-color:var(--parch-dk); }
+  .fi::placeholder { color:var(--text-muted); font-style:italic; }
+  .fsel {
+    appearance:none; cursor:pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2342300e'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 13px center;
+  }
+  .fsel option { background:var(--stone-warm); }
+  .fhint { font-style:italic; font-size:12px; color:var(--text-muted); margin-top:5px; }
+
+  .rsn-st { display:flex; align-items:center; gap:7px; margin-top:6px; font-style:italic; font-size:13px; min-height:18px; transition:color 0.3s; }
+  .rsn-st.checking { color:var(--parch-dim); }
+  .rsn-st.valid    { color:var(--glow); }
+  .rsn-st.invalid  { color:#884040; }
+  .rsn-st.empty    { color:transparent; }
+  .sdot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+  .sdot.pulse { animation:sdp 1s ease-in-out infinite; }
+  @keyframes sdp { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .sub-btn {
+    width:100%; font-family:'Cinzel',serif; font-size:12px; font-weight:700;
+    letter-spacing:0.22em; text-transform:uppercase; padding:14px;
+    background:var(--forest); color:var(--glow-bright);
+    border:2px solid var(--glow); cursor:pointer; margin-top:10px;
+    transition:all 0.25s; position:relative; overflow:hidden;
+    box-shadow:0 0 14px rgba(40,78,35,0.35), inset 0 1px 0 rgba(92,184,74,0.14);
+  }
+  .sub-btn::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%);
+  }
+  .sub-btn:hover:not(:disabled) {
+    background:var(--forest-lt); box-shadow:0 0 28px rgba(92,184,74,0.5); color:var(--bg);
+  }
+  .sub-btn:disabled {
+    background:var(--border); border-color:var(--border); color:var(--text-muted);
+    cursor:not-allowed; box-shadow:none;
+  }
+
+  .suc-st { display:none; padding:42px 16px; text-align:center; }
+  .suc-icon { font-size:42px; margin-bottom:12px; animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+  .suc-title { font-family:'Cinzel Decorative',serif; font-size:23px; color:var(--glow); text-shadow:0 0 24px rgba(92,184,74,0.5); margin-bottom:11px; }
+  .suc-body { font-style:italic; font-size:16px; color:var(--text-dim); line-height:1.8; }
+  .app-ref {
+    display:inline-block; font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.2em;
+    color:var(--gold-dim); border:1px solid var(--border); padding:5px 15px;
+    margin-top:17px; background:var(--stone-warm);
+  }
+
+  /* ══════════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════════ */
+  footer {
+    padding:28px 56px; border-top:1px solid var(--border);
+    background:var(--stone-dark);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ft-logo { font-family:'Cinzel',serif; font-size:13px; letter-spacing:0.2em; color:var(--text-dim); }
+  .ft-links { display:flex; gap:20px; }
+  .ft-link { font-size:17px; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+  .ft-link:hover { color:var(--parch-dim); }
+  .ft-note { font-style:italic; font-size:12px; color:var(--text-muted); }
+  .ft-note a { color:var(--glow-dim); text-decoration:none; }
+  .ft-note a:hover { color:var(--glow); }
+
+  /* ══════════════════════════════════════════
+     UTILS
+  ══════════════════════════════════════════ */
+  .reveal { opacity:0; transform:translateY(16px); transition:opacity 0.75s ease, transform 0.75s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+  .center { text-align:center; }
+
+  @keyframes riseIn { from{opacity:0;transform:translateY(44px) scale(0.93)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(13px)} to{opacity:1;transform:translateY(0)} }
+
+  @media(max-width:880px) {
+    nav { overflow-x:auto; justify-content:flex-start; }
+    .nav-link { padding:0 16px; font-size:9px; }
+    .float-l,.float-r { display:none; }
+    .bramble { width:240px; height:240px; }
+    .lb-grid { grid-template-columns:1fr; }
+    .apply-inner { grid-template-columns:1fr; gap:40px; }
+    section { padding:56px 22px; }
+    .stats-strip { padding:0 22px; }
+    footer { flex-direction:column; gap:12px; text-align:center; padding:22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ════════════════ NAV ════════════════ -->
+<nav>
+  <a href="#"             class="nav-link active">Home</a>
+  <a href="#leaderboards" class="nav-link">Leaderboards</a>
+  <a href="#"             class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"             class="nav-link">Event Calendar</a>
+  <a href="#"             class="nav-link">Rat Profiles</a>
+  <a href="#"             class="nav-link">The Ledger</a>
+</nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <!-- Brambles -->
+  <div class="bramble bramble-tl"><svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C18,55 4,120 14,195 C20,245 6,285 22,340 C30,368 18,398 30,420" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,0 C65,28 148,12 218,26 C272,36 312,20 372,38 C398,46 418,36 420,50" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,18 C38,76 18,155 32,228 C40,272 28,310 40,360" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M0,42 C52,98 28,188 44,268" stroke="#221808" stroke-width="1.1"/>
+    <path d="M18,0 C78,44 158,25 238,34 C290,40 330,28 390,48" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M44,0 C108,50 195,30 278,40" stroke="#221808" stroke-width="1.1"/>
+    <!-- thorns branch left vine -->
+    <path d="M8,68 L-4,55 M8,68 L0,82" stroke="#342612" stroke-width="1.1"/>
+    <path d="M14,118 L2,107 M14,118 L6,132" stroke="#342612" stroke-width="1.1"/>
+    <path d="M20,170 L7,160 M20,170 L12,185" stroke="#342612" stroke-width="1.1"/>
+    <path d="M16,222 L3,213 M16,222 L8,238" stroke="#342612" stroke-width="1.1"/>
+    <path d="M22,272 L9,262 M22,272 L14,288" stroke="#342612" stroke-width="1.1"/>
+    <!-- thorns top vine -->
+    <path d="M68,10 L56,0 M68,10 L78,2" stroke="#342612" stroke-width="1.1"/>
+    <path d="M128,18 L116,8 M128,18 L138,10" stroke="#342612" stroke-width="1.1"/>
+    <path d="M190,25 L178,14 M190,25 L200,17" stroke="#342612" stroke-width="1.1"/>
+    <path d="M252,33 L240,22 M252,33 L262,25" stroke="#342612" stroke-width="1.1"/>
+    <path d="M318,42 L306,30 M318,42 L328,34" stroke="#342612" stroke-width="1.1"/>
+    <!-- secondary vines -->
+    <path d="M4,88 C28,118 18,155 30,188 C38,212 28,240 40,268" stroke="#1c1208" stroke-width="1.1"/>
+    <path d="M26,6 C60,40 95,44 128,60 C155,74 168,100 185,126" stroke="#1c1208" stroke-width="1.1"/>
+    <path d="M0,150 C16,168 12,190 20,210" stroke="#201609" stroke-width="0.9"/>
+    <path d="M90,0 C118,22 138,38 152,62" stroke="#201609" stroke-width="0.9"/>
+  </g></svg></div>
+
+  <div class="bramble bramble-tr"><svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C18,55 4,120 14,195 C20,245 6,285 22,340 C30,368 18,398 30,420" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,0 C65,28 148,12 218,26 C272,36 312,20 372,38 C398,46 418,36 420,50" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,18 C38,76 18,155 32,228 C40,272 28,310 40,360" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M18,0 C78,44 158,25 238,34 C290,40 330,28 390,48" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M8,68 L-4,55 M8,68 L0,82" stroke="#342612" stroke-width="1.1"/>
+    <path d="M14,118 L2,107 M14,118 L6,132" stroke="#342612" stroke-width="1.1"/>
+    <path d="M20,170 L7,160 M20,170 L12,185" stroke="#342612" stroke-width="1.1"/>
+    <path d="M68,10 L56,0 M68,10 L78,2" stroke="#342612" stroke-width="1.1"/>
+    <path d="M128,18 L116,8 M128,18 L138,10" stroke="#342612" stroke-width="1.1"/>
+    <path d="M190,25 L178,14 M190,25 L200,17" stroke="#342612" stroke-width="1.1"/>
+    <path d="M4,88 C28,118 18,155 30,188" stroke="#1c1208" stroke-width="1.1"/>
+    <path d="M26,6 C60,40 95,44 128,60" stroke="#1c1208" stroke-width="1.1"/>
+  </g></svg></div>
+
+  <div class="bramble bramble-bl"><svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C18,55 4,120 14,195 C20,245 6,285 22,340" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,0 C65,28 148,12 218,26 C272,36 312,20 372,38" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,18 C38,76 18,155 32,228" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M18,0 C78,44 158,25 238,34" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M8,68 L-4,55 M8,68 L0,82" stroke="#342612" stroke-width="1.1"/>
+    <path d="M14,118 L2,107 M14,118 L6,132" stroke="#342612" stroke-width="1.1"/>
+    <path d="M68,10 L56,0 M68,10 L78,2" stroke="#342612" stroke-width="1.1"/>
+    <path d="M128,18 L116,8 M128,18 L138,10" stroke="#342612" stroke-width="1.1"/>
+    <path d="M4,88 C28,118 18,155 30,188" stroke="#1c1208" stroke-width="1.1"/>
+  </g></svg></div>
+
+  <div class="bramble bramble-br"><svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C18,55 4,120 14,195 C20,245 6,285 22,340" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,0 C65,28 148,12 218,26 C272,36 312,20 372,38" stroke="#1c1409" stroke-width="2.4"/>
+    <path d="M0,18 C38,76 18,155 32,228" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M18,0 C78,44 158,25 238,34" stroke="#281e0c" stroke-width="1.5"/>
+    <path d="M8,68 L-4,55 M8,68 L0,82" stroke="#342612" stroke-width="1.1"/>
+    <path d="M68,10 L56,0 M68,10 L78,2" stroke="#342612" stroke-width="1.1"/>
+    <path d="M128,18 L116,8 M128,18 L138,10" stroke="#342612" stroke-width="1.1"/>
+  </g></svg></div>
+
+  <!-- Floating panel: PVP -->
+  <div class="float-l">
+    <div class="panel">
+      <div class="panel-head">Current PvP Leaderboard</div>
+      <div class="panel-body">
+        <div class="pvp-row"><span class="pvp-rank">1</span><span class="pvp-icon">🐀</span><span class="pvp-name">R4TKING</span><span class="pvp-kc">660</span></div>
+        <div class="pvp-row"><span class="pvp-rank">2</span><span class="pvp-icon">🐀</span><span class="pvp-name">skullcrushr</span><span class="pvp-kc">196</span></div>
+        <div class="pvp-row"><span class="pvp-rank">3</span><span class="pvp-icon">🐀</span><span class="pvp-name">Ratashasam</span><span class="pvp-kc">99</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating panel: Event -->
+  <div class="float-r">
+    <div class="panel">
+      <div class="panel-head">Upcoming Clan Event</div>
+      <div class="panel-body">
+        <span class="ev-live"></span>
+        <div class="ev-name">Raid Night</div>
+        <div class="ev-detail">Halvistor &nbsp;·&nbsp; 22:00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="hero-inner">
+    <div class="logo-wrap">
+      <div class="glow-halo"></div>
+      <div class="glow-eyes"></div>
+      <div class="glow-gem"></div>
+      <img src="RatPhonk-Logo.png" alt="Rat Phonk">
+    </div>
+
+    <h1 class="hero-title">
+      Welcome to the<br>
+      <span class="g">Rat Phonk Hive</span>
+    </h1>
+    <p class="hero-sub">Old School RuneScape. Absolute Domination. Join the Horde.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn btn-green">Join Clan Discord</a>
+      <a href="#apply" class="btn btn-stone">Apply to Rat Phonk</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ STATS ════════════════ -->
+<div class="stats-strip">
+  <div class="stat-blk"><div class="stat-label">Active Members</div><div class="stat-val">47</div><div class="stat-note">+3 this month</div></div>
+  <div class="stat-blk"><div class="stat-label">XP Gained (Week)</div><div class="stat-val">2.4<span class="u">B</span></div><div class="stat-note">across 40 members</div></div>
+  <div class="stat-blk"><div class="stat-label">Boss KC (All Time)</div><div class="stat-val">18<span class="u">K</span></div></div>
+  <div class="stat-blk"><div class="stat-label">PK Kills (Month)</div><div class="stat-val">312</div><div class="stat-note">K/D ratio 2.7</div></div>
+  <div class="stat-blk"><div class="stat-label">GP Split (Month)</div><div class="stat-val">4.1<span class="u">B</span></div></div>
+</div>
+
+<!-- ════════════════ LEADERBOARDS ════════════════ -->
+<section id="leaderboards">
+  <div class="center reveal">
+    <span class="s-over">This Week's Standings</span>
+    <h2 class="s-title">The Rankings</h2>
+    <div class="s-rule" style="justify-content:center"><div class="s-line"></div><div class="s-gem"></div><div class="s-line r"></div></div>
+  </div>
+  <div class="lb-grid reveal">
+    <div class="lb-card">
+      <div class="lb-head"><span class="lb-head-t">⚔ XP Gains</span><span class="lb-head-s">Week 24 · resets Mon</span></div>
+      <div class="lb-row r1"><div class="lb-rank">I</div><div class="lb-icon">🐀</div><div class="lb-name">R4TKING</div><div class="lb-val">84.2M</div><div class="lb-bar-row"><div class="lb-bar" style="width:100%"></div></div></div>
+      <div class="lb-row r2"><div class="lb-rank">II</div><div class="lb-icon">🐀</div><div class="lb-name">skullcrushr</div><div class="lb-val">61.8M</div><div class="lb-bar-row"><div class="lb-bar" style="width:73%"></div></div></div>
+      <div class="lb-row r3"><div class="lb-rank">III</div><div class="lb-icon">🐀</div><div class="lb-name">goblinhuntr</div><div class="lb-val">49.1M</div><div class="lb-bar-row"><div class="lb-bar" style="width:58%"></div></div></div>
+      <div class="lb-row"><div class="lb-rank">IV</div><div class="lb-icon">🐀</div><div class="lb-name">im_sleepy99</div><div class="lb-val">38.4M</div><div class="lb-bar-row"><div class="lb-bar" style="width:46%"></div></div></div>
+      <div class="lb-row"><div class="lb-rank">V</div><div class="lb-icon">🐀</div><div class="lb-name">vorkath_btw</div><div class="lb-val">27.3M</div><div class="lb-bar-row"><div class="lb-bar" style="width:32%"></div></div></div>
+    </div>
+    <div class="lb-card">
+      <div class="lb-head"><span class="lb-head-t">☠ Boss Kill Count</span><span class="lb-head-s">Week 24 · resets Mon</span></div>
+      <div class="lb-row r1"><div class="lb-rank">I</div><div class="lb-icon">🐀</div><div class="lb-name">vorkath_btw</div><div class="lb-val kc">412 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:100%"></div></div></div>
+      <div class="lb-row r2"><div class="lb-rank">II</div><div class="lb-icon">🐀</div><div class="lb-name">R4TKING</div><div class="lb-val kc">287 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:70%"></div></div></div>
+      <div class="lb-row r3"><div class="lb-rank">III</div><div class="lb-icon">🐀</div><div class="lb-name">raid_lord</div><div class="lb-val kc">201 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:49%"></div></div></div>
+      <div class="lb-row"><div class="lb-rank">IV</div><div class="lb-icon">🐀</div><div class="lb-name">skullcrushr</div><div class="lb-val kc">188 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:46%"></div></div></div>
+      <div class="lb-row"><div class="lb-rank">V</div><div class="lb-icon">🐀</div><div class="lb-name">goblinhuntr</div><div class="lb-val kc">143 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:35%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ DROPS ════════════════ -->
+<section id="drops" class="drops-section">
+  <div class="center reveal">
+    <span class="s-over">The Spoils</span>
+    <h2 class="s-title">Recent Drops</h2>
+    <div class="s-rule" style="justify-content:center"><div class="s-line"></div><div class="s-gem"></div><div class="s-line r"></div></div>
+  </div>
+  <div class="drops-list reveal">
+    <div class="drop-row"><div><div class="drop-name">Scythe of vitur <span class="split-tag">3-way split</span></div><div class="drop-meta"><strong>R4TKING</strong> · Theatre of Blood</div></div><div><div class="drop-gp">1,240M</div><div class="drop-time">2h ago</div></div></div>
+    <div class="drop-row"><div><div class="drop-name">Tumeken's shadow <span class="split-tag">5-way split</span></div><div class="drop-meta"><strong>vorkath_btw</strong> · Tombs of Amascut</div></div><div><div class="drop-gp">890M</div><div class="drop-time">6h ago</div></div></div>
+    <div class="drop-row"><div><div class="drop-name">Twisted bow</div><div class="drop-meta"><strong>goblinhuntr</strong> · Chambers of Xeric</div></div><div><div class="drop-gp">1,770M</div><div class="drop-time">1d ago</div></div></div>
+    <div class="drop-row"><div><div class="drop-name">Elysian sigil <span class="split-tag">2-way split</span></div><div class="drop-meta"><strong>skullcrushr</strong> · Corporeal Beast</div></div><div><div class="drop-gp">740M</div><div class="drop-time">2d ago</div></div></div>
+  </div>
+</section>
+
+<!-- ════════════════ APPLY ════════════════ -->
+<section id="apply">
+  <div class="apply-inner">
+    <div class="reveal">
+      <span class="s-over">Recruitment</span>
+      <h2 class="s-title" style="margin-bottom:0">Want In?</h2>
+      <div class="s-rule" style="justify-content:flex-start;margin-bottom:18px">
+        <div class="s-gem"></div>
+        <div class="s-line r" style="background:linear-gradient(to right,var(--border-lt),transparent)"></div>
+      </div>
+      <p class="apply-body">Got recruited in-game? Start here. Submit your RSN and we'll check your account against <strong>Wise Old Man</strong> before an admin reviews your application.</p>
+      <p class="apply-body">Once approved you'll get a <strong>Discord invite link</strong>. No separate password — your Discord is your login.</p>
+      <ul class="req-list">
+        <li>Combat level 100+ — negotiable for dedicated skillers</li>
+        <li>Active player. We track weekly gains. Inactivity gets you culled.</li>
+        <li>Discord mandatory for raids, events &amp; splits</li>
+        <li>No drama. We're here to grind.</li>
+      </ul>
+    </div>
+
+    <div class="form-box reveal" id="form-wrap">
+      <div id="form-content">
+        <div class="form-heading">Apply to the Clan</div>
+        <div class="form-note">Reviewed within 24–48 hours by an officer</div>
+        <div class="fg">
+          <label class="fl" for="rsn">Your RuneScape Name</label>
+          <input class="fi" type="text" id="rsn" placeholder="ExactRSNHere" maxlength="12" autocomplete="off">
+          <div class="rsn-st empty" id="rsn-st"><div class="sdot"></div><span id="rsn-msg"></span></div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="ref">Who recruited you?</label>
+          <input class="fi" type="text" id="ref" placeholder="Their RSN or Discord tag" autocomplete="off">
+          <div class="fhint">Helps us verify you were legitimately recruited.</div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="sty">Primary Playstyle</label>
+          <select class="fsel" id="sty">
+            <option value="" disabled selected>Choose one</option>
+            <option>PVM / Bossing</option>
+            <option>PK / Wilderness</option>
+            <option>Skilling</option>
+            <option>Mixed / All-round</option>
+            <option>Ironman (observer)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl" for="nt">Anything else?</label>
+          <input class="fi" type="text" id="nt" placeholder="Optional — flex your stats, say hi." autocomplete="off">
+        </div>
+        <button class="sub-btn" id="sub-btn" onclick="doSub()" disabled>Submit Application</button>
+      </div>
+
+      <div class="suc-st" id="suc">
+        <div class="suc-icon">⚜</div>
+        <div class="suc-title">Application Received</div>
+        <p class="suc-body">Your application has been lodged with the officers.<br>Expect a review within 24–48 hours.<br><br>Check back here or ask your recruiter in-game.</p>
+        <div class="app-ref" id="app-ref">REF · #XXXXX</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer>
+  <div class="ft-logo">Rat Phonk · OSRS Clan</div>
+  <div class="ft-links">
+    <a href="#" class="ft-link" title="Discord">⚡</a>
+    <a href="#" class="ft-link" title="Twitch">📺</a>
+    <a href="#" class="ft-link" title="Link">🔗</a>
+  </div>
+  <div class="ft-note">© 2024 Rat Phonk OSRS. Managed via <a href="#">PhonkNet</a>.</div>
+</footer>
+
+</div>
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(
+  es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+  { threshold: 0.1 }
+);
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// LB bar animation
+const lbObs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.lb-bar').forEach(b => {
+      const w = b.style.width; b.style.width = '0';
+      requestAnimationFrame(() => { b.style.width = w; });
+    });
+    lbObs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.lb-grid').forEach(el => lbObs.observe(el));
+
+// RSN check
+const rsnEl = document.getElementById('rsn');
+const stEl  = document.getElementById('rsn-st');
+const msgEl = document.getElementById('rsn-msg');
+const btn   = document.getElementById('sub-btn');
+let deb, ok = false;
+
+function setSt(s, m) {
+  stEl.className = 'rsn-st ' + s;
+  msgEl.textContent = m;
+  stEl.querySelector('.sdot').classList.toggle('pulse', s === 'checking');
+}
+
+rsnEl.addEventListener('input', () => {
+  const v = rsnEl.value.trim();
+  ok = false; btn.disabled = true; clearTimeout(deb);
+  if (!v) { setSt('empty', ''); return; }
+  setSt('checking', 'Checking Wise Old Man...');
+  deb = setTimeout(async () => {
+    await new Promise(r => setTimeout(r, 750)); // replace with real WOM fetch
+    const found = v.length >= 3 && v.toLowerCase() !== 'notfound';
+    if (found) { setSt('valid', '✦ ' + v + ' found on Wise Old Man'); ok = true; btn.disabled = false; }
+    else        { setSt('invalid', 'RSN not found. Have you logged in recently?'); }
+  }, 650);
+});
+
+function doSub() {
+  if (!ok) return;
+  btn.disabled = true;
+  btn.textContent = 'Lodging application...';
+  setTimeout(() => {
+    document.getElementById('form-content').style.display = 'none';
+    document.getElementById('suc').style.display = 'block';
+    document.getElementById('app-ref').textContent = 'REF · #' + Math.floor(10000 + Math.random() * 90000);
+  }, 1100);
+}
+</script>
+</body>
+</html>
