@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>R4TKING — RAT PHONK</title>
+<title>Profile — RAT PHONK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -529,27 +529,21 @@
 
     <!-- AVATAR -->
     <div class="avatar-wrap anim d1">
-      <div class="avatar-frame admin">
-        <!-- WOM player avatar: https://api.wiseoldman.net/v2/players/{rsn}/avatar -->
-        <img src="https://api.wiseoldman.net/v2/players/r4tking/avatar"
+      <div class="avatar-frame" id="avatar-frame">
+        <img src="" id="avatar-img"
              onerror="this.src='https://oldschool.runescape.wiki/images/thumb/Wise_Old_Man.png/200px-Wise_Old_Man.png'"
-             alt="R4TKING avatar">
+             alt="Player avatar">
       </div>
-      <div class="avatar-role admin">Admin</div>
+      <div class="avatar-role member" id="avatar-role">Member</div>
     </div>
 
     <!-- IDENTITY -->
     <div class="identity anim d2">
-      <div class="profile-rsn">R4TKING</div>
-      <div class="profile-badges">
-        <span class="badge gold">👑 Co-Founder</span>
-        <span class="badge green">⚔ Raid Logger</span>
-        <span class="badge green">💀 PK Legend</span>
-        <span class="badge grey">🐀 Rat Phonk OG</span>
-      </div>
+      <div class="profile-rsn" id="profile-rsn">Loading...</div>
+      <div class="profile-badges" id="profile-badges"></div>
       <div class="profile-joined">
-        Member since <span>January 2023</span> &nbsp;·&nbsp;
-        Last seen <span style="color:var(--glow)">today</span>
+        Member since <span id="join-date">—</span> &nbsp;·&nbsp;
+        Last seen <span id="last-seen" style="color:var(--glow)">—</span>
       </div>
     </div>
 
@@ -557,59 +551,59 @@
     <div class="quick-stats anim d3">
       <div class="qs-item green">
         <div class="qs-label">Combat Level</div>
-        <div class="qs-value green">126</div>
-        <div class="qs-sub">Maxed combat</div>
+        <div class="qs-value green" id="qs-combat">—</div>
+        <div class="qs-sub" id="qs-combat-sub">—</div>
       </div>
       <div class="qs-item parch">
         <div class="qs-label">Total Level</div>
-        <div class="qs-value white">2,277</div>
-        <div class="qs-sub">All 99s</div>
+        <div class="qs-value white" id="qs-total">—</div>
+        <div class="qs-sub">Overall</div>
       </div>
       <div class="qs-item gold">
         <div class="qs-label">Collection Log</div>
-        <div class="qs-value gold">1,402</div>
+        <div class="qs-value gold" id="qs-clog">—</div>
         <div class="qs-sub">/ 1,477 slots</div>
       </div>
       <div class="qs-item green">
-        <div class="qs-label">Rank (This Week)</div>
-        <div class="qs-value green">#1</div>
-        <div class="qs-sub">XP Gains</div>
+        <div class="qs-label">Total XP</div>
+        <div class="qs-value green" id="qs-xp">—</div>
+        <div class="qs-sub">All skills</div>
       </div>
     </div>
 
     <!-- WEEKLY SPOTLIGHT -->
-    <div class="weekly-bar anim d4">
+    <div class="weekly-bar anim d4" id="weekly-bar">
       <div class="wb-dot"></div>
-      <div class="wb-label">This week's top skill</div>
-      <div class="wb-skill">Slayer &nbsp;·&nbsp; 84.2M XP gained</div>
-      <div class="wb-rank">#1 on weekly board</div>
-      <div class="wb-value">84.2M</div>
+      <div class="wb-label">Total XP</div>
+      <div class="wb-skill" id="wb-skill">Loading stats...</div>
+      <div class="wb-rank" id="wb-rank"></div>
+      <div class="wb-value" id="wb-value"></div>
     </div>
 
     <!-- BOSS HIGHLIGHTS -->
-    <div class="boss-highlights">
+    <div class="boss-highlights" id="boss-highlights">
       <div class="boss-card">
-        <div class="boss-icon">🐲</div>
+        <div class="boss-icon">⏳</div>
         <div class="boss-info">
-          <div class="boss-name">Vorkath</div>
-          <div class="boss-kc">4,841</div>
-          <div class="boss-sub">Top boss · 287 this week</div>
+          <div class="boss-name">Loading...</div>
+          <div class="boss-kc">—</div>
+          <div class="boss-sub">Fetching boss data</div>
         </div>
       </div>
       <div class="boss-card">
-        <div class="boss-icon">🩸</div>
+        <div class="boss-icon">⏳</div>
         <div class="boss-info">
-          <div class="boss-name">Theatre of Blood</div>
-          <div class="boss-kc">1,204</div>
-          <div class="boss-sub">Scythe · Sanguinesti drops</div>
+          <div class="boss-name">Loading...</div>
+          <div class="boss-kc">—</div>
+          <div class="boss-sub"></div>
         </div>
       </div>
       <div class="boss-card">
-        <div class="boss-icon">☠</div>
+        <div class="boss-icon">⏳</div>
         <div class="boss-info">
-          <div class="boss-name">Chambers of Xeric</div>
-          <div class="boss-kc">988</div>
-          <div class="boss-sub">Twisted bow drop at 412 KC</div>
+          <div class="boss-name">Loading...</div>
+          <div class="boss-kc">—</div>
+          <div class="boss-sub"></div>
         </div>
       </div>
     </div>
@@ -631,7 +625,7 @@
     <div class="sec-head reveal">
       <span class="sec-title">Skill Hiscores</span>
       <div class="sec-rule"></div>
-      <span style="font-style:italic;font-size:13px;color:var(--text-dim)">Total XP: 4,284,116,220</span>
+      <span style="font-style:italic;font-size:13px;color:var(--text-dim)" id="total-xp-label">Total XP: —</span>
     </div>
     <div class="skills-grid reveal" id="skills-grid"></div>
   </div>
@@ -724,84 +718,135 @@
 <script>
 const API = 'https://ratphonk-production.up.railway.app';
 
-// Get RSN from URL param e.g. profile.html?rsn=whizzahh
 const params = new URLSearchParams(window.location.search);
 const RSN = params.get('rsn') || 'whizzahh';
 
-// Update page title
+// Apply RSN immediately
 document.title = RSN + ' — RAT PHONK';
+document.getElementById('profile-rsn').textContent = RSN;
+document.getElementById('avatar-img').src = `https://api.wiseoldman.net/v2/players/${encodeURIComponent(RSN)}/avatar`;
+
+const BOSS_ICONS = {
+  vorkath:'🐲', theatre_of_blood:'🩸', chambers_of_xeric:'💠',
+  tombs_of_amascut:'☀', zulrah:'🐍', cerberus:'🐕',
+  general_graardor:'⚔', commander_zilyana:'👼', kreearra:'🦅',
+  kril_tsutsaroth:'😈', corporeal_beast:'👁', nightmare:'😴',
+  abyssal_sire:'🌊', kraken:'🦑', callisto:'🐻',
+  venenatis:'🕷', vetion:'💀', dagannoth_rex:'👑',
+  barrows_chests:'⚰', corrupted_gauntlet:'⚡',
+};
+
+const BOSS_NAMES = {
+  vorkath:'Vorkath', theatre_of_blood:'Theatre of Blood',
+  chambers_of_xeric:'Chambers of Xeric', tombs_of_amascut:'Tombs of Amascut',
+  zulrah:'Zulrah', cerberus:'Cerberus', general_graardor:'General Graardor',
+  commander_zilyana:'Commander Zilyana', kreearra:"Kree'arra",
+  kril_tsutsaroth:"K'ril Tsutsaroth", corporeal_beast:'Corporeal Beast',
+  nightmare:'Nightmare', abyssal_sire:'Abyssal Sire', kraken:'Kraken',
+  callisto:'Callisto', venenatis:'Venenatis', vetion:"Vet'ion",
+  dagannoth_rex:'Dagannoth Rex', barrows_chests:'Barrows Chests',
+  corrupted_gauntlet:'Gauntlet (Corrupted)',
+};
 
 async function loadProfile() {
   try {
-    // Load from our backend (includes role/join date)
+    // Load member data from backend
     const memberRes = await fetch(`${API}/api/members/${encodeURIComponent(RSN)}`);
     if (memberRes.ok) {
       const member = await memberRes.json();
-      // Update RSN display
-      document.querySelector('.profile-rsn').textContent = member.rsn;
-      // Update role badge
-      const roleBadge = document.querySelector('.avatar-role');
-      if (roleBadge) {
-        roleBadge.textContent = member.role.charAt(0).toUpperCase() + member.role.slice(1);
-        roleBadge.className = 'avatar-role ' + member.role;
-      }
-      // Update join date
-      const joinEl = document.querySelector('.profile-joined span');
-      if (joinEl && member.joined_at) {
+      document.getElementById('profile-rsn').textContent = member.rsn;
+      // Role badge
+      const roleEl = document.getElementById('avatar-role');
+      const frameEl = document.getElementById('avatar-frame');
+      roleEl.textContent = member.role.charAt(0).toUpperCase() + member.role.slice(1);
+      roleEl.className = 'avatar-role ' + member.role;
+      frameEl.className = 'avatar-frame ' + member.role;
+      // Role badge in identity
+      const badgesEl = document.getElementById('profile-badges');
+      const roleColor = member.role === 'admin' ? 'gold' : member.role === 'officer' ? 'green' : 'grey';
+      const roleIcon = member.role === 'admin' ? '👑' : member.role === 'officer' ? '⚔' : '🐀';
+      badgesEl.innerHTML = `<span class="badge ${roleColor}">${roleIcon} ${member.role.charAt(0).toUpperCase() + member.role.slice(1)}</span><span class="badge grey">🐀 Rat Phonk</span>`;
+      // Join date
+      if (member.joined_at) {
         const date = new Date(member.joined_at * 1000);
-        joinEl.textContent = date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-      }
-      // Update snapshot data if available
-      if (member.snapshot) {
-        const s = member.snapshot;
-        // Combat level (approximate from snapshot)
-        document.querySelectorAll('.qs-value')[1].textContent = s.overall_level || '—';
-        // Collection log
-        document.querySelectorAll('.qs-value')[2].textContent = s.collection_log_count?.toLocaleString() || '—';
-        // Top boss KC
-        const topBossKc = Math.max(s.vorkath_kc, s.zulrah_kc, s.cox_kc, s.tob_kc);
-        // Update skill bars
-        loadSkillBars(s);
+        document.getElementById('join-date').textContent = date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
       }
     }
 
-    // Load live WOM data for detailed stats
+    // Load live WOM data
     const womRes = await fetch(`${API}/api/wom/player/${encodeURIComponent(RSN)}`);
     if (womRes.ok) {
       const wom = await womRes.json();
-      // Update avatar
-      const avatarImg = document.querySelector('.avatar-frame img');
-      if (avatarImg) {
-        avatarImg.src = `https://api.wiseoldman.net/v2/players/${encodeURIComponent(RSN)}/avatar`;
-        avatarImg.onerror = () => avatarImg.src = 'https://oldschool.runescape.wiki/images/thumb/Wise_Old_Man.png/200px-Wise_Old_Man.png';
+      const skills = wom.latestSnapshot?.data?.skills || {};
+      const bosses = wom.latestSnapshot?.data?.bosses || {};
+
+      // Last seen
+      if (wom.updatedAt) {
+        const updated = new Date(wom.updatedAt);
+        const diff = Math.floor((Date.now() - updated) / 86400000);
+        document.getElementById('last-seen').textContent = diff === 0 ? 'today' : diff + 'd ago';
       }
-      // Update total level
-      const totalLevel = wom.latestSnapshot?.data?.skills?.overall?.level || '—';
-      document.querySelectorAll('.qs-value')[1].textContent = totalLevel;
-      // Update overall XP
-      const overallXp = wom.exp;
-      if (overallXp) {
-        const xpFormatted = overallXp >= 1e9 ? (overallXp/1e9).toFixed(2) + 'B'
-                          : overallXp >= 1e6 ? (overallXp/1e6).toFixed(1) + 'M'
-                          : overallXp.toLocaleString();
-        document.querySelector('.profile-sub') &&
-          (document.querySelector('.profile-sub').textContent = `Total XP: ${xpFormatted}`);
-      }
-      // Update clog
+
+      // Quick stats
+      const totalLevel = skills.overall?.level || '—';
+      const totalXp = wom.exp || 0;
+      const xpFmt = totalXp >= 1e9 ? (totalXp/1e9).toFixed(2)+'B'
+                  : totalXp >= 1e6 ? (totalXp/1e6).toFixed(1)+'M'
+                  : totalXp.toLocaleString();
+      document.getElementById('qs-total').textContent = totalLevel.toLocaleString();
+      document.getElementById('qs-xp').textContent = xpFmt;
       if (wom.collectionLogCount) {
-        document.querySelectorAll('.qs-value')[2].textContent = wom.collectionLogCount.toLocaleString();
+        document.getElementById('qs-clog').textContent = wom.collectionLogCount.toLocaleString();
       }
-      // Update skill grid from WOM snapshot
-      if (wom.latestSnapshot?.data?.skills) {
-        updateSkillGrid(wom.latestSnapshot.data.skills);
+
+      // Combat level
+      const cb = (skills.attack?.level||1) + (skills.strength?.level||1) +
+                 (skills.defence?.level||1) + (skills.hitpoints?.level||10) +
+                 Math.floor((skills.prayer?.level||1)/2) +
+                 Math.floor(Math.max(
+                   (skills.ranged?.level||1)*1.5,
+                   (skills.magic?.level||1)*1.5,
+                   (skills.attack?.level||1) + (skills.strength?.level||1)
+                 )/4);
+      const combat = Math.min(126, Math.floor(cb * 0.25 + (skills.hitpoints?.level||10) * 0.125 + (skills.defence?.level||1) * 0.125));
+      document.getElementById('qs-combat').textContent = combat || '—';
+
+      // Total XP label
+      document.getElementById('total-xp-label').textContent = 'Total XP: ' + xpFmt;
+
+      // Weekly bar - show total XP
+      document.getElementById('wb-skill').textContent = `Overall · Level ${totalLevel}`;
+      document.getElementById('wb-value').textContent = xpFmt;
+
+      // Boss highlights - top 3 by KC
+      const bossEntries = Object.entries(bosses)
+        .map(([key, val]) => ({ key, kc: val?.kills || 0 }))
+        .filter(b => b.kc > 0)
+        .sort((a, b) => b.kc - a.kc)
+        .slice(0, 3);
+
+      const highlightsEl = document.getElementById('boss-highlights');
+      if (bossEntries.length > 0) {
+        highlightsEl.innerHTML = bossEntries.map(b => `
+          <div class="boss-card">
+            <div class="boss-icon">${BOSS_ICONS[b.key] || '☠'}</div>
+            <div class="boss-info">
+              <div class="boss-name">${BOSS_NAMES[b.key] || b.key}</div>
+              <div class="boss-kc">${b.kc.toLocaleString()}</div>
+              <div class="boss-sub">All time kills</div>
+            </div>
+          </div>`).join('');
       }
-      // Update boss grid from WOM snapshot
-      if (wom.latestSnapshot?.data?.bosses) {
-        updateBossGrid(wom.latestSnapshot.data.bosses);
-      }
+
+      // Skill grid
+      updateSkillGrid(skills);
+
+      // Boss grid
+      updateBossGrid(bosses);
     }
   } catch (err) {
     console.warn('Profile load error:', err);
+    document.getElementById('profile-rsn').textContent = RSN;
   }
 }
 
@@ -820,6 +865,13 @@ function updateSkillGrid(skills) {
     {name:'Farming',key:'farming'},{name:'Construction',key:'construction'},
     {name:'Hunter',key:'hunter'},
   ];
+  const ICONS = {
+    Attack:'⚔',Hitpoints:'❤',Mining:'⛏',Strength:'💪',Agility:'🏃',
+    Smithing:'🔨',Defence:'🛡',Herblore:'🌿',Fishing:'🎣',Ranged:'🏹',
+    Thieving:'🗝',Cooking:'🍳',Prayer:'✨',Crafting:'💎',Firemaking:'🔥',
+    Magic:'🔮',Fletching:'🪶',Woodcutting:'🪓',Runecraft:'🌀',Slayer:'💀',
+    Farming:'🌾',Construction:'🏗',Hunter:'🦌',
+  };
   const grid = document.getElementById('skills-grid');
   if (!grid) return;
   const MAX_XP = 200000000;
@@ -832,7 +884,7 @@ function updateSkillGrid(skills) {
     const xpStr = xp >= 1e6 ? (xp/1e6).toFixed(1)+'M' : xp.toLocaleString();
     return `
       <div class="skill-row">
-        <div class="skill-icon">⚔</div>
+        <div class="skill-icon">${ICONS[sk.name]||'⚔'}</div>
         <div class="skill-name">${sk.name}</div>
         <div class="skill-lvl ${maxed?'maxed':''}">${lvl}</div>
         <div class="skill-xp">${xpStr} xp</div>
@@ -845,28 +897,7 @@ function updateSkillGrid(skills) {
 }
 
 function updateBossGrid(bosses) {
-  const BOSSES = [
-    {name:'Vorkath',key:'vorkath',icon:'🐲'},
-    {name:'Theatre of Blood',key:'theatre_of_blood',icon:'🩸'},
-    {name:'Chambers of Xeric',key:'chambers_of_xeric',icon:'💠'},
-    {name:'Tombs of Amascut',key:'tombs_of_amascut',icon:'☀'},
-    {name:'Zulrah',key:'zulrah',icon:'🐍'},
-    {name:'Cerberus',key:'cerberus',icon:'🐕'},
-    {name:'General Graardor',key:'general_graardor',icon:'⚔'},
-    {name:'Commander Zilyana',key:'commander_zilyana',icon:'👼'},
-    {name:"Kree'arra",key:'kreearra',icon:'🦅'},
-    {name:"K'ril Tsutsaroth",key:'kril_tsutsaroth',icon:'😈'},
-    {name:'Corporeal Beast',key:'corporeal_beast',icon:'👁'},
-    {name:'Nightmare',key:'nightmare',icon:'😴'},
-    {name:'Abyssal Sire',key:'abyssal_sire',icon:'🌊'},
-    {name:'Kraken',key:'kraken',icon:'🦑'},
-    {name:'Callisto',key:'callisto',icon:'🐻'},
-    {name:'Venenatis',key:'venenatis',icon:'🕷'},
-    {name:"Vet'ion",key:'vetion',icon:'💀'},
-    {name:'Dagannoth Rex',key:'dagannoth_rex',icon:'👑'},
-    {name:'Barrows Chests',key:'barrows_chests',icon:'⚰'},
-    {name:'Gauntlet (Corrupted)',key:'corrupted_gauntlet',icon:'⚡'},
-  ];
+  const BOSSES = Object.keys(BOSS_NAMES).map(key => ({ key, name: BOSS_NAMES[key], icon: BOSS_ICONS[key]||'☠' }));
   const grid = document.getElementById('boss-grid');
   if (!grid) return;
   grid.innerHTML = BOSSES.map(b => {
@@ -881,7 +912,39 @@ function updateBossGrid(bosses) {
   }).join('');
 }
 
-// Tab switching
+// PvP tab - load real kills
+async function loadPvpHistory() {
+  try {
+    const memberRes = await fetch(`${API}/api/members/${encodeURIComponent(RSN)}`);
+    if (!memberRes.ok) return;
+    const member = await memberRes.json();
+    const pvpRes = await fetch(`${API}/api/pvp?limit=20&member=${encodeURIComponent(RSN)}`, {
+      credentials: 'include'
+    });
+    if (pvpRes.ok) {
+      const kills = await pvpRes.json();
+      if (kills.length > 0) {
+        const tbody = document.querySelector('.kill-table tbody');
+        if (tbody) {
+          tbody.innerHTML = kills.map(k => {
+            const time = new Date(k.occurred_at * 1000);
+            const diff = Math.floor((Date.now() - time) / 3600000);
+            const timeStr = diff < 1 ? 'just now' : diff < 24 ? diff+'h ago' : Math.floor(diff/24)+'d ago';
+            const gp = k.loot_gp >= 1e6 ? (k.loot_gp/1e6).toFixed(1)+'M' : k.loot_gp.toLocaleString();
+            return `<tr>
+              <td><span class="kill-victim">${k.victim_rsn}</span></td>
+              <td><span class="kill-loc">${k.location||'Unknown'}</span></td>
+              <td class="kill-loot">${gp}</td>
+              <td class="kill-time">${timeStr}</td>
+              <td style="text-align:right">${k.screenshot_url ? '<span class="kill-shot">📷 Screenshot</span>' : '—'}</td>
+            </tr>`;
+          }).join('');
+        }
+      }
+    }
+  } catch(e) {}
+}
+
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -892,16 +955,15 @@ function switchTab(id, btn) {
       document.querySelectorAll('.skill-bar[data-w]').forEach(b => { b.style.width = b.dataset.w; });
     }, 100);
   }
+  if (id === 'pvp') loadPvpHistory();
 }
 
-// Scroll reveal
 const obs = new IntersectionObserver(
   es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
   { threshold: 0.08 }
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// Init
 loadProfile();
 </script>
 </body>
