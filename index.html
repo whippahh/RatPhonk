@@ -817,14 +817,101 @@
 
 </div>
 <script>
-// Scroll reveal
+const API = 'https://ratphonk-production.up.railway.app';
+
+// ── LOAD REAL CLAN STATS ──────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const data = await res.json();
+    document.querySelector('.stat-b:nth-child(1) .stat-val').textContent = data.memberCount;
+    document.querySelector('.stat-b:nth-child(3) .stat-val').innerHTML = data.dropCount.toLocaleString();
+    document.querySelector('.stat-b:nth-child(4) .stat-val').textContent = data.killCount.toLocaleString();
+    const gp = data.dropGp;
+    const gpFormatted = gp >= 1e9 ? (gp/1e9).toFixed(1) + '<span class="u">B</span>'
+                      : gp >= 1e6 ? (gp/1e6).toFixed(1) + '<span class="u">M</span>'
+                      : gp.toLocaleString();
+    document.querySelector('.stat-b:nth-child(5) .stat-val').innerHTML = gpFormatted;
+  } catch (err) {
+    console.warn('Could not load stats:', err);
+  }
+}
+
+// ── REAL RSN CHECK ────────────────────────────────────────────
+const rsnInput  = document.getElementById('rsn');
+const stEl      = document.getElementById('rsn-st');
+const msgEl     = document.getElementById('rsn-msg');
+const subBtn    = document.getElementById('sub-btn');
+let deb, ok = false;
+
+function setSt(s, m) {
+  stEl.className = 'rsn-st ' + s;
+  msgEl.textContent = m;
+  stEl.querySelector('.sdot').classList.toggle('pulse', s === 'checking');
+}
+
+rsnInput.addEventListener('input', () => {
+  const v = rsnInput.value.trim();
+  ok = false; subBtn.disabled = true; clearTimeout(deb);
+  if (!v) { setSt('empty', ''); return; }
+  setSt('checking', 'Checking Wise Old Man...');
+  deb = setTimeout(async () => {
+    try {
+      const res = await fetch(`${API}/api/wom/player/${encodeURIComponent(v)}`);
+      if (res.ok) {
+        setSt('valid', '✦ ' + v + ' found on Wise Old Man');
+        ok = true; subBtn.disabled = false;
+      } else {
+        setSt('invalid', 'RSN not found. Have you logged in recently?');
+      }
+    } catch {
+      setSt('invalid', 'Could not reach server. Try again shortly.');
+    }
+  }, 650);
+});
+
+// ── REAL APPLICATION SUBMIT ───────────────────────────────────
+async function doSub() {
+  if (!ok) return;
+  subBtn.disabled = true;
+  subBtn.textContent = 'Lodging application...';
+  try {
+    const res = await fetch(`${API}/api/applications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rsn:       rsnInput.value.trim(),
+        referral:  document.getElementById('ref')?.value.trim(),
+        playstyle: document.getElementById('sty')?.value,
+        notes:     document.getElementById('nt')?.value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('form-content').style.display = 'none';
+      document.getElementById('suc').style.display = 'block';
+      document.getElementById('app-ref').textContent = 'REF · #' + Math.floor(10000 + Math.random() * 90000);
+    } else {
+      subBtn.disabled = false;
+      subBtn.textContent = 'Submit Application';
+      setSt('invalid', data.error || 'Submission failed. Try again.');
+    }
+  } catch {
+    subBtn.disabled = false;
+    subBtn.textContent = 'Submit Application';
+    setSt('invalid', 'Could not reach server. Try again.');
+  }
+}
+
+// Nav scroll, reveal, LB bars — keep existing code
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('solid', window.scrollY > 50);
+});
 const obs = new IntersectionObserver(
   es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
   { threshold: 0.1 }
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// LB bar animation
 const lbObs = new IntersectionObserver(es => {
   es.forEach(e => {
     if (!e.isIntersecting) return;
@@ -837,42 +924,7 @@ const lbObs = new IntersectionObserver(es => {
 }, { threshold: 0.3 });
 document.querySelectorAll('.lb-grid').forEach(el => lbObs.observe(el));
 
-// RSN check
-const rsnEl = document.getElementById('rsn');
-const stEl  = document.getElementById('rsn-st');
-const msgEl = document.getElementById('rsn-msg');
-const btn   = document.getElementById('sub-btn');
-let deb, ok = false;
-
-function setSt(s, m) {
-  stEl.className = 'rsn-st ' + s;
-  msgEl.textContent = m;
-  stEl.querySelector('.sdot').classList.toggle('pulse', s === 'checking');
-}
-
-rsnEl.addEventListener('input', () => {
-  const v = rsnEl.value.trim();
-  ok = false; btn.disabled = true; clearTimeout(deb);
-  if (!v) { setSt('empty', ''); return; }
-  setSt('checking', 'Checking Wise Old Man...');
-  deb = setTimeout(async () => {
-    await new Promise(r => setTimeout(r, 750)); // replace with real WOM fetch
-    const found = v.length >= 3 && v.toLowerCase() !== 'notfound';
-    if (found) { setSt('valid', '✦ ' + v + ' found on Wise Old Man'); ok = true; btn.disabled = false; }
-    else        { setSt('invalid', 'RSN not found. Have you logged in recently?'); }
-  }, 650);
-});
-
-function doSub() {
-  if (!ok) return;
-  btn.disabled = true;
-  btn.textContent = 'Lodging application...';
-  setTimeout(() => {
-    document.getElementById('form-content').style.display = 'none';
-    document.getElementById('suc').style.display = 'block';
-    document.getElementById('app-ref').textContent = 'REF · #' + Math.floor(10000 + Math.random() * 90000);
-  }, 1100);
-}
+loadStats();
 </script>
 </body>
 </html>
