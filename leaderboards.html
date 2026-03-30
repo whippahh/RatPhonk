@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboards — RAT PHONK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:      #060504;
+    --deep:       #0a0804;
+    --surface:    #100d08;
+    --raised:     #17130c;
+    --forest:     #263f22;
+    --forest-md:  #3a6634;
+    --forest-lt:  #4e8c46;
+    --glow:       #5dba4e;
+    --glow-lt:    #80d96c;
+    --glow-dim:   #2d5c28;
+    --gold:       #c9a94c;
+    --gold-dim:   #7c6230;
+    --gold-dk:    #4a3a1a;
+    --parch:      #b9a272;
+    --parch-md:   #8a7250;
+    --parch-dk:   #4a3820;
+    --red:        #8c3a3a;
+    --red-lt:     #c05050;
+    --border:     #221a0e;
+    --border-md:  #332614;
+    --text:       #c2a86e;
+    --text-dim:   #766040;
+    --text-deep:  #332818;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size:17px; line-height:1.65;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)' opacity='0.052'/%3E%3C/svg%3E");
+    background-size:380px 380px; mix-blend-mode:overlay;
+  }
+
+  .page { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
+
+  /* ══ NAV ══ */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    height:54px;
+    background:linear-gradient(180deg, rgba(6,5,4,.98) 0%, rgba(10,8,4,.95) 100%);
+    border-bottom:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 30px rgba(0,0,0,.7);
+  }
+  .nav-link {
+    font-family:'Cinzel',serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--parch-md); text-decoration:none;
+    padding:0 26px; height:54px;
+    display:flex; align-items:center;
+    border-right:1px solid var(--border);
+    transition:color .2s, background .2s;
+    position:relative; white-space:nowrap;
+  }
+  .nav-link:first-child { border-left:1px solid var(--border); }
+  .nav-link:hover { color:var(--parch); background:rgba(255,200,80,.025); }
+  .nav-link.active { color:var(--glow); }
+  .nav-link.active::after {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+    background:var(--glow); box-shadow:0 0 8px var(--glow), 0 0 18px var(--glow-dim);
+  }
+
+  /* ══ PAGE HEADER ══ */
+  .page-header {
+    padding-top:54px;
+    background: linear-gradient(180deg, rgba(6,5,4,1) 0%, var(--deep) 100%);
+    border-bottom:2px solid var(--border);
+    position:relative; overflow:hidden;
+  }
+  .page-header::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 80% 100% at 50% 100%, rgba(38,80,34,.12) 0%, transparent 70%);
+  }
+
+  /* Brambles — smaller, top corners only */
+  .bramble {
+    position:absolute; pointer-events:none; z-index:0;
+    width:280px; height:280px; opacity:.7;
+  }
+  .bramble svg { width:100%; height:100%; }
+  .bramble-tl { top:54px; left:0; }
+  .bramble-tr { top:54px; right:0; transform:scaleX(-1); }
+
+  .header-inner {
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:36px 56px 32px;
+    gap:24px;
+  }
+
+  .header-left {}
+  .header-eyebrow {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.35em;
+    color:var(--forest-lt); text-transform:uppercase; display:block; margin-bottom:10px;
+  }
+  .header-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(32px,5vw,60px); color:var(--parch);
+    letter-spacing:.04em; line-height:1.1;
+    text-shadow:0 2px 20px rgba(0,0,0,.9);
+  }
+  .header-sub {
+    font-style:italic; font-size:16px; color:var(--text-dim);
+    margin-top:10px;
+  }
+
+  /* Mini logo in header */
+  .header-logo {
+    width:120px; opacity:.85;
+    filter:drop-shadow(0 0 20px rgba(50,110,44,.7)) drop-shadow(0 4px 16px rgba(0,0,0,.9));
+    flex-shrink:0;
+  }
+
+  /* Reset countdown */
+  .reset-strip {
+    display:flex; gap:0;
+    border-top:1px solid var(--border);
+  }
+  .reset-item {
+    padding:12px 28px; border-right:1px solid var(--border);
+    display:flex; align-items:center; gap:10px;
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.18em;
+    color:var(--text-dim); text-transform:uppercase;
+  }
+  .reset-item:last-child { border-right:none; }
+  .reset-dot {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--glow); box-shadow:0 0 6px var(--glow);
+    animation:blink 2.2s ease-in-out infinite; flex-shrink:0;
+  }
+  .reset-dot.gold { background:var(--gold); box-shadow:0 0 6px var(--gold); animation-delay:.8s; }
+  .reset-dot.dim  { background:var(--parch-md); box-shadow:none; animation:none; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+  .reset-time { color:var(--glow); font-size:12px; }
+  .reset-time.gold { color:var(--gold); }
+
+  /* ══ MAIN LAYOUT ══ */
+  .lb-page {
+    flex:1; display:grid;
+    grid-template-columns: 220px 1fr;
+    gap:0;
+  }
+
+  /* ══ SIDEBAR ══ */
+  .sidebar {
+    background:var(--deep);
+    border-right:2px solid var(--border);
+    padding:28px 0;
+    position:sticky; top:54px; height:calc(100vh - 54px);
+    overflow-y:auto;
+  }
+
+  .sidebar-section { margin-bottom:32px; }
+  .sidebar-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.3em;
+    color:var(--text-deep); text-transform:uppercase;
+    padding:0 20px; margin-bottom:8px; display:block;
+  }
+
+  /* Category tabs */
+  .cat-btn {
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:12px 20px;
+    background:transparent; border:none; border-left:3px solid transparent;
+    color:var(--text-dim); font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase; text-align:left;
+    cursor:pointer; transition:all .2s;
+  }
+  .cat-btn:hover { color:var(--text); background:rgba(255,200,80,.03); }
+  .cat-btn.active {
+    color:var(--glow); background:rgba(38,80,34,.15);
+    border-left-color:var(--glow);
+  }
+  .cat-icon { font-size:16px; flex-shrink:0; width:20px; text-align:center; }
+  .cat-label { flex:1; }
+  .cat-count {
+    font-size:10px; color:var(--text-deep);
+    background:var(--surface); padding:2px 7px;
+    border:1px solid var(--border);
+  }
+  .cat-btn.active .cat-count { color:var(--glow-dim); border-color:var(--glow-dim); }
+
+  /* Period tabs */
+  .period-tabs {
+    display:flex; flex-direction:column; gap:2px; padding:0 12px;
+  }
+  .period-btn {
+    padding:9px 14px; background:transparent;
+    border:1px solid transparent; border-radius:0;
+    color:var(--text-dim); font-family:'Cinzel',serif; font-size:10px;
+    letter-spacing:.15em; text-transform:uppercase; text-align:left;
+    cursor:pointer; transition:all .2s; display:flex; justify-content:space-between; align-items:center;
+  }
+  .period-btn:hover { color:var(--text); border-color:var(--border-md); }
+  .period-btn.active { color:var(--parch); border-color:var(--border-md); background:var(--surface); }
+  .period-tag {
+    font-size:8px; letter-spacing:.1em;
+    padding:1px 6px; border:1px solid var(--border); color:var(--text-deep);
+  }
+  .period-btn.active .period-tag { border-color:var(--glow-dim); color:var(--glow-dim); }
+
+  /* ══ MAIN CONTENT ══ */
+  .lb-main { padding:32px 40px; }
+
+  /* Board header */
+  .board-header {
+    display:flex; align-items:flex-end; justify-content:space-between;
+    margin-bottom:28px; gap:20px;
+    opacity:0; animation:fadeUp .6s ease .1s forwards;
+  }
+  .board-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(22px,3vw,36px); color:var(--parch);
+    letter-spacing:.04em; line-height:1.1;
+  }
+  .board-title span { color:var(--glow); }
+  .board-subtitle {
+    font-style:italic; font-size:14px; color:var(--text-dim); margin-top:6px;
+  }
+  .board-meta {
+    text-align:right; flex-shrink:0;
+  }
+  .board-updated {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.2em;
+    color:var(--text-deep); text-transform:uppercase; display:block;
+  }
+  .board-period-badge {
+    display:inline-block; margin-top:6px;
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.15em;
+    color:var(--glow); border:1px solid var(--glow-dim);
+    padding:4px 12px; text-transform:uppercase;
+    background:rgba(38,80,34,.15);
+  }
+
+  /* ══ PODIUM (top 3) ══ */
+  .podium {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:12px; margin-bottom:28px;
+    opacity:0; animation:fadeUp .6s ease .2s forwards;
+  }
+
+  .podium-card {
+    background:var(--surface); border:1px solid var(--border-md);
+    padding:24px 20px; text-align:center; position:relative;
+    transition:border-color .2s, transform .2s;
+    cursor:pointer;
+  }
+  .podium-card:hover { border-color:var(--parch-dk); transform:translateY(-2px); }
+  .podium-card::before, .podium-card::after {
+    content:''; position:absolute; width:10px; height:10px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none;
+  }
+  .podium-card::before { top:0; left:0; border-width:1px 0 0 1px; }
+  .podium-card::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  /* First place special */
+  .podium-card.first {
+    border-color:var(--gold-dim);
+    background:linear-gradient(180deg, rgba(124,98,48,.12) 0%, var(--surface) 60%);
+    order:-1; /* centre visually via grid but bump to top */
+  }
+  .podium-card.first::before, .podium-card.first::after { border-color:var(--gold-dim); }
+  .podium-card.first:hover { border-color:var(--gold); }
+
+  .podium-crown {
+    font-size:24px; margin-bottom:6px; display:block;
+    filter:drop-shadow(0 0 8px rgba(201,169,76,.6));
+  }
+  .podium-rank {
+    font-family:'Cinzel Decorative',serif; font-size:28px;
+    color:var(--text-deep); line-height:1; margin-bottom:10px;
+  }
+  .podium-card.first  .podium-rank { color:var(--gold); text-shadow:0 0 16px rgba(201,169,76,.6); }
+  .podium-card.second .podium-rank { color:var(--parch-md); }
+  .podium-card.third  .podium-rank { color:#6b4830; }
+
+  .podium-avatar {
+    width:52px; height:52px; border-radius:50%;
+    background:var(--raised); border:2px solid var(--border-md);
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; margin:0 auto 12px;
+  }
+  .podium-card.first .podium-avatar { border-color:var(--gold-dim); box-shadow:0 0 16px rgba(201,169,76,.25); }
+
+  .podium-name {
+    font-family:'Cinzel',serif; font-size:13px; letter-spacing:.08em;
+    color:var(--parch); margin-bottom:8px; display:block;
+  }
+  .podium-card.first .podium-name { color:var(--parch); font-size:15px; }
+
+  .podium-value {
+    font-family:'Cinzel Decorative',serif; font-size:22px;
+    color:var(--glow); line-height:1;
+  }
+  .podium-card.first .podium-value { font-size:28px; text-shadow:0 0 20px rgba(93,186,78,.4); }
+  .podium-value.gold { color:var(--gold); }
+  .podium-value.kc   { color:var(--gold-dim); font-size:20px; }
+
+  .podium-unit {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.15em;
+    color:var(--text-dim); text-transform:uppercase; margin-top:4px; display:block;
+  }
+
+  /* Delta badge */
+  .delta {
+    position:absolute; top:10px; right:10px;
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.1em;
+    padding:2px 7px; text-transform:uppercase;
+  }
+  .delta.up   { color:var(--glow);   border:1px solid var(--glow-dim);  background:rgba(38,80,34,.2); }
+  .delta.down { color:var(--red-lt); border:1px solid var(--red);       background:rgba(140,58,58,.15); }
+  .delta.same { color:var(--text-deep); border:1px solid var(--border); }
+
+  /* ══ TABLE ══ */
+  .lb-table-wrap {
+    background:var(--surface); border:1px solid var(--border-md);
+    position:relative;
+    opacity:0; animation:fadeUp .6s ease .35s forwards;
+  }
+  .lb-table-wrap::before, .lb-table-wrap::after {
+    content:''; position:absolute; width:12px; height:12px;
+    border-color:var(--parch-dk); border-style:solid; pointer-events:none; z-index:1;
+  }
+  .lb-table-wrap::before { top:0; left:0; border-width:1px 0 0 1px; }
+  .lb-table-wrap::after  { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+  .lb-table { width:100%; border-collapse:collapse; }
+
+  .lb-table thead tr {
+    background:var(--raised);
+    border-bottom:2px solid var(--border-md);
+  }
+  .lb-table th {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.25em;
+    color:var(--text-dim); text-transform:uppercase;
+    padding:13px 20px; text-align:left; font-weight:600;
+    white-space:nowrap;
+  }
+  .lb-table th.right { text-align:right; }
+
+  .lb-table tbody tr {
+    border-bottom:1px solid rgba(34,26,14,.7);
+    transition:background .15s; cursor:pointer;
+  }
+  .lb-table tbody tr:hover { background:rgba(185,162,114,.04); }
+  .lb-table tbody tr:last-child { border-bottom:none; }
+
+  .lb-table td {
+    padding:13px 20px; vertical-align:middle;
+  }
+
+  /* Rank cell */
+  .td-rank {
+    font-family:'Cinzel Decorative',serif; font-size:16px;
+    color:var(--text-deep); width:48px; text-align:center;
+  }
+  tr.r4  .td-rank { color:var(--text-dim); }
+  tr.r5  .td-rank { color:var(--text-dim); }
+  tr.r6  .td-rank { color:var(--text-dim); }
+  tr.r7  .td-rank { color:var(--text-dim); }
+  tr.r8  .td-rank { color:var(--text-dim); }
+  tr.r9  .td-rank { color:var(--text-dim); }
+  tr.r10 .td-rank { color:var(--text-dim); }
+
+  /* Member cell */
+  .td-member { display:flex; align-items:center; gap:12px; }
+  .member-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:var(--raised); border:1px solid var(--border-md);
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+    flex-shrink:0;
+  }
+  .member-name {
+    font-family:'Cinzel',serif; font-size:13px; letter-spacing:.06em; color:var(--text);
+  }
+  .member-title {
+    font-style:italic; font-size:12px; color:var(--text-dim); margin-top:1px;
+  }
+
+  /* Value cell */
+  .td-value {
+    font-family:'Cinzel Decorative',serif; font-size:18px;
+    color:var(--glow); text-align:right;
+  }
+  .td-value.gold { color:var(--gold); }
+  .td-value.kc   { color:var(--gold-dim); font-size:16px; }
+  .td-value.pvp  { color:var(--red-lt); }
+
+  /* Sub value (e.g. K/D) */
+  .td-sub { font-style:italic; font-size:12px; color:var(--text-dim); text-align:right; }
+
+  /* Delta in table */
+  .td-delta { text-align:right; }
+  .d-badge {
+    display:inline-block; font-family:'Cinzel',serif; font-size:9px; letter-spacing:.08em;
+    padding:2px 8px; text-transform:uppercase;
+  }
+  .d-badge.up   { color:var(--glow);   border:1px solid var(--glow-dim);  background:rgba(38,80,34,.2); }
+  .d-badge.down { color:var(--red-lt); border:1px solid var(--red);       background:rgba(140,58,58,.15); }
+  .d-badge.same { color:var(--text-deep); border:1px solid var(--border); }
+
+  /* Bar in table */
+  .td-bar { width:120px; }
+  .bar-track { height:3px; background:var(--border); border-radius:0; overflow:hidden; }
+  .bar-fill  { height:100%; background:var(--forest-md); opacity:.8; transition:width 1.1s cubic-bezier(.16,1,.3,1); }
+  .bar-fill.gold { background:var(--gold-dim); }
+  .bar-fill.pvp  { background:var(--red); }
+
+  /* ══ SKILL BREAKDOWN (XP category extra) ══ */
+  .skill-breakdown {
+    margin-top:20px; background:var(--surface); border:1px solid var(--border);
+    padding:20px 24px;
+    opacity:0; animation:fadeUp .6s ease .45s forwards;
+  }
+  .skill-breakdown-title {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.25em;
+    color:var(--text-dim); text-transform:uppercase; margin-bottom:16px;
+  }
+  .skill-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px;
+  }
+  .skill-item { display:flex; align-items:center; gap:10px; }
+  .skill-name {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.1em;
+    color:var(--text-dim); text-transform:uppercase; flex:1; min-width:60px;
+  }
+  .skill-track { flex:2; height:2px; background:var(--border); }
+  .skill-bar   { height:100%; background:var(--forest-md); opacity:.7; }
+  .skill-val   { font-family:'Cinzel',serif; font-size:11px; color:var(--glow); min-width:40px; text-align:right; }
+
+  /* ══ EMPTY / LOADING ══ */
+  .board-empty {
+    padding:60px; text-align:center;
+    font-style:italic; color:var(--text-dim); font-size:16px;
+  }
+
+  /* ══ FOOTER ══ */
+  footer {
+    padding:26px 56px; border-top:2px solid var(--border);
+    background:var(--deep);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ft-logo { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.2em; color:var(--text-dim); }
+  .ft-note { font-style:italic; font-size:12px; color:var(--text-deep); }
+  .ft-note a { color:var(--glow-dim); text-decoration:none; }
+
+  /* ══ ANIMATIONS ══ */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ══ RESPONSIVE ══ */
+  @media(max-width:1000px) {
+    .lb-page { grid-template-columns:1fr; }
+    .sidebar { position:static; height:auto; border-right:none; border-bottom:2px solid var(--border); padding:16px 0; display:flex; flex-wrap:wrap; gap:0; }
+    .sidebar-section { margin-bottom:0; flex:1; min-width:180px; }
+    .cat-btn { padding:10px 16px; }
+    .lb-main { padding:24px 20px; }
+    .podium { grid-template-columns:1fr 1fr 1fr; }
+    .header-inner { padding:24px; flex-direction:column; align-items:flex-start; }
+    .header-logo { width:80px; }
+    nav { overflow-x:auto; justify-content:flex-start; }
+    .nav-link { padding:0 16px; font-size:9.5px; }
+    footer { padding:20px 24px; flex-direction:column; gap:8px; text-align:center; }
+  }
+  @media(max-width:600px) {
+    .podium { grid-template-columns:1fr; }
+    .td-bar, .td-sub, .td-delta { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html"    class="nav-link">Home</a>
+  <a href="#"             class="nav-link active">Leaderboards</a>
+  <a href="#"             class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"             class="nav-link">Event Calendar</a>
+  <a href="#"             class="nav-link">Rat Profiles</a>
+  <a href="#"             class="nav-link">The Ledger</a>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <!-- Brambles -->
+  <div class="bramble bramble-tl"><svg viewBox="0 0 280 280" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width=".9"/>
+    <path d="M9,70 L2,63 M9,70 L2,77" stroke="#332010" stroke-width=".9"/>
+    <path d="M13,105 L5,99 M13,105 L5,112" stroke="#332010" stroke-width=".9"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width=".9"/>
+    <path d="M72,12 L65,5 M72,12 L79,6" stroke="#332010" stroke-width=".9"/>
+    <path d="M112,17 L105,10 M112,17 L119,11" stroke="#332010" stroke-width=".9"/>
+  </g></svg></div>
+  <div class="bramble bramble-tr"><svg viewBox="0 0 280 280" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width=".9"/>
+    <path d="M9,70 L2,63 M9,70 L2,77" stroke="#332010" stroke-width=".9"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width=".9"/>
+    <path d="M72,12 L65,5 M72,12 L79,6" stroke="#332010" stroke-width=".9"/>
+  </g></svg></div>
+
+  <div class="header-inner">
+    <div class="header-left">
+      <span class="header-eyebrow">Rat Phonk · OSRS Clan</span>
+      <h1 class="header-title">Leaderboards</h1>
+      <p class="header-sub">Live rankings across XP, kills, drops &amp; collection log.</p>
+    </div>
+    <img src="RatPhonk-Logo.png" alt="Rat Phonk" class="header-logo">
+  </div>
+
+  <div class="reset-strip">
+    <div class="reset-item">
+      <div class="reset-dot"></div>
+      Weekly resets in &nbsp;<span class="reset-time" id="weekly-countdown">3d 14h 22m</span>
+    </div>
+    <div class="reset-item">
+      <div class="reset-dot gold"></div>
+      Monthly resets in &nbsp;<span class="reset-time gold" id="monthly-countdown">18d 9h 05m</span>
+    </div>
+    <div class="reset-item">
+      <div class="reset-dot dim"></div>
+      Last synced &nbsp;<span style="color:var(--text-dim)">4 minutes ago</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="lb-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Category</span>
+      <button class="cat-btn active" onclick="setCategory('xp', this)">
+        <span class="cat-icon">⚔</span>
+        <span class="cat-label">XP Gains</span>
+        <span class="cat-count">47</span>
+      </button>
+      <button class="cat-btn" onclick="setCategory('boss', this)">
+        <span class="cat-icon">☠</span>
+        <span class="cat-label">Boss KC</span>
+        <span class="cat-count">47</span>
+      </button>
+      <button class="cat-btn" onclick="setCategory('pvp', this)">
+        <span class="cat-icon">💀</span>
+        <span class="cat-label">PvP Kills</span>
+        <span class="cat-count">38</span>
+      </button>
+      <button class="cat-btn" onclick="setCategory('gp', this)">
+        <span class="cat-icon">💰</span>
+        <span class="cat-label">GP Earned</span>
+        <span class="cat-count">47</span>
+      </button>
+      <button class="cat-btn" onclick="setCategory('clog', this)">
+        <span class="cat-icon">📖</span>
+        <span class="cat-label">Collection Log</span>
+        <span class="cat-count">44</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">Period</span>
+      <div class="period-tabs">
+        <button class="period-btn active" onclick="setPeriod('weekly', this)">
+          Weekly <span class="period-tag">LIVE</span>
+        </button>
+        <button class="period-btn" onclick="setPeriod('monthly', this)">
+          Monthly <span class="period-tag">APR</span>
+        </button>
+        <button class="period-btn" onclick="setPeriod('alltime', this)">
+          All Time <span class="period-tag">∞</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- BOARD -->
+  <main class="lb-main" id="lb-main">
+    <!-- Injected by JS -->
+  </main>
+</div>
+
+<footer>
+  <div class="ft-logo">Rat Phonk · OSRS Clan</div>
+  <div class="ft-note">Data pulled from <a href="#">Wise Old Man</a> · Updates every 6 hours</div>
+</footer>
+</div>
+
+<script>
+// ══ DATA ══
+const DATA = {
+  xp: {
+    label: 'XP Gains',
+    unit: 'XP',
+    icon: '⚔',
+    valueClass: '',
+    weekly: [
+      { name:'R4TKING',    icon:'🐀', value:'84.2M', raw:84200000, sub:'Slayer focus',    delta:'up',   rank:'I'   },
+      { name:'skullcrushr',icon:'🐀', value:'61.8M', raw:61800000, sub:'Farming runs',   delta:'same', rank:'II'  },
+      { name:'goblinhuntr',icon:'🐀', value:'49.1M', raw:49100000, sub:'Agility grind',  delta:'up',   rank:'III' },
+      { name:'im_sleepy99',icon:'🐀', value:'38.4M', raw:38400000, sub:'Mixed skills',   delta:'down', rank:'IV'  },
+      { name:'vorkath_btw',icon:'🐀', value:'27.3M', raw:27300000, sub:'Magic training', delta:'up',   rank:'V'   },
+      { name:'raid_lord',  icon:'🐀', value:'22.1M', raw:22100000, sub:'Prayer',         delta:'same', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'18.7M', raw:18700000, sub:'Construction',   delta:'down', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'14.2M', raw:14200000, sub:'Woodcutting',    delta:'up',   rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'11.9M', raw:11900000, sub:'Firemaking',     delta:'same', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'8.4M',  raw:8400000,  sub:'Fishing',        delta:'down', rank:'X'   },
+    ],
+    monthly: [
+      { name:'vorkath_btw',icon:'🐀', value:'312M', raw:312000000, sub:'Consistent grind', delta:'up',   rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'287M', raw:287000000, sub:'Slayer focus',    delta:'same', rank:'II'  },
+      { name:'skullcrushr',icon:'🐀', value:'241M', raw:241000000, sub:'Farming',         delta:'up',   rank:'III' },
+      { name:'raid_lord',  icon:'🐀', value:'198M', raw:198000000, sub:'Mixed',           delta:'down', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'176M', raw:176000000, sub:'Agility',         delta:'same', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'154M', raw:154000000, sub:'Mixed',           delta:'up',   rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'122M', raw:122000000, sub:'Construction',    delta:'same', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'98M',  raw:98000000,  sub:'Woodcutting',     delta:'down', rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'74M',  raw:74000000,  sub:'Various',         delta:'up',   rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'61M',  raw:61000000,  sub:'Fishing',         delta:'same', rank:'X'   },
+    ],
+    alltime: [
+      { name:'raid_lord',  icon:'🐀', value:'2.41B', raw:2410000000, sub:'Veteran',    delta:'same', rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'2.18B', raw:2180000000, sub:'Co-founder', delta:'same', rank:'II'  },
+      { name:'vorkath_btw',icon:'🐀', value:'1.94B', raw:1940000000, sub:'OG member',  delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'1.72B', raw:1720000000, sub:'Veteran',    delta:'same', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'1.41B', raw:1410000000, sub:'Officer',    delta:'same', rank:'V'   },
+      { name:'Ratashasam', icon:'🐀', value:'1.18B', raw:1180000000, sub:'Member',     delta:'same', rank:'VI'  },
+      { name:'im_sleepy99',icon:'🐀', value:'987M',  raw:987000000,  sub:'Member',     delta:'down', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'812M',  raw:812000000,  sub:'Member',     delta:'up',   rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'698M',  raw:698000000,  sub:'Member',     delta:'same', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'544M',  raw:544000000,  sub:'Member',     delta:'same', rank:'X'   },
+    ]
+  },
+  boss: {
+    label: 'Boss KC',
+    unit: 'KC',
+    icon: '☠',
+    valueClass: 'kc',
+    weekly: [
+      { name:'vorkath_btw',icon:'🐀', value:'412', raw:412, sub:'Vorkath mainly',  delta:'up',   rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'287', raw:287, sub:'ToB + ToA',       delta:'same', rank:'II'  },
+      { name:'raid_lord',  icon:'🐀', value:'201', raw:201, sub:'CoX specialist',  delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'188', raw:188, sub:'Mixed bosses',    delta:'down', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'143', raw:143, sub:'Wildy bosses',    delta:'up',   rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'118', raw:118, sub:'GWD grind',       delta:'same', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'94',  raw:94,  sub:'Cerberus',        delta:'down', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'76',  raw:76,  sub:'Nightmare',       delta:'same', rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'58',  raw:58,  sub:'KQ + DKS',        delta:'up',   rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'41',  raw:41,  sub:'Mixed',           delta:'down', rank:'X'   },
+    ],
+    monthly: [
+      { name:'raid_lord',  icon:'🐀', value:'1,842', raw:1842, sub:'CoX specialist',  delta:'up',   rank:'I'   },
+      { name:'vorkath_btw',icon:'🐀', value:'1,611', raw:1611, sub:'Vorkath mainly',  delta:'same', rank:'II'  },
+      { name:'R4TKING',    icon:'🐀', value:'1,298', raw:1298, sub:'ToB + ToA',       delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'1,044', raw:1044, sub:'Mixed bosses',    delta:'down', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'876',   raw:876,  sub:'Wildy bosses',    delta:'same', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'712',   raw:712,  sub:'GWD grind',       delta:'up',   rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'588',   raw:588,  sub:'Cerberus',        delta:'same', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'441',   raw:441,  sub:'Nightmare',       delta:'down', rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'388',   raw:388,  sub:'KQ + DKS',        delta:'up',   rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'294',   raw:294,  sub:'Mixed',           delta:'same', rank:'X'   },
+    ],
+    alltime: [
+      { name:'vorkath_btw',icon:'🐀', value:'18,441', raw:18441, sub:'Vorkath legend', delta:'same', rank:'I'   },
+      { name:'raid_lord',  icon:'🐀', value:'16,882', raw:16882, sub:'CoX veteran',    delta:'same', rank:'II'  },
+      { name:'R4TKING',    icon:'🐀', value:'14,201', raw:14201, sub:'All-rounder',    delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'11,988', raw:11988, sub:'Mixed',          delta:'same', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'9,412',  raw:9412,  sub:'Wildy bosses',   delta:'same', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'7,841',  raw:7841,  sub:'GWD grind',      delta:'down', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'6,102',  raw:6102,  sub:'Cerberus',       delta:'same', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'4,887',  raw:4887,  sub:'Nightmare',      delta:'up',   rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'3,944',  raw:3944,  sub:'KQ + DKS',       delta:'same', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'2,811',  raw:2811,  sub:'Mixed',          delta:'down', rank:'X'   },
+    ]
+  },
+  pvp: {
+    label: 'PvP Kills',
+    unit: 'Kills',
+    icon: '💀',
+    valueClass: 'pvp',
+    weekly: [
+      { name:'R4TKING',    icon:'🐀', value:'88',  raw:88,  sub:'K/D 4.2',  delta:'up',   rank:'I'   },
+      { name:'skullcrushr',icon:'🐀', value:'62',  raw:62,  sub:'K/D 3.8',  delta:'same', rank:'II'  },
+      { name:'Ratashasam', icon:'🐀', value:'44',  raw:44,  sub:'K/D 2.9',  delta:'up',   rank:'III' },
+      { name:'ratcaller',  icon:'🐀', value:'38',  raw:38,  sub:'K/D 3.1',  delta:'down', rank:'IV'  },
+      { name:'theratking', icon:'🐀', value:'31',  raw:31,  sub:'K/D 2.4',  delta:'same', rank:'V'   },
+      { name:'goblinhuntr',icon:'🐀', value:'24',  raw:24,  sub:'K/D 1.9',  delta:'up',   rank:'VI'  },
+      { name:'vorkath_btw',icon:'🐀', value:'18',  raw:18,  sub:'K/D 2.2',  delta:'same', rank:'VII' },
+      { name:'phonkmaster',icon:'🐀', value:'14',  raw:14,  sub:'K/D 1.6',  delta:'down', rank:'VIII'},
+      { name:'raid_lord',  icon:'🐀', value:'9',   raw:9,   sub:'K/D 1.1',  delta:'same', rank:'IX'  },
+      { name:'im_sleepy99',icon:'🐀', value:'6',   raw:6,   sub:'K/D 0.8',  delta:'down', rank:'X'   },
+    ],
+    monthly: [
+      { name:'skullcrushr',icon:'🐀', value:'312', raw:312, sub:'K/D 4.1',  delta:'up',   rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'298', raw:298, sub:'K/D 3.9',  delta:'same', rank:'II'  },
+      { name:'Ratashasam', icon:'🐀', value:'201', raw:201, sub:'K/D 2.7',  delta:'up',   rank:'III' },
+      { name:'ratcaller',  icon:'🐀', value:'178', raw:178, sub:'K/D 2.9',  delta:'same', rank:'IV'  },
+      { name:'theratking', icon:'🐀', value:'144', raw:144, sub:'K/D 2.2',  delta:'down', rank:'V'   },
+      { name:'goblinhuntr',icon:'🐀', value:'112', raw:112, sub:'K/D 1.8',  delta:'same', rank:'VI'  },
+      { name:'phonkmaster',icon:'🐀', value:'88',  raw:88,  sub:'K/D 1.6',  delta:'up',   rank:'VII' },
+      { name:'vorkath_btw',icon:'🐀', value:'64',  raw:64,  sub:'K/D 2.0',  delta:'same', rank:'VIII'},
+      { name:'raid_lord',  icon:'🐀', value:'44',  raw:44,  sub:'K/D 1.2',  delta:'down', rank:'IX'  },
+      { name:'im_sleepy99',icon:'🐀', value:'28',  raw:28,  sub:'K/D 0.7',  delta:'down', rank:'X'   },
+    ],
+    alltime: [
+      { name:'R4TKING',    icon:'🐀', value:'4,841', raw:4841, sub:'K/D 4.4',  delta:'same', rank:'I'   },
+      { name:'skullcrushr',icon:'🐀', value:'4,102', raw:4102, sub:'K/D 3.7',  delta:'same', rank:'II'  },
+      { name:'Ratashasam', icon:'🐀', value:'2,988', raw:2988, sub:'K/D 2.8',  delta:'up',   rank:'III' },
+      { name:'ratcaller',  icon:'🐀', value:'2,441', raw:2441, sub:'K/D 2.9',  delta:'same', rank:'IV'  },
+      { name:'theratking', icon:'🐀', value:'1,988', raw:1988, sub:'K/D 2.1',  delta:'same', rank:'V'   },
+      { name:'goblinhuntr',icon:'🐀', value:'1,612', raw:1612, sub:'K/D 1.7',  delta:'down', rank:'VI'  },
+      { name:'phonkmaster',icon:'🐀', value:'1,244', raw:1244, sub:'K/D 1.5',  delta:'same', rank:'VII' },
+      { name:'vorkath_btw',icon:'🐀', value:'988',   raw:988,  sub:'K/D 2.0',  delta:'same', rank:'VIII'},
+      { name:'raid_lord',  icon:'🐀', value:'712',   raw:712,  sub:'K/D 1.1',  delta:'down', rank:'IX'  },
+      { name:'im_sleepy99',icon:'🐀', value:'441',   raw:441,  sub:'K/D 0.8',  delta:'up',   rank:'X'   },
+    ]
+  },
+  gp: {
+    label: 'GP Earned',
+    unit: 'GP',
+    icon: '💰',
+    valueClass: 'gold',
+    weekly: [
+      { name:'goblinhuntr',icon:'🐀', value:'1.77B', raw:1770000000, sub:'Twisted bow drop', delta:'up',   rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'1.24B', raw:1240000000, sub:'Scythe split',     delta:'same', rank:'II'  },
+      { name:'vorkath_btw',icon:'🐀', value:'890M',  raw:890000000,  sub:'Tumeken split',    delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'740M',  raw:740000000,  sub:'Elysian split',    delta:'same', rank:'IV'  },
+      { name:'raid_lord',  icon:'🐀', value:'412M',  raw:412000000,  sub:'CoX drops',        delta:'down', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'284M',  raw:284000000,  sub:'Bandos drop',      delta:'same', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'198M',  raw:198000000,  sub:'Mixed drops',      delta:'up',   rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'142M',  raw:142000000,  sub:'Wildy drops',      delta:'same', rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'88M',   raw:88000000,   sub:'Various',          delta:'down', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'44M',   raw:44000000,   sub:'GWD drops',        delta:'same', rank:'X'   },
+    ],
+    monthly: [
+      { name:'raid_lord',  icon:'🐀', value:'8.4B',  raw:8400000000, sub:'CoX MVP',          delta:'up',   rank:'I'   },
+      { name:'R4TKING',    icon:'🐀', value:'6.1B',  raw:6100000000, sub:'All-rounder',      delta:'same', rank:'II'  },
+      { name:'vorkath_btw',icon:'🐀', value:'4.8B',  raw:4800000000, sub:'Vorkath pet inc.', delta:'up',   rank:'III' },
+      { name:'goblinhuntr',icon:'🐀', value:'3.9B',  raw:3900000000, sub:'Twisted bow',      delta:'same', rank:'IV'  },
+      { name:'skullcrushr',icon:'🐀', value:'2.7B',  raw:2700000000, sub:'PvP + PvM',        delta:'down', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'1.8B',  raw:1800000000, sub:'Bandos grind',     delta:'same', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'1.2B',  raw:1200000000, sub:'Mixed drops',      delta:'up',   rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'880M',  raw:880000000,  sub:'Wildy PKing',      delta:'same', rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'612M',  raw:612000000,  sub:'Various',          delta:'down', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'441M',  raw:441000000,  sub:'GWD grind',        delta:'same', rank:'X'   },
+    ],
+    alltime: [
+      { name:'R4TKING',    icon:'🐀', value:'84.1B',  raw:84100000000, sub:'Co-founder haul',  delta:'same', rank:'I'   },
+      { name:'raid_lord',  icon:'🐀', value:'71.4B',  raw:71400000000, sub:'CoX legend',       delta:'same', rank:'II'  },
+      { name:'vorkath_btw',icon:'🐀', value:'58.8B',  raw:58800000000, sub:'Vorkath machine',  delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'44.2B',  raw:44200000000, sub:'PvP + PvM',        delta:'same', rank:'IV'  },
+      { name:'goblinhuntr',icon:'🐀', value:'38.1B',  raw:38100000000, sub:'Twisted bow ×3',   delta:'same', rank:'V'   },
+      { name:'im_sleepy99',icon:'🐀', value:'28.4B',  raw:28400000000, sub:'GWD main',         delta:'down', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'19.8B',  raw:19800000000, sub:'Mixed',            delta:'same', rank:'VII' },
+      { name:'ratcaller',  icon:'🐀', value:'14.1B',  raw:14100000000, sub:'Wildy PKing',      delta:'up',   rank:'VIII'},
+      { name:'phonkmaster',icon:'🐀', value:'9.4B',   raw:9400000000,  sub:'Various',          delta:'same', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'6.2B',   raw:6200000000,  sub:'GWD grind',        delta:'same', rank:'X'   },
+    ]
+  },
+  clog: {
+    label: 'Collection Log',
+    unit: 'Slots',
+    icon: '📖',
+    valueClass: '',
+    weekly: [
+      { name:'im_sleepy99',icon:'🐀', value:'28',  raw:28,  sub:'1,284 / 1,477 total', delta:'up',   rank:'I'   },
+      { name:'raid_lord',  icon:'🐀', value:'21',  raw:21,  sub:'1,341 / 1,477 total', delta:'same', rank:'II'  },
+      { name:'vorkath_btw',icon:'🐀', value:'17',  raw:17,  sub:'1,198 / 1,477 total', delta:'up',   rank:'III' },
+      { name:'R4TKING',    icon:'🐀', value:'14',  raw:14,  sub:'1,402 / 1,477 total', delta:'same', rank:'IV'  },
+      { name:'phonkmaster',icon:'🐀', value:'11',  raw:11,  sub:'988 / 1,477 total',   delta:'down', rank:'V'   },
+      { name:'Ratashasam', icon:'🐀', value:'9',   raw:9,   sub:'812 / 1,477 total',   delta:'same', rank:'VI'  },
+      { name:'skullcrushr',icon:'🐀', value:'7',   raw:7,   sub:'1,088 / 1,477 total', delta:'up',   rank:'VII' },
+      { name:'goblinhuntr',icon:'🐀', value:'5',   raw:5,   sub:'944 / 1,477 total',   delta:'same', rank:'VIII'},
+      { name:'ratcaller',  icon:'🐀', value:'4',   raw:4,   sub:'677 / 1,477 total',   delta:'down', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'2',   raw:2,   sub:'512 / 1,477 total',   delta:'same', rank:'X'   },
+    ],
+    monthly: [
+      { name:'raid_lord',  icon:'🐀', value:'88',  raw:88,  sub:'1,341 / 1,477 total', delta:'up',   rank:'I'   },
+      { name:'im_sleepy99',icon:'🐀', value:'74',  raw:74,  sub:'1,284 / 1,477 total', delta:'same', rank:'II'  },
+      { name:'R4TKING',    icon:'🐀', value:'61',  raw:61,  sub:'1,402 / 1,477 total', delta:'up',   rank:'III' },
+      { name:'vorkath_btw',icon:'🐀', value:'54',  raw:54,  sub:'1,198 / 1,477 total', delta:'same', rank:'IV'  },
+      { name:'phonkmaster',icon:'🐀', value:'42',  raw:42,  sub:'988 / 1,477 total',   delta:'down', rank:'V'   },
+      { name:'skullcrushr',icon:'🐀', value:'38',  raw:38,  sub:'1,088 / 1,477 total', delta:'same', rank:'VI'  },
+      { name:'Ratashasam', icon:'🐀', value:'31',  raw:31,  sub:'812 / 1,477 total',   delta:'up',   rank:'VII' },
+      { name:'goblinhuntr',icon:'🐀', value:'24',  raw:24,  sub:'944 / 1,477 total',   delta:'same', rank:'VIII'},
+      { name:'ratcaller',  icon:'🐀', value:'18',  raw:18,  sub:'677 / 1,477 total',   delta:'down', rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'11',  raw:11,  sub:'512 / 1,477 total',   delta:'same', rank:'X'   },
+    ],
+    alltime: [
+      { name:'R4TKING',    icon:'🐀', value:'1,402', raw:1402, sub:'94.9% complete',   delta:'same', rank:'I'   },
+      { name:'raid_lord',  icon:'🐀', value:'1,341', raw:1341, sub:'90.8% complete',   delta:'same', rank:'II'  },
+      { name:'im_sleepy99',icon:'🐀', value:'1,284', raw:1284, sub:'86.9% complete',   delta:'up',   rank:'III' },
+      { name:'skullcrushr',icon:'🐀', value:'1,088', raw:1088, sub:'73.7% complete',   delta:'same', rank:'IV'  },
+      { name:'vorkath_btw',icon:'🐀', value:'1,198', raw:1198, sub:'81.1% complete',   delta:'same', rank:'V'   },
+      { name:'goblinhuntr',icon:'🐀', value:'944',   raw:944,  sub:'63.9% complete',   delta:'down', rank:'VI'  },
+      { name:'phonkmaster',icon:'🐀', value:'988',   raw:988,  sub:'66.9% complete',   delta:'same', rank:'VII' },
+      { name:'Ratashasam', icon:'🐀', value:'812',   raw:812,  sub:'55.0% complete',   delta:'same', rank:'VIII'},
+      { name:'ratcaller',  icon:'🐀', value:'677',   raw:677,  sub:'45.8% complete',   delta:'up',   rank:'IX'  },
+      { name:'theratking', icon:'🐀', value:'512',   raw:512,  sub:'34.7% complete',   delta:'same', rank:'X'   },
+    ]
+  }
+};
+
+const PERIOD_LABELS = {
+  weekly: { label:'Weekly Gains', badge:'This Week', desc:'XP gained since Monday 00:00 UTC' },
+  monthly: { label:'Monthly Gains', badge:'April 2025', desc:'XP gained since 1st April 00:00 UTC' },
+  alltime: { label:'All Time', badge:'All Time', desc:'Total accumulated since clan founding' }
+};
+
+let currentCat = 'xp';
+let currentPeriod = 'weekly';
+
+function setCategory(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setPeriod(period, btn) {
+  currentPeriod = period;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  const cat = DATA[currentCat];
+  const rows = cat[currentPeriod];
+  const pl = PERIOD_LABELS[currentPeriod];
+  const top = rows[0].raw;
+  const vc = cat.valueClass;
+
+  // Podium cards (top 3)
+  const podiumHTML = `
+    <div class="podium">
+      ${[1,0,2].map(i => {
+        const r = rows[i];
+        const isFirst = i === 0;
+        const cls = ['second','first','third'][i === 0 ? 1 : i === 1 ? 0 : 2];
+        const realCls = i === 0 ? 'first' : i === 1 ? 'second' : 'third';
+        return \`
+        <div class="podium-card \${realCls}" onclick="window.location='profile.html?rsn=\${r.name}'">
+          \${isFirst ? '<span class="podium-crown">👑</span>' : ''}
+          <div class="delta \${r.delta}">\${r.delta === 'up' ? '▲' : r.delta === 'down' ? '▼' : '—'}</div>
+          <div class="podium-rank">\${r.rank}</div>
+          <div class="podium-avatar">\${r.icon}</div>
+          <span class="podium-name">\${r.name}</span>
+          <div class="podium-value \${vc}">\${r.value}</div>
+          <span class="podium-unit">\${cat.unit} \${pl.badge}</span>
+        </div>\`;
+      }).join('')}
+    </div>`;
+
+  // Table rows (4–10)
+  const tableRows = rows.slice(3).map((r, idx) => {
+    const pct = Math.round((r.raw / top) * 100);
+    const barCls = vc === 'gold' ? 'gold' : vc === 'pvp' ? 'pvp' : '';
+    return \`
+      <tr class="r\${idx+4}" onclick="window.location='profile.html?rsn=\${r.name}'" style="cursor:pointer">
+        <td class="td-rank">\${r.rank}</td>
+        <td>
+          <div class="td-member">
+            <div class="member-avatar">\${r.icon}</div>
+            <div>
+              <div class="member-name">\${r.name}</div>
+              <div class="member-title">\${r.sub}</div>
+            </div>
+          </div>
+        </td>
+        <td class="td-value \${vc}">\${r.value}</td>
+        <td class="td-sub">\${r.sub}</td>
+        <td class="td-bar">
+          <div class="bar-track"><div class="bar-fill \${barCls}" style="width:0%" data-width="\${pct}%"></div></div>
+        </td>
+        <td class="td-delta"><span class="d-badge \${r.delta}">\${r.delta === 'up' ? '▲ Up' : r.delta === 'down' ? '▼ Down' : '— Same'}</span></td>
+      </tr>\`;
+  }).join('');
+
+  const periodDesc = {
+    weekly: 'Gains since Monday 00:00 UTC. Resets every week.',
+    monthly: 'Gains since 1st of the month. Resets monthly.',
+    alltime: 'Total accumulated stats since clan founding.'
+  }[currentPeriod];
+
+  document.getElementById('lb-main').innerHTML = \`
+    <div class="board-header">
+      <div>
+        <div class="board-title">\${cat.icon} \${cat.label} <span>·</span> \${pl.label}</div>
+        <div class="board-subtitle">\${periodDesc}</div>
+      </div>
+      <div class="board-meta">
+        <span class="board-updated">Last updated</span>
+        <span class="board-period-badge">\${pl.badge}</span>
+      </div>
+    </div>
+    \${podiumHTML}
+    <div class="lb-table-wrap">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th class="right">\${cat.unit}</th>
+            <th class="right">Notes</th>
+            <th class="right">Relative</th>
+            <th class="right">Trend</th>
+          </tr>
+        </thead>
+        <tbody>\${tableRows}</tbody>
+      </table>
+    </div>
+  \`;
+
+  // Animate bars in
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar-fill[data-width]').forEach(b => {
+      b.style.width = b.dataset.width;
+    });
+  });
+
+  // Re-animate board header
+  document.querySelector('.board-header').style.animation = 'none';
+  document.querySelector('.podium').style.animation = 'none';
+  document.querySelector('.lb-table-wrap').style.animation = 'none';
+  requestAnimationFrame(() => {
+    document.querySelector('.board-header').style.animation = 'fadeUp .5s ease forwards';
+    document.querySelector('.podium').style.animation = 'fadeUp .5s ease .1s forwards';
+    document.querySelector('.lb-table-wrap').style.animation = 'fadeUp .5s ease .2s forwards';
+  });
+}
+
+// Countdown timers
+function updateCountdowns() {
+  const now = new Date();
+
+  // Next Monday 00:00 UTC
+  const nextMonday = new Date(now);
+  const day = now.getUTCDay();
+  const daysUntilMonday = (8 - day) % 7 || 7;
+  nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday);
+  nextMonday.setUTCHours(0,0,0,0);
+  const weeklyMs = nextMonday - now;
+  const wd = Math.floor(weeklyMs / 86400000);
+  const wh = Math.floor((weeklyMs % 86400000) / 3600000);
+  const wm = Math.floor((weeklyMs % 3600000) / 60000);
+  document.getElementById('weekly-countdown').textContent = wd + 'd ' + wh + 'h ' + wm + 'm';
+
+  // Next 1st of month 00:00 UTC
+  const nextFirst = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  const monthlyMs = nextFirst - now;
+  const md = Math.floor(monthlyMs / 86400000);
+  const mh = Math.floor((monthlyMs % 86400000) / 3600000);
+  const mm = Math.floor((monthlyMs % 3600000) / 60000);
+  document.getElementById('monthly-countdown').textContent = md + 'd ' + mh + 'h ' + mm + 'm';
+}
+
+// Init
+render();
+updateCountdowns();
+setInterval(updateCountdowns, 60000);
+</script>
+</body>
+</html>

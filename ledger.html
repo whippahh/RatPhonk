@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger — RAT PHONK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:      #060504;
+    --deep:       #0a0804;
+    --surface:    #100d08;
+    --raised:     #17130c;
+    --forest:     #263f22;
+    --forest-md:  #3a6634;
+    --forest-lt:  #4e8c46;
+    --glow:       #5dba4e;
+    --glow-lt:    #80d96c;
+    --glow-dim:   #2d5c28;
+    --glow-dk:    #1a3a16;
+    --gold:       #c9a94c;
+    --gold-dim:   #7c6230;
+    --gold-dk:    #3a2c10;
+    --red:        #c05050;
+    --red-dim:    #6b2828;
+    --red-dk:     #2a1010;
+    --amber:      #c8841a;
+    --amber-dim:  #6b4410;
+    --parch:      #b9a272;
+    --parch-md:   #8a7250;
+    --parch-dk:   #4a3820;
+    --border:     #221a0e;
+    --border-md:  #332614;
+    --text:       #c2a86e;
+    --text-dim:   #766040;
+    --text-deep:  #332818;
+    --white:      #e8dcc8;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size:17px; line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    background-size:380px 380px; mix-blend-mode:overlay;
+  }
+
+  .page { position:relative; z-index:1; }
+
+  /* ══ NAV ══ */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    height:54px;
+    background:linear-gradient(180deg,rgba(6,5,4,.98) 0%,rgba(10,8,4,.95) 100%);
+    border-bottom:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 30px rgba(0,0,0,.7);
+  }
+  .nav-link {
+    font-family:'Cinzel',serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--parch-md); text-decoration:none;
+    padding:0 26px; height:54px;
+    display:flex; align-items:center;
+    border-right:1px solid var(--border);
+    transition:color .2s, background .2s;
+    position:relative; white-space:nowrap;
+  }
+  .nav-link:first-child { border-left:1px solid var(--border); }
+  .nav-link:hover { color:var(--parch); background:rgba(255,200,80,.025); }
+  .nav-link.active { color:var(--glow); }
+  .nav-link.active::after {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+    background:var(--glow); box-shadow:0 0 8px var(--glow);
+  }
+
+  /* ══ PAGE HEADER ══ */
+  .page-header {
+    padding-top:54px;
+    background:linear-gradient(180deg, var(--deep) 0%, var(--black) 100%);
+    border-bottom:2px solid var(--border);
+    position:relative; overflow:hidden;
+  }
+  .page-header::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 100% at 50% 0%, rgba(38,63,34,.1) 0%, transparent 70%);
+  }
+
+  .bramble {
+    position:absolute; pointer-events:none; z-index:0;
+    width:260px; height:260px; opacity:.55;
+  }
+  .bramble svg { width:100%; height:100%; }
+  .bramble-tl { top:54px; left:0; }
+  .bramble-tr { top:54px; right:0; transform:scaleX(-1); }
+
+  .header-inner {
+    position:relative; z-index:1;
+    max-width:1200px; margin:0 auto;
+    padding:36px 56px 0;
+  }
+
+  .header-top {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    margin-bottom:28px; gap:24px;
+  }
+
+  .header-eyebrow {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:.35em;
+    color:var(--forest-lt); text-transform:uppercase; display:block; margin-bottom:10px;
+  }
+  .header-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(30px,5vw,56px); color:var(--white);
+    letter-spacing:.04em; line-height:1.1;
+    text-shadow:0 2px 20px rgba(0,0,0,.9);
+  }
+  .header-sub {
+    font-style:italic; font-size:16px; color:var(--text-dim); margin-top:8px;
+  }
+
+  /* Summary strip */
+  .summary-strip {
+    display:grid; grid-template-columns:repeat(5,1fr); gap:2px;
+    border-top:1px solid var(--border);
+  }
+  .sum-item {
+    padding:18px 24px;
+    border-right:1px solid var(--border);
+  }
+  .sum-item:last-child { border-right:none; }
+  .sum-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.25em;
+    color:var(--text-deep); text-transform:uppercase; margin-bottom:6px;
+  }
+  .sum-val {
+    font-family:'Cinzel Decorative',serif; font-size:24px; line-height:1;
+  }
+  .sum-val.green { color:var(--glow); }
+  .sum-val.gold  { color:var(--gold); }
+  .sum-val.red   { color:var(--red); }
+  .sum-val.white { color:var(--white); }
+  .sum-note { font-style:italic; font-size:12px; color:var(--text-dim); margin-top:3px; }
+
+  /* ══ VIEW TOGGLE ══ */
+  .view-toggle {
+    display:flex; gap:2px;
+    background:var(--surface);
+    border:1px solid var(--border-md);
+    padding:3px;
+    flex-shrink:0;
+  }
+  .vt-btn {
+    font-family:'Cinzel',serif; font-size:11px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    padding:10px 28px; cursor:pointer;
+    background:transparent; border:none; color:var(--text-dim);
+    transition:all .2s;
+  }
+  .vt-btn:hover { color:var(--text); }
+  .vt-btn.active {
+    background:var(--raised); color:var(--white);
+    border:1px solid var(--border-md);
+  }
+  .vt-btn.active.pvp  { color:var(--red);  border-color:var(--red-dim); }
+  .vt-btn.active.drop { color:var(--gold); border-color:var(--gold-dim); }
+
+  /* ══ MAIN ══ */
+  .main {
+    max-width:1200px; margin:0 auto;
+    padding:32px 56px;
+  }
+
+  /* ══ VIEWS ══ */
+  .view { display:none; }
+  .view.active { display:block; }
+
+  /* ══ FILTER BAR ══ */
+  .filter-bar {
+    display:flex; gap:10px; align-items:center;
+    margin-bottom:20px; flex-wrap:wrap;
+  }
+  .filter-input {
+    background:var(--surface); border:1px solid var(--border);
+    color:var(--white); font-family:'JetBrains Mono',monospace;
+    font-size:12px; padding:8px 14px; outline:none;
+    transition:border-color .2s; width:220px;
+  }
+  .filter-input:focus { border-color:var(--border-md); }
+  .filter-input::placeholder { color:var(--text-deep); }
+
+  .filter-select {
+    background:var(--surface); border:1px solid var(--border);
+    color:var(--text); font-family:'JetBrains Mono',monospace;
+    font-size:12px; padding:8px 14px; outline:none; cursor:pointer;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23332614'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+    padding-right:30px;
+  }
+  .filter-select option { background:var(--surface); }
+
+  .filter-count {
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--text-dim); margin-left:auto;
+  }
+
+  /* ══ PVP FEED ══ */
+  .pvp-feed { display:flex; flex-direction:column; gap:2px; }
+
+  .kill-card {
+    background:var(--surface); border:1px solid var(--border);
+    transition:border-color .2s;
+    position:relative; overflow:hidden;
+  }
+  .kill-card::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--red);
+  }
+  .kill-card:hover { border-color:var(--border-md); }
+
+  .kill-card-inner {
+    padding:16px 20px 16px 24px;
+    display:grid;
+    grid-template-columns:1fr auto auto auto auto;
+    align-items:center; gap:20px;
+  }
+
+  .kill-main {}
+  .kill-headline {
+    font-family:'Cinzel',serif; font-size:14px; letter-spacing:.06em;
+    color:var(--white); margin-bottom:5px;
+  }
+  .kill-headline .killer { color:var(--glow); }
+  .kill-headline .victim { color:var(--red); }
+  .kill-headline .arrow  { color:var(--text-deep); margin:0 6px; }
+
+  .kill-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .kill-tag {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.12em;
+    text-transform:uppercase; padding:2px 8px; border:1px solid var(--border-md);
+    color:var(--text-dim);
+  }
+  .kill-tag.loc  { border-color:var(--amber-dim); color:var(--amber); }
+  .kill-tag.clan { border-color:var(--glow-dim);  color:var(--glow); }
+
+  .kill-loot {
+    font-family:'Cinzel Decorative',serif; font-size:20px;
+    color:var(--gold); white-space:nowrap; text-align:right;
+  }
+  .kill-loot-note { font-style:italic; font-size:12px; color:var(--text-dim); text-align:right; margin-top:2px; }
+
+  .kill-time { font-style:italic; font-size:12px; color:var(--text-dim); white-space:nowrap; text-align:right; }
+
+  .kill-verified {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 9px; border:1px solid;
+    white-space:nowrap;
+  }
+  .kill-verified.yes { border-color:var(--glow-dim); color:var(--glow); background:var(--glow-dk); }
+  .kill-verified.pending { border-color:var(--amber-dim); color:var(--amber); background:var(--amber-dim); }
+
+  .shot-btn {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.1em;
+    text-transform:uppercase; padding:4px 10px;
+    border:1px solid var(--border-md); color:var(--text-dim);
+    background:transparent; cursor:pointer; transition:all .2s;
+    white-space:nowrap;
+  }
+  .shot-btn:hover { border-color:var(--parch-dk); color:var(--parch); }
+
+  /* ══ DROP FEED ══ */
+  .drop-feed { display:flex; flex-direction:column; gap:2px; }
+
+  .drop-card {
+    background:var(--surface); border:1px solid var(--border);
+    transition:border-color .2s;
+    position:relative; overflow:hidden;
+  }
+  .drop-card:hover { border-color:var(--border-md); }
+
+  /* Left accent colour by drop tier */
+  .drop-card::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  }
+  .drop-card.tier-s::before { background:var(--gold); }
+  .drop-card.tier-a::before { background:var(--glow); }
+  .drop-card.tier-b::before { background:var(--parch-md); }
+
+  .drop-card-top {
+    padding:16px 20px 14px 24px;
+    display:grid;
+    grid-template-columns:1fr auto auto auto;
+    align-items:start; gap:20px;
+  }
+
+  .drop-main {}
+  .drop-item-name {
+    font-family:'Cinzel',serif; font-size:15px; letter-spacing:.07em;
+    color:var(--white); margin-bottom:5px;
+  }
+  .drop-item-name.tier-s { color:var(--gold); text-shadow:0 0 16px rgba(201,169,76,.35); }
+  .drop-item-name.tier-a { color:var(--glow-lt); }
+
+  .drop-meta { font-style:italic; font-size:14px; color:var(--text-dim); margin-bottom:6px; }
+  .drop-meta strong { font-style:normal; color:var(--parch-md); }
+
+  .drop-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .drop-tag {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.12em;
+    text-transform:uppercase; padding:2px 8px; border:1px solid var(--border-md);
+    color:var(--text-dim);
+  }
+  .drop-tag.split { border-color:var(--glow-dim); color:var(--glow); }
+  .drop-tag.solo  { border-color:var(--gold-dim);  color:var(--gold); }
+  .drop-tag.boss  { border-color:var(--border-md); color:var(--parch-md); }
+
+  .drop-value {
+    font-family:'Cinzel Decorative',serif; font-size:22px;
+    color:var(--gold); white-space:nowrap; text-align:right; line-height:1;
+  }
+  .drop-value-note { font-style:italic; font-size:12px; color:var(--text-dim); text-align:right; margin-top:3px; }
+
+  .drop-time { font-style:italic; font-size:12px; color:var(--text-dim); white-space:nowrap; text-align:right; }
+
+  .drop-verified {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 9px; border:1px solid;
+    white-space:nowrap; align-self:start;
+  }
+  .drop-verified.yes { border-color:var(--glow-dim); color:var(--glow); background:var(--glow-dk); }
+  .drop-verified.pending { border-color:var(--amber-dim); color:var(--amber); }
+
+  /* Split panel */
+  .split-panel {
+    border-top:1px solid var(--border);
+    padding:12px 24px;
+    background:rgba(16,13,8,.6);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .split-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--text-deep); flex-shrink:0;
+  }
+  .split-members { display:flex; gap:10px; flex-wrap:wrap; flex:1; }
+  .split-member {
+    display:flex; align-items:center; gap:6px;
+    font-size:13px; color:var(--text-dim);
+  }
+  .split-member-name { font-family:'Cinzel',serif; font-size:12px; letter-spacing:.06em; color:var(--parch-md); }
+  .split-cut { font-family:'Cinzel Decorative',serif; font-size:15px; color:var(--gold); margin-left:4px; }
+  .split-dot { width:4px; height:4px; background:var(--border-md); border-radius:50%; }
+
+  /* ══ GP TOTALS ══ */
+  .gp-section { margin-top:36px; }
+
+  .gp-head {
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .gp-title {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.25em;
+    color:var(--parch-md); text-transform:uppercase;
+  }
+  .gp-rule { flex:1; height:1px; background:var(--border); }
+
+  .gp-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:2px;
+  }
+
+  .gp-card {
+    background:var(--surface); border:1px solid var(--border);
+    padding:16px 20px;
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px;
+    transition:background .15s; cursor:pointer;
+  }
+  .gp-card:hover { background:var(--raised); border-color:var(--border-md); }
+
+  .gp-rank {
+    font-family:'Cinzel Decorative',serif; font-size:20px; color:var(--text-deep);
+    width:28px; text-align:center;
+  }
+  .gp-card.top1 .gp-rank { color:var(--gold); text-shadow:0 0 10px rgba(201,169,76,.5); }
+  .gp-card.top2 .gp-rank { color:var(--parch-md); }
+  .gp-card.top3 .gp-rank { color:#6b4830; }
+
+  .gp-info {}
+  .gp-name { font-family:'Cinzel',serif; font-size:13px; letter-spacing:.07em; color:var(--white); margin-bottom:3px; }
+  .gp-card.top1 .gp-name { color:var(--gold); }
+  .gp-sub { font-style:italic; font-size:12px; color:var(--text-dim); }
+
+  .gp-amount {
+    font-family:'Cinzel Decorative',serif; font-size:18px; color:var(--gold-dim);
+    text-align:right; line-height:1;
+  }
+  .gp-card.top1 .gp-amount { color:var(--gold); font-size:20px; text-shadow:0 0 12px rgba(201,169,76,.3); }
+
+  .gp-bar-wrap { grid-column:2/-1; height:2px; background:var(--border); margin-top:2px; }
+  .gp-bar { height:100%; background:var(--gold-dim); opacity:.6; transition:width 1.1s cubic-bezier(.16,1,.3,1); }
+  .gp-card.top1 .gp-bar { background:var(--gold); opacity:.8; }
+
+  /* ══ EMPTY ══ */
+  .empty { padding:48px; text-align:center; color:var(--text-deep); font-style:italic; font-size:15px; }
+
+  /* ══ ORNAMENT RULE ══ */
+  .orn-rule {
+    display:flex; align-items:center; gap:12px; margin:28px 0 20px;
+  }
+  .orn-line { flex:1; height:1px; background:linear-gradient(to right,transparent,var(--border)); }
+  .orn-line.r { background:linear-gradient(to left,transparent,var(--border)); }
+  .orn-gem { width:5px; height:5px; background:var(--gold-dim); transform:rotate(45deg); flex-shrink:0; }
+
+  /* ══ REVEAL ══ */
+  .reveal { opacity:0; transform:translateY(14px); transition:opacity .65s ease, transform .65s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+
+  /* ══ FOOTER ══ */
+  footer {
+    padding:26px 56px; border-top:2px solid var(--border);
+    background:var(--deep);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ft-logo { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.2em; color:var(--text-dim); }
+  .ft-note { font-style:italic; font-size:12px; color:var(--text-deep); }
+  .ft-note a { color:var(--glow-dim); text-decoration:none; }
+
+  @media(max-width:900px){
+    nav { overflow-x:auto; justify-content:flex-start; }
+    .nav-link { padding:0 16px; font-size:9.5px; }
+    .header-inner { padding:24px 24px 0; }
+    .header-top { flex-direction:column; align-items:flex-start; }
+    .summary-strip { grid-template-columns:1fr 1fr; }
+    .main { padding:24px 20px; }
+    .kill-card-inner { grid-template-columns:1fr auto; gap:10px; }
+    .kill-time, .kill-verified { display:none; }
+    .drop-card-top { grid-template-columns:1fr auto; gap:10px; }
+    .drop-time, .drop-verified { display:none; }
+    .gp-grid { grid-template-columns:1fr; }
+    footer { flex-direction:column; gap:10px; text-align:center; padding:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="ratphonk_final.html" class="nav-link">Home</a>
+  <a href="leaderboards.html"   class="nav-link">Leaderboards</a>
+  <a href="#"                   class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"                   class="nav-link">Event Calendar</a>
+  <a href="#"                   class="nav-link">Rat Profiles</a>
+  <a href="#"                   class="nav-link active">The Ledger</a>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="bramble bramble-tl"><svg viewBox="0 0 260 260" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.3"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.3"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width="1"/>
+    <path d="M9,70 L2,63 M9,70 L2,77" stroke="#332010" stroke-width="1"/>
+    <path d="M13,110 L5,103 M13,110 L5,118" stroke="#332010" stroke-width="1"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width="1"/>
+    <path d="M75,13 L68,6 M75,13 L82,7" stroke="#332010" stroke-width="1"/>
+    <path d="M118,19 L111,12 M118,19 L125,13" stroke="#332010" stroke-width="1"/>
+  </g></svg></div>
+  <div class="bramble bramble-tr"><svg viewBox="0 0 260 260" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.3"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.3"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width="1"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width="1"/>
+    <path d="M75,13 L68,6 M75,13 L82,7" stroke="#332010" stroke-width="1"/>
+  </g></svg></div>
+
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <span class="header-eyebrow">Members Only · Rat Phonk</span>
+        <h1 class="header-title">The Ledger</h1>
+        <p class="header-sub">Every kill. Every drop. Every split. On record.</p>
+      </div>
+      <div class="view-toggle" id="view-toggle">
+        <button class="vt-btn active pvp" onclick="setView('pvp',this)">💀 PvP Kills</button>
+        <button class="vt-btn drop"       onclick="setView('drop',this)">💰 Drop Log</button>
+      </div>
+    </div>
+
+    <div class="summary-strip">
+      <div class="sum-item">
+        <div class="sum-label">Total PK Kills</div>
+        <div class="sum-val green">12,441</div>
+        <div class="sum-note">All time</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">GP Looted (PvP)</div>
+        <div class="sum-val gold">48.2B</div>
+        <div class="sum-note">All time</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">Total Drops Logged</div>
+        <div class="sum-val white">3,841</div>
+        <div class="sum-note">All time</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">GP from Drops</div>
+        <div class="sum-val gold">284B</div>
+        <div class="sum-note">All time</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">GP Split (Total)</div>
+        <div class="sum-val gold">112B</div>
+        <div class="sum-note">Across all members</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ══ PVP VIEW ══ -->
+  <div class="view active" id="view-pvp">
+
+    <div class="filter-bar reveal">
+      <input class="filter-input" type="text" placeholder="Search killer or victim..." id="pvp-search" oninput="filterPvp()">
+      <select class="filter-select" id="pvp-loc" onchange="filterPvp()">
+        <option value="">All Locations</option>
+        <option>Revenant Caves</option>
+        <option>Edgeville</option>
+        <option>Chaos Altar</option>
+        <option>Wilderness (lvl 20-30)</option>
+        <option>Wilderness (lvl 40-55)</option>
+      </select>
+      <select class="filter-select" id="pvp-period" onchange="filterPvp()">
+        <option value="">All Time</option>
+        <option>This Week</option>
+        <option>This Month</option>
+      </select>
+      <span class="filter-count" id="pvp-count">Showing 8 kills</span>
+    </div>
+
+    <div class="pvp-feed reveal" id="pvp-feed"></div>
+
+    <div class="orn-rule">
+      <div class="orn-line"></div><div class="orn-gem"></div><div class="orn-line r"></div>
+    </div>
+
+    <!-- GP TOTALS BY MEMBER -->
+    <div class="gp-section reveal">
+      <div class="gp-head">
+        <span class="gp-title">💀 Lifetime PK Loot by Member</span>
+        <div class="gp-rule"></div>
+      </div>
+      <div class="gp-grid" id="pvp-gp-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══ DROP VIEW ══ -->
+  <div class="view" id="view-drop">
+
+    <div class="filter-bar reveal">
+      <input class="filter-input" type="text" placeholder="Search item or member..." id="drop-search" oninput="filterDrops()">
+      <select class="filter-select" id="drop-boss" onchange="filterDrops()">
+        <option value="">All Bosses</option>
+        <option>Theatre of Blood</option>
+        <option>Chambers of Xeric</option>
+        <option>Tombs of Amascut</option>
+        <option>Vorkath</option>
+        <option>Zulrah</option>
+        <option>General Graardor</option>
+        <option>Corporeal Beast</option>
+      </select>
+      <select class="filter-select" id="drop-type" onchange="filterDrops()">
+        <option value="">Solo &amp; Split</option>
+        <option value="split">Splits Only</option>
+        <option value="solo">Solo Only</option>
+      </select>
+      <span class="filter-count" id="drop-count">Showing 8 drops</span>
+    </div>
+
+    <div class="drop-feed reveal" id="drop-feed"></div>
+
+    <div class="orn-rule">
+      <div class="orn-line"></div><div class="orn-gem"></div><div class="orn-line r"></div>
+    </div>
+
+    <!-- GP TOTALS BY MEMBER -->
+    <div class="gp-section reveal">
+      <div class="gp-head">
+        <span class="gp-title">💰 Lifetime GP from Drops by Member</span>
+        <div class="gp-rule"></div>
+      </div>
+      <div class="gp-grid" id="drop-gp-grid"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="ft-logo">Rat Phonk · OSRS Clan</div>
+  <div class="ft-note">Entries submitted via Discord · Verified by officers · <a href="#">PhonkNet</a></div>
+</footer>
+</div>
+
+<script>
+// ══ DATA ══
+const PVP_DATA = [
+  { killer:'R4TKING',    victim:'PKwarrior88', loc:'Revenant Caves',      loot:'12.4M',  lootRaw:12400000,  time:'2h ago',  verified:true,  tags:['Clan Trip'] },
+  { killer:'skullcrushr',victim:'ZulrahGrind', loc:'Wilderness (lvl 44)', loot:'8.1M',   lootRaw:8100000,   time:'5h ago',  verified:true,  tags:[] },
+  { killer:'R4TKING',    victim:'IronNoob',    loc:'Edgeville',           loot:'240K',   lootRaw:240000,    time:'1d ago',  verified:true,  tags:[] },
+  { killer:'Ratashasam', victim:'BossHunter99',loc:'Wilderness (lvl 52)', loot:'44.8M',  lootRaw:44800000,  time:'1d ago',  verified:true,  tags:['Clan Trip','Big Loot'] },
+  { killer:'ratcaller',  victim:'slayer_main', loc:'Chaos Altar',         loot:'6.2M',   lootRaw:6200000,   time:'2d ago',  verified:true,  tags:[] },
+  { killer:'skullcrushr',victim:'raid_pker420',loc:'Revenant Caves',      loot:'18.9M',  lootRaw:18900000,  time:'2d ago',  verified:false, tags:['Clan Trip'] },
+  { killer:'R4TKING',    victim:'GWD_Farmer',  loc:'Wilderness (lvl 38)', loot:'3.4M',   lootRaw:3400000,   time:'3d ago',  verified:true,  tags:[] },
+  { killer:'theratking', victim:'purenoob99',  loc:'Edgeville',           loot:'1.8M',   lootRaw:1800000,   time:'4d ago',  verified:true,  tags:[] },
+];
+
+const DROP_DATA = [
+  {
+    item:'Scythe of vitur', boss:'Theatre of Blood', tier:'s',
+    member:'R4TKING', value:'1,240M', valueRaw:1240000000,
+    time:'2h ago', verified:true,
+    split:true,
+    members:[
+      {name:'R4TKING',    cut:'413M'},
+      {name:'skullcrushr',cut:'413M'},
+      {name:'vorkath_btw',cut:'414M'},
+    ]
+  },
+  {
+    item:"Tumeken's shadow", boss:'Tombs of Amascut', tier:'s',
+    member:'vorkath_btw', value:'890M', valueRaw:890000000,
+    time:'6h ago', verified:true,
+    split:true,
+    members:[
+      {name:'vorkath_btw',cut:'178M'},
+      {name:'R4TKING',    cut:'178M'},
+      {name:'raid_lord',  cut:'178M'},
+      {name:'goblinhuntr',cut:'178M'},
+      {name:'im_sleepy99',cut:'178M'},
+    ]
+  },
+  {
+    item:'Twisted bow', boss:'Chambers of Xeric', tier:'s',
+    member:'goblinhuntr', value:'1,770M', valueRaw:1770000000,
+    time:'1d ago', verified:true,
+    split:false, members:[]
+  },
+  {
+    item:'Elysian sigil', boss:'Corporeal Beast', tier:'a',
+    member:'skullcrushr', value:'740M', valueRaw:740000000,
+    time:'2d ago', verified:true,
+    split:true,
+    members:[
+      {name:'skullcrushr',cut:'370M'},
+      {name:'R4TKING',    cut:'370M'},
+    ]
+  },
+  {
+    item:'Bandos chestplate', boss:'General Graardor', tier:'b',
+    member:'im_sleepy99', value:'18.4M', valueRaw:18400000,
+    time:'2d ago', verified:true,
+    split:false, members:[]
+  },
+  {
+    item:'Primordial crystal', boss:'Cerberus', tier:'a',
+    member:'Ratashasam', value:'44.1M', valueRaw:44100000,
+    time:'3d ago', verified:false,
+    split:false, members:[]
+  },
+  {
+    item:'Vorkath head (99th kill)', boss:'Vorkath', tier:'b',
+    member:'vorkath_btw', value:'—', valueRaw:0,
+    time:'3d ago', verified:true,
+    split:false, members:[]
+  },
+  {
+    item:'Magma mutagen', boss:'Zulrah', tier:'a',
+    member:'ratcaller', value:'280M', valueRaw:280000000,
+    time:'4d ago', verified:true,
+    split:false, members:[]
+  },
+];
+
+const PVP_GP = [
+  {name:'R4TKING',    gp:'4.84B', raw:4840000000},
+  {name:'skullcrushr',gp:'4.10B', raw:4100000000},
+  {name:'Ratashasam', gp:'2.99B', raw:2990000000},
+  {name:'ratcaller',  gp:'2.44B', raw:2440000000},
+  {name:'theratking', gp:'1.99B', raw:1990000000},
+  {name:'goblinhuntr',gp:'1.61B', raw:1610000000},
+  {name:'phonkmaster',gp:'1.24B', raw:1240000000},
+  {name:'vorkath_btw',gp:'988M',  raw:988000000},
+];
+
+const DROP_GP = [
+  {name:'R4TKING',    gp:'84.1B', raw:84100000000},
+  {name:'raid_lord',  gp:'71.4B', raw:71400000000},
+  {name:'vorkath_btw',gp:'58.8B', raw:58800000000},
+  {name:'skullcrushr',gp:'44.2B', raw:44200000000},
+  {name:'goblinhuntr',gp:'38.1B', raw:38100000000},
+  {name:'im_sleepy99',gp:'28.4B', raw:28400000000},
+  {name:'Ratashasam', gp:'19.8B', raw:19800000000},
+  {name:'ratcaller',  gp:'14.1B', raw:14100000000},
+];
+
+// ══ RENDER PVP ══
+function renderPvp(data) {
+  const feed = document.getElementById('pvp-feed');
+  feed.innerHTML = data.length ? data.map(k => `
+    <div class="kill-card">
+      <div class="kill-card-inner">
+        <div class="kill-main">
+          <div class="kill-headline">
+            <a href="profile.html?rsn=${k.killer}" class="killer" style="text-decoration:none">${k.killer}</a>
+            <span class="arrow">☠</span>
+            <span class="victim">${k.victim}</span>
+          </div>
+          <div class="kill-tags">
+            <span class="kill-tag loc">📍 ${k.loc}</span>
+            ${k.tags.map(t => `<span class="kill-tag clan">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="kill-loot">${k.loot}</div>
+          <div class="kill-loot-note">Loot value</div>
+        </div>
+        <div class="kill-time">${k.time}</div>
+        <span class="kill-verified ${k.verified ? 'yes' : 'pending'}">${k.verified ? '✓ Verified' : '⏳ Pending'}</span>
+        <button class="shot-btn">📷 Screenshot</button>
+      </div>
+    </div>`).join('')
+  : '<div class="empty">No kills match your filters.</div>';
+  document.getElementById('pvp-count').textContent = `Showing ${data.length} kill${data.length!==1?'s':''}`;
+}
+
+// ══ RENDER DROPS ══
+function renderDrops(data) {
+  const feed = document.getElementById('drop-feed');
+  feed.innerHTML = data.length ? data.map(d => {
+    const splitPanel = d.split ? `
+      <div class="split-panel">
+        <span class="split-label">Split between</span>
+        <div class="split-members">
+          ${d.members.map((m,i) => `
+            <div class="split-member">
+              ${i > 0 ? '<div class="split-dot"></div>' : ''}
+              <a href="profile.html?rsn=${m.name}" class="split-member-name" style="text-decoration:none">${m.name}</a>
+              <span class="split-cut">${m.cut}</span>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="drop-card tier-${d.tier}">
+        <div class="drop-card-top">
+          <div class="drop-main">
+            <div class="drop-item-name tier-${d.tier}">${d.item}</div>
+            <div class="drop-meta">
+              <strong><a href="profile.html?rsn=${d.member}" style="text-decoration:none;color:inherit">${d.member}</a></strong>
+              &nbsp;·&nbsp; ${d.boss}
+            </div>
+            <div class="drop-tags">
+              <span class="drop-tag boss">⚔ ${d.boss}</span>
+              ${d.split
+                ? `<span class="drop-tag split">🤝 ${d.members.length}-way split</span>`
+                : `<span class="drop-tag solo">⭐ Solo drop</span>`}
+            </div>
+          </div>
+          <div>
+            <div class="drop-value">${d.value}</div>
+            <div class="drop-value-note">GE value</div>
+          </div>
+          <div class="drop-time">${d.time}</div>
+          <span class="drop-verified ${d.verified ? 'yes' : 'pending'}">${d.verified ? '✓ Verified' : '⏳ Pending'}</span>
+        </div>
+        ${splitPanel}
+      </div>`;
+  }).join('')
+  : '<div class="empty">No drops match your filters.</div>';
+  document.getElementById('drop-count').textContent = `Showing ${data.length} drop${data.length!==1?'s':''}`;
+}
+
+// ══ RENDER GP GRIDS ══
+function renderGpGrid(data, elId) {
+  const top = data[0].raw;
+  const el = document.getElementById(elId);
+  el.innerHTML = data.map((m, i) => {
+    const cls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const pct = Math.round((m.raw/top)*100);
+    return `
+      <div class="gp-card ${cls}" onclick="window.location='profile.html?rsn=${m.name}'">
+        <div class="gp-rank">${['I','II','III','IV','V','VI','VII','VIII'][i]}</div>
+        <div class="gp-info">
+          <div class="gp-name">${m.name}</div>
+          <div class="gp-bar-wrap"><div class="gp-bar" style="width:0%" data-w="${pct}%"></div></div>
+        </div>
+        <div class="gp-amount">${m.gp}</div>
+      </div>`;
+  }).join('');
+}
+
+// ══ FILTERS ══
+function filterPvp() {
+  const search = document.getElementById('pvp-search').value.toLowerCase();
+  const loc    = document.getElementById('pvp-loc').value;
+  const filtered = PVP_DATA.filter(k =>
+    (!search || k.killer.toLowerCase().includes(search) || k.victim.toLowerCase().includes(search)) &&
+    (!loc    || k.loc === loc)
+  );
+  renderPvp(filtered);
+}
+
+function filterDrops() {
+  const search = document.getElementById('drop-search').value.toLowerCase();
+  const boss   = document.getElementById('drop-boss').value;
+  const type   = document.getElementById('drop-type').value;
+  const filtered = DROP_DATA.filter(d =>
+    (!search || d.item.toLowerCase().includes(search) || d.member.toLowerCase().includes(search)) &&
+    (!boss   || d.boss === boss) &&
+    (!type   || (type === 'split' ? d.split : !d.split))
+  );
+  renderDrops(filtered);
+}
+
+// ══ VIEW TOGGLE ══
+function setView(v, btn) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Animate GP bars for the newly visible view
+  setTimeout(animateBars, 150);
+}
+
+// ══ ANIMATE BARS ══
+function animateBars() {
+  document.querySelectorAll('.gp-bar[data-w]').forEach(b => {
+    b.style.width = b.dataset.w;
+  });
+}
+
+// ══ SCROLL REVEAL ══
+const obs = new IntersectionObserver(
+  es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+  { threshold:0.08 }
+);
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ══ INIT ══
+renderPvp(PVP_DATA);
+renderDrops(DROP_DATA);
+renderGpGrid(PVP_GP,  'pvp-gp-grid');
+renderGpGrid(DROP_GP, 'drop-gp-grid');
+setTimeout(animateBars, 500);
+</script>
+</body>
+</html>

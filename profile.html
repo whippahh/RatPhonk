@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R4TKING — RAT PHONK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:      #060504;
+    --deep:       #0a0804;
+    --surface:    #100d08;
+    --raised:     #17130c;
+    --forest:     #263f22;
+    --forest-md:  #3a6634;
+    --forest-lt:  #4e8c46;
+    --glow:       #5dba4e;
+    --glow-lt:    #80d96c;
+    --glow-dim:   #2d5c28;
+    --glow-dk:    #1a3a16;
+    --gold:       #c9a94c;
+    --gold-dim:   #7c6230;
+    --gold-dk:    #3a2c10;
+    --red:        #c05050;
+    --red-dim:    #6b2828;
+    --parch:      #b9a272;
+    --parch-md:   #8a7250;
+    --parch-dk:   #4a3820;
+    --border:     #221a0e;
+    --border-md:  #332614;
+    --text:       #c2a86e;
+    --text-dim:   #766040;
+    --text-deep:  #332818;
+  }
+
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size:17px; line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    background-size:380px 380px; mix-blend-mode:overlay;
+  }
+
+  .page { position:relative; z-index:1; }
+
+  /* ══ NAV ══ */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    height:54px;
+    background:linear-gradient(180deg,rgba(6,5,4,.98) 0%,rgba(10,8,4,.95) 100%);
+    border-bottom:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 30px rgba(0,0,0,.7);
+  }
+  .nav-link {
+    font-family:'Cinzel',serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--parch-md); text-decoration:none;
+    padding:0 26px; height:54px;
+    display:flex; align-items:center;
+    border-right:1px solid var(--border);
+    transition:color .2s, background .2s;
+    position:relative; white-space:nowrap;
+  }
+  .nav-link:first-child { border-left:1px solid var(--border); }
+  .nav-link:hover { color:var(--parch); background:rgba(255,200,80,.025); }
+  .nav-link.active { color:var(--glow); }
+  .nav-link.active::after {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+    background:var(--glow); box-shadow:0 0 8px var(--glow);
+  }
+
+  /* ══ PROFILE HERO ══ */
+  .profile-hero {
+    padding-top:54px;
+    position:relative; overflow:hidden;
+    background:linear-gradient(180deg, var(--deep) 0%, var(--black) 100%);
+    border-bottom:2px solid var(--border);
+  }
+
+  /* Ambient glow */
+  .hero-ambient {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:900px; height:500px; pointer-events:none; z-index:0;
+    background:radial-gradient(ellipse 60% 80% at 50% 0%, rgba(38,80,34,.14) 0%, transparent 70%);
+  }
+
+  /* Brambles — corners */
+  .bramble {
+    position:absolute; pointer-events:none; z-index:1;
+    width:260px; height:260px; opacity:.6;
+  }
+  .bramble svg { width:100%; height:100%; }
+  .bramble-tl { top:54px; left:0; }
+  .bramble-tr { top:54px; right:0; transform:scaleX(-1); }
+
+  .hero-inner {
+    position:relative; z-index:2;
+    max-width:1100px; margin:0 auto;
+    padding:44px 56px 0;
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:36px; align-items:start;
+  }
+
+  /* ── AVATAR ── */
+  .avatar-wrap { position:relative; flex-shrink:0; }
+  .avatar-frame {
+    width:120px; height:120px;
+    border:2px solid var(--border-md);
+    background:var(--surface);
+    overflow:hidden;
+    position:relative;
+  }
+  .avatar-frame img {
+    width:100%; height:100%;
+    object-fit:cover; image-rendering:pixelated;
+  }
+  .avatar-frame::after {
+    content:''; position:absolute; inset:0;
+    box-shadow:inset 0 0 16px rgba(0,0,0,.6);
+    pointer-events:none;
+  }
+  /* Gold border for admin, green for officer */
+  .avatar-frame.admin   { border-color:var(--gold-dim); box-shadow:0 0 20px rgba(201,169,76,.2); }
+  .avatar-frame.officer { border-color:var(--glow-dim); box-shadow:0 0 20px rgba(93,186,78,.15); }
+
+  .avatar-role {
+    position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.15em;
+    text-transform:uppercase; padding:3px 10px;
+    white-space:nowrap; border:1px solid;
+  }
+  .avatar-role.admin   { background:var(--gold-dk); border-color:var(--gold-dim); color:var(--gold); }
+  .avatar-role.officer { background:var(--glow-dk); border-color:var(--glow-dim); color:var(--glow); }
+  .avatar-role.member  { background:var(--surface);  border-color:var(--border-md); color:var(--text-dim); }
+
+  /* ── IDENTITY ── */
+  .identity { padding-bottom:8px; }
+
+  .profile-rsn {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(28px,4vw,52px);
+    color:#e8dcc8; letter-spacing:.04em; line-height:1.1;
+    text-shadow:0 2px 20px rgba(0,0,0,.9);
+    margin-bottom:10px;
+  }
+
+  .profile-badges {
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;
+    align-items:center;
+  }
+  .badge {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.15em;
+    text-transform:uppercase; padding:3px 10px; border:1px solid;
+    display:inline-block;
+  }
+  .badge.gold   { border-color:var(--gold-dim); color:var(--gold); background:var(--gold-dk); }
+  .badge.green  { border-color:var(--glow-dim); color:var(--glow); background:var(--glow-dk); }
+  .badge.grey   { border-color:var(--border-md); color:var(--text-dim); background:var(--surface); }
+  .badge.red    { border-color:var(--red-dim); color:var(--red); background:rgba(58,20,20,.4); }
+
+  .profile-joined {
+    font-style:italic; font-size:14px; color:var(--text-dim);
+  }
+  .profile-joined span { color:var(--parch-md); }
+
+  /* ── QUICK STATS ── */
+  .quick-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:2px;
+    min-width:260px;
+  }
+  .qs-item {
+    background:rgba(16,13,8,.7);
+    border:1px solid var(--border);
+    padding:14px 18px;
+    position:relative; overflow:hidden;
+  }
+  .qs-item::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  }
+  .qs-item.green::before { background:var(--glow); }
+  .qs-item.gold::before  { background:var(--gold); }
+  .qs-item.parch::before { background:var(--parch-md); }
+
+  .qs-label {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:.25em;
+    text-transform:uppercase; color:var(--text-deep); margin-bottom:6px;
+  }
+  .qs-value {
+    font-family:'Cinzel Decorative',serif; font-size:22px;
+    line-height:1; margin-bottom:4px;
+  }
+  .qs-value.green { color:var(--glow); text-shadow:0 0 14px rgba(93,186,78,.4); }
+  .qs-value.gold  { color:var(--gold); }
+  .qs-value.white { color:#e8dcc8; }
+  .qs-sub { font-style:italic; font-size:12px; color:var(--text-dim); }
+
+  /* ── BOSS HIGHLIGHTS ── */
+  .boss-highlights {
+    grid-column:1/-1;
+    padding:0 0 0;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:2px;
+    margin-top:28px;
+  }
+
+  .boss-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-top:2px solid var(--border-md);
+    padding:16px 20px;
+    display:flex; align-items:center; gap:14px;
+    transition:border-color .2s;
+  }
+  .boss-card:hover { border-color:var(--border-md); }
+  .boss-icon { font-size:26px; flex-shrink:0; }
+  .boss-info { flex:1; min-width:0; }
+  .boss-name {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.1em;
+    color:var(--parch-md); text-transform:uppercase; margin-bottom:4px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .boss-kc {
+    font-family:'Cinzel Decorative',serif; font-size:24px;
+    color:var(--gold); line-height:1;
+  }
+  .boss-sub { font-style:italic; font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+  /* ── WEEKLY SPOTLIGHT ── */
+  .weekly-bar {
+    grid-column:1/-1;
+    background:rgba(38,80,34,.1);
+    border:1px solid var(--glow-dim);
+    padding:14px 20px;
+    display:flex; align-items:center; gap:20px;
+    margin-top:2px;
+  }
+  .wb-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.25em;
+    color:var(--glow-dim); text-transform:uppercase; white-space:nowrap;
+  }
+  .wb-skill {
+    font-family:'Cinzel',serif; font-size:12px; color:var(--parch);
+    letter-spacing:.08em;
+  }
+  .wb-value {
+    font-family:'Cinzel Decorative',serif; font-size:20px;
+    color:var(--glow); margin-left:auto; white-space:nowrap;
+  }
+  .wb-rank {
+    font-family:'Cinzel',serif; font-size:11px;
+    color:var(--text-dim); white-space:nowrap;
+  }
+  .wb-dot {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--glow); box-shadow:0 0 8px var(--glow);
+    flex-shrink:0; animation:blink 2.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  /* ══ TABS ══ */
+  .tabs-bar {
+    background:var(--deep);
+    border-bottom:2px solid var(--border);
+    display:flex;
+    max-width:1100px; margin:0 auto;
+    padding:0 56px;
+    position:sticky; top:54px; z-index:50;
+  }
+  .tab {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--text-dim);
+    padding:16px 24px; cursor:pointer;
+    background:none; border:none;
+    border-bottom:2px solid transparent; margin-bottom:-2px;
+    transition:color .2s; white-space:nowrap;
+  }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--glow); border-bottom-color:var(--glow); }
+
+  /* ══ TAB CONTENT ══ */
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .content-wrap {
+    max-width:1100px; margin:0 auto;
+    padding:36px 56px;
+  }
+
+  /* ── SKILLS ── */
+  .skills-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px,1fr));
+    gap:2px;
+  }
+
+  .skill-row {
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:12px 16px;
+    display:grid;
+    grid-template-columns:28px 1fr auto;
+    align-items:center; gap:10px;
+    transition:background .15s;
+  }
+  .skill-row:hover { background:var(--raised); }
+
+  .skill-icon { font-size:18px; text-align:center; }
+  .skill-name {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.08em;
+    color:var(--parch-md); text-transform:uppercase;
+  }
+  .skill-lvl {
+    font-family:'Cinzel Decorative',serif; font-size:18px;
+    color:var(--parch); text-align:right; line-height:1;
+  }
+  .skill-lvl.maxed { color:var(--gold); text-shadow:0 0 10px rgba(201,169,76,.5); }
+  .skill-xp {
+    grid-column:2/-1;
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--text-dim); margin-top:2px;
+  }
+  .skill-bar-wrap { grid-column:2/-1; height:2px; background:var(--border); margin-top:2px; }
+  .skill-bar { height:100%; background:var(--forest-md); opacity:.7; transition:width 1s cubic-bezier(.16,1,.3,1); }
+
+  /* ── BOSSES ── */
+  .boss-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+    gap:2px;
+  }
+
+  .boss-row {
+    background:var(--surface); border:1px solid var(--border);
+    padding:14px 18px;
+    display:grid; grid-template-columns:32px 1fr auto;
+    align-items:center; gap:12px;
+    transition:background .15s;
+  }
+  .boss-row:hover { background:var(--raised); }
+  .boss-row-icon { font-size:20px; text-align:center; }
+  .boss-row-name {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.08em;
+    color:var(--parch-md); text-transform:uppercase; line-height:1.3;
+  }
+  .boss-row-kc {
+    font-family:'Cinzel Decorative',serif; font-size:20px;
+    color:var(--gold-dim); text-align:right; line-height:1;
+  }
+  .boss-row-kc.notable { color:var(--gold); }
+
+  /* ── PVP ── */
+  .pvp-summary {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px;
+  }
+  .pvp-stat {
+    background:var(--surface); border:1px solid var(--border);
+    padding:18px 20px; text-align:center;
+  }
+  .pvp-stat-val {
+    font-family:'Cinzel Decorative',serif; font-size:28px; line-height:1; margin-bottom:6px;
+  }
+  .pvp-stat-val.green { color:var(--glow); }
+  .pvp-stat-val.red   { color:var(--red); }
+  .pvp-stat-val.gold  { color:var(--gold); }
+  .pvp-stat-val.white { color:#e8dcc8; }
+  .pvp-stat-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.2em;
+    color:var(--text-deep); text-transform:uppercase;
+  }
+
+  .kill-table { width:100%; border-collapse:collapse; }
+  .kill-table th {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--text-dim);
+    padding:10px 16px; border-bottom:1px solid var(--border-md);
+    text-align:left; font-weight:600;
+  }
+  .kill-table th.r { text-align:right; }
+  .kill-table td { padding:11px 16px; border-bottom:1px solid rgba(34,26,14,.6); font-size:14px; }
+  .kill-table tr:last-child td { border-bottom:none; }
+  .kill-table tbody tr { transition:background .15s; }
+  .kill-table tbody tr:hover { background:rgba(185,162,114,.04); }
+
+  .kill-victim { font-family:'Cinzel',serif; font-size:13px; color:#e8dcc8; letter-spacing:.06em; }
+  .kill-loc  { font-style:italic; font-size:13px; color:var(--text-dim); }
+  .kill-loot { font-family:'Cinzel Decorative',serif; font-size:15px; color:var(--gold); text-align:right; }
+  .kill-time { font-size:12px; color:var(--text-dim); text-align:right; }
+  .kill-shot {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:.1em;
+    padding:2px 8px; border:1px solid var(--glow-dim); color:var(--glow);
+    cursor:pointer; text-transform:uppercase; transition:background .2s;
+  }
+  .kill-shot:hover { background:var(--glow-dk); }
+
+  /* ── LEADERBOARD HISTORY ── */
+  .lb-history {
+    display:flex; flex-direction:column; gap:28px;
+  }
+
+  .lbh-week {
+    background:var(--surface); border:1px solid var(--border);
+  }
+  .lbh-week-head {
+    background:var(--raised); border-bottom:1px solid var(--border);
+    padding:12px 20px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .lbh-week-title {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.15em;
+    color:var(--parch); text-transform:uppercase;
+  }
+  .lbh-week-date { font-style:italic; font-size:13px; color:var(--text-dim); }
+
+  .lbh-row {
+    display:grid; grid-template-columns:120px 1fr 120px 120px;
+    padding:10px 20px; border-bottom:1px solid rgba(34,26,14,.6);
+    align-items:center; gap:12px;
+  }
+  .lbh-row:last-child { border-bottom:none; }
+
+  .lbh-cat { font-family:'Cinzel',serif; font-size:10px; letter-spacing:.1em; color:var(--text-dim); text-transform:uppercase; }
+  .lbh-bar-wrap { height:3px; background:var(--border); }
+  .lbh-bar { height:100%; background:var(--forest-md); opacity:.7; }
+  .lbh-val { font-family:'Cinzel Decorative',serif; font-size:16px; color:var(--glow); text-align:right; }
+  .lbh-val.gold { color:var(--gold-dim); }
+  .lbh-rank-badge {
+    font-family:'Cinzel Decorative',serif; font-size:18px; text-align:right;
+    color:var(--text-deep);
+  }
+  .lbh-rank-badge.r1 { color:var(--gold); text-shadow:0 0 10px rgba(201,169,76,.5); }
+  .lbh-rank-badge.r2 { color:var(--parch-md); }
+  .lbh-rank-badge.r3 { color:#6b4830; }
+
+  /* ══ SECTION HEADER ══ */
+  .sec-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px; gap:12px;
+  }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:.25em;
+    color:var(--parch-md); text-transform:uppercase;
+  }
+  .sec-rule { flex:1; height:1px; background:var(--border); }
+
+  /* ══ FOOTER ══ */
+  footer {
+    padding:26px 56px; border-top:2px solid var(--border);
+    background:var(--deep);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ft-logo { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.2em; color:var(--text-dim); }
+  .ft-note { font-style:italic; font-size:12px; color:var(--text-deep); }
+  .ft-note a { color:var(--glow-dim); text-decoration:none; }
+
+  /* ══ ANIMATIONS ══ */
+  .reveal { opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .anim { opacity:0; animation:fadeUp .6s ease forwards; }
+  .anim.d1 { animation-delay:.05s; }
+  .anim.d2 { animation-delay:.15s; }
+  .anim.d3 { animation-delay:.25s; }
+  .anim.d4 { animation-delay:.35s; }
+
+  @media(max-width:900px){
+    nav { overflow-x:auto; justify-content:flex-start; }
+    .nav-link { padding:0 16px; font-size:9.5px; }
+    .hero-inner { grid-template-columns:1fr; gap:20px; padding:24px; }
+    .quick-stats { grid-template-columns:1fr 1fr; }
+    .boss-highlights { grid-template-columns:1fr; }
+    .tabs-bar { padding:0 16px; overflow-x:auto; }
+    .content-wrap { padding:24px 16px; }
+    .pvp-summary { grid-template-columns:1fr 1fr; }
+    .lbh-row { grid-template-columns:100px 1fr 80px 80px; }
+    footer { flex-direction:column; gap:10px; text-align:center; padding:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="ratphonk_final.html" class="nav-link">Home</a>
+  <a href="leaderboards.html"   class="nav-link">Leaderboards</a>
+  <a href="#"                   class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"                   class="nav-link">Event Calendar</a>
+  <a href="#"                   class="nav-link active">Rat Profiles</a>
+  <a href="#"                   class="nav-link">The Ledger</a>
+</nav>
+
+<!-- PROFILE HERO -->
+<div class="profile-hero">
+  <div class="hero-ambient"></div>
+
+  <!-- Brambles -->
+  <div class="bramble bramble-tl"><svg viewBox="0 0 260 260" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width=".9"/>
+    <path d="M9,70 L2,63 M9,70 L2,77" stroke="#332010" stroke-width=".9"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width=".9"/>
+    <path d="M72,12 L65,5 M72,12 L79,6" stroke="#332010" stroke-width=".9"/>
+  </g></svg></div>
+  <div class="bramble bramble-tr"><svg viewBox="0 0 260 260" fill="none"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,0 C12,44 3,95 11,140 C16,175 5,205 19,244" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,0 C48,19 105,8 155,17 C188,24 216,14 257,25" stroke="#1c1309" stroke-width="2"/>
+    <path d="M0,12 C28,57 15,112 25,163" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M12,0 C55,31 112,19 165,25" stroke="#271a0c" stroke-width="1.2"/>
+    <path d="M5,37 L0,30 M5,37 L0,45" stroke="#332010" stroke-width=".9"/>
+    <path d="M37,7 L31,1 M37,7 L43,2" stroke="#332010" stroke-width=".9"/>
+  </g></svg></div>
+
+  <div class="hero-inner">
+
+    <!-- AVATAR -->
+    <div class="avatar-wrap anim d1">
+      <div class="avatar-frame admin">
+        <!-- WOM player avatar: https://api.wiseoldman.net/v2/players/{rsn}/avatar -->
+        <img src="https://api.wiseoldman.net/v2/players/r4tking/avatar"
+             onerror="this.src='https://oldschool.runescape.wiki/images/thumb/Wise_Old_Man.png/200px-Wise_Old_Man.png'"
+             alt="R4TKING avatar">
+      </div>
+      <div class="avatar-role admin">Admin</div>
+    </div>
+
+    <!-- IDENTITY -->
+    <div class="identity anim d2">
+      <div class="profile-rsn">R4TKING</div>
+      <div class="profile-badges">
+        <span class="badge gold">👑 Co-Founder</span>
+        <span class="badge green">⚔ Raid Logger</span>
+        <span class="badge green">💀 PK Legend</span>
+        <span class="badge grey">🐀 Rat Phonk OG</span>
+      </div>
+      <div class="profile-joined">
+        Member since <span>January 2023</span> &nbsp;·&nbsp;
+        Last seen <span style="color:var(--glow)">today</span>
+      </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="quick-stats anim d3">
+      <div class="qs-item green">
+        <div class="qs-label">Combat Level</div>
+        <div class="qs-value green">126</div>
+        <div class="qs-sub">Maxed combat</div>
+      </div>
+      <div class="qs-item parch">
+        <div class="qs-label">Total Level</div>
+        <div class="qs-value white">2,277</div>
+        <div class="qs-sub">All 99s</div>
+      </div>
+      <div class="qs-item gold">
+        <div class="qs-label">Collection Log</div>
+        <div class="qs-value gold">1,402</div>
+        <div class="qs-sub">/ 1,477 slots</div>
+      </div>
+      <div class="qs-item green">
+        <div class="qs-label">Rank (This Week)</div>
+        <div class="qs-value green">#1</div>
+        <div class="qs-sub">XP Gains</div>
+      </div>
+    </div>
+
+    <!-- WEEKLY SPOTLIGHT -->
+    <div class="weekly-bar anim d4">
+      <div class="wb-dot"></div>
+      <div class="wb-label">This week's top skill</div>
+      <div class="wb-skill">Slayer &nbsp;·&nbsp; 84.2M XP gained</div>
+      <div class="wb-rank">#1 on weekly board</div>
+      <div class="wb-value">84.2M</div>
+    </div>
+
+    <!-- BOSS HIGHLIGHTS -->
+    <div class="boss-highlights">
+      <div class="boss-card">
+        <div class="boss-icon">🐲</div>
+        <div class="boss-info">
+          <div class="boss-name">Vorkath</div>
+          <div class="boss-kc">4,841</div>
+          <div class="boss-sub">Top boss · 287 this week</div>
+        </div>
+      </div>
+      <div class="boss-card">
+        <div class="boss-icon">🩸</div>
+        <div class="boss-info">
+          <div class="boss-name">Theatre of Blood</div>
+          <div class="boss-kc">1,204</div>
+          <div class="boss-sub">Scythe · Sanguinesti drops</div>
+        </div>
+      </div>
+      <div class="boss-card">
+        <div class="boss-icon">☠</div>
+        <div class="boss-info">
+          <div class="boss-name">Chambers of Xeric</div>
+          <div class="boss-kc">988</div>
+          <div class="boss-sub">Twisted bow drop at 412 KC</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('skills', this)">Skills</button>
+  <button class="tab" onclick="switchTab('bosses', this)">Boss KC</button>
+  <button class="tab" onclick="switchTab('pvp', this)">PvP History</button>
+  <button class="tab" onclick="switchTab('history', this)">LB History</button>
+</div>
+
+<!-- ══ SKILLS TAB ══ -->
+<div class="tab-content active" id="tab-skills">
+  <div class="content-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-title">Skill Hiscores</span>
+      <div class="sec-rule"></div>
+      <span style="font-style:italic;font-size:13px;color:var(--text-dim)">Total XP: 4,284,116,220</span>
+    </div>
+    <div class="skills-grid reveal" id="skills-grid"></div>
+  </div>
+</div>
+
+<!-- ══ BOSSES TAB ══ -->
+<div class="tab-content" id="tab-bosses">
+  <div class="content-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-title">Boss Kill Count</span>
+      <div class="sec-rule"></div>
+      <span style="font-style:italic;font-size:13px;color:var(--text-dim)">All time totals</span>
+    </div>
+    <div class="boss-grid reveal" id="boss-grid"></div>
+  </div>
+</div>
+
+<!-- ══ PVP TAB ══ -->
+<div class="tab-content" id="tab-pvp">
+  <div class="content-wrap">
+    <div class="pvp-summary reveal">
+      <div class="pvp-stat">
+        <div class="pvp-stat-val green">4,841</div>
+        <div class="pvp-stat-label">Total Kills</div>
+      </div>
+      <div class="pvp-stat">
+        <div class="pvp-stat-val red">1,102</div>
+        <div class="pvp-stat-label">Total Deaths</div>
+      </div>
+      <div class="pvp-stat">
+        <div class="pvp-stat-val white">4.4</div>
+        <div class="pvp-stat-label">K/D Ratio</div>
+      </div>
+      <div class="pvp-stat">
+        <div class="pvp-stat-val gold">84.1B</div>
+        <div class="pvp-stat-label">GP Looted</div>
+      </div>
+    </div>
+
+    <div class="sec-head reveal">
+      <span class="sec-title">Recent Kills</span>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border-md)" class="reveal">
+      <table class="kill-table">
+        <thead>
+          <tr>
+            <th>Victim</th>
+            <th>Location</th>
+            <th class="r">Loot</th>
+            <th class="r">When</th>
+            <th class="r">Proof</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="kill-victim">PKwarrior88</span></td><td><span class="kill-loc">Revenant Caves</span></td><td class="kill-loot">12.4M</td><td class="kill-time">2h ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">ZulrahGrind</span></td><td><span class="kill-loc">Wilderness (lvl 44)</span></td><td class="kill-loot">8.1M</td><td class="kill-time">5h ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">IronNoob</span></td><td><span class="kill-loc">Edgeville</span></td><td class="kill-loot">240K</td><td class="kill-time">1d ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">BossHunter99</span></td><td><span class="kill-loc">Wilderness (lvl 52)</span></td><td class="kill-loot">44.8M</td><td class="kill-time">1d ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">slayer_main</span></td><td><span class="kill-loc">Chaos Altar</span></td><td class="kill-loot">6.2M</td><td class="kill-time">2d ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">raid_pker420</span></td><td><span class="kill-loc">Revenant Caves</span></td><td class="kill-loot">18.9M</td><td class="kill-time">2d ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+          <tr><td><span class="kill-victim">GWD_Farmer</span></td><td><span class="kill-loc">Wilderness (lvl 38)</span></td><td class="kill-loot">3.4M</td><td class="kill-time">3d ago</td><td style="text-align:right"><span class="kill-shot">📷 Screenshot</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LB HISTORY TAB ══ -->
+<div class="tab-content" id="tab-history">
+  <div class="content-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-title">Leaderboard History</span>
+      <div class="sec-rule"></div>
+      <span style="font-style:italic;font-size:13px;color:var(--text-dim)">Past 4 weeks</span>
+    </div>
+    <div class="lb-history reveal" id="lb-history"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">Rat Phonk · OSRS Clan</div>
+  <div class="ft-note">Data via <a href="#">Wise Old Man API</a> · Updates every 6 hours</div>
+</footer>
+
+</div>
+
+<script>
+// ══ SKILLS DATA ══
+const SKILLS = [
+  {name:'Attack',      icon:'⚔',  lvl:99, xp:'13,034,451', pct:100},
+  {name:'Hitpoints',   icon:'❤',  lvl:99, xp:'200,000,000',pct:100},
+  {name:'Mining',      icon:'⛏',  lvl:99, xp:'13,034,451', pct:100},
+  {name:'Strength',    icon:'💪', lvl:99, xp:'200,000,000',pct:100},
+  {name:'Agility',     icon:'🏃', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Smithing',    icon:'🔨', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Defence',     icon:'🛡',  lvl:99, xp:'13,034,451', pct:100},
+  {name:'Herblore',    icon:'🌿', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Fishing',     icon:'🎣', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Ranged',      icon:'🏹', lvl:99, xp:'200,000,000',pct:100},
+  {name:'Thieving',    icon:'🗝',  lvl:99, xp:'13,034,451', pct:100},
+  {name:'Cooking',     icon:'🍳', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Prayer',      icon:'✨', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Crafting',    icon:'💎', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Firemaking',  icon:'🔥', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Magic',       icon:'🔮', lvl:99, xp:'200,000,000',pct:100},
+  {name:'Fletching',   icon:'🪶', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Woodcutting', icon:'🪓', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Runecraft',   icon:'🌀', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Slayer',      icon:'💀', lvl:99, xp:'200,000,000',pct:100},
+  {name:'Farming',     icon:'🌾', lvl:99, xp:'13,034,451', pct:100},
+  {name:'Construction',icon:'🏗',  lvl:99, xp:'13,034,451', pct:100},
+  {name:'Hunter',      icon:'🦌', lvl:99, xp:'13,034,451', pct:100},
+];
+
+const skillsGrid = document.getElementById('skills-grid');
+SKILLS.forEach(s => {
+  const maxed = s.lvl === 99;
+  skillsGrid.innerHTML += `
+    <div class="skill-row">
+      <div class="skill-icon">${s.icon}</div>
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-lvl ${maxed ? 'maxed' : ''}">${s.lvl}</div>
+      <div class="skill-xp">${s.xp} xp</div>
+      <div class="skill-bar-wrap"><div class="skill-bar" style="width:0%" data-w="${s.pct}%"></div></div>
+    </div>`;
+});
+
+// ══ BOSSES DATA ══
+const BOSSES = [
+  {name:'Vorkath',              icon:'🐲', kc:4841, notable:true},
+  {name:'Theatre of Blood',     icon:'🩸', kc:1204, notable:true},
+  {name:'Chambers of Xeric',    icon:'💠', kc:988,  notable:true},
+  {name:'Tombs of Amascut',     icon:'☀',  kc:741,  notable:true},
+  {name:'Zulrah',               icon:'🐍', kc:2841, notable:true},
+  {name:'Cerberus',             icon:'🐕', kc:1882, notable:true},
+  {name:'General Graardor',     icon:'⚔',  kc:944,  notable:false},
+  {name:'Commander Zilyana',    icon:'👼', kc:812,  notable:false},
+  {name:'Kree\'arra',           icon:'🦅', kc:688,  notable:false},
+  {name:'K\'ril Tsutsaroth',    icon:'😈', kc:544,  notable:false},
+  {name:'Callisto',             icon:'🐻', kc:412,  notable:false},
+  {name:'Venenatis',            icon:'🕷',  kc:388,  notable:false},
+  {name:"Vet'ion",              icon:'💀', kc:298,  notable:false},
+  {name:'Corporeal Beast',      icon:'👁',  kc:241,  notable:false},
+  {name:'Nightmare',            icon:'😴', kc:188,  notable:false},
+  {name:'Gauntlet (Corrupted)', icon:'⚡', kc:144,  notable:false},
+  {name:'Abyssal Sire',         icon:'🌊', kc:341,  notable:false},
+  {name:'Kraken',               icon:'🦑', kc:1204, notable:false},
+  {name:'Dagannoth Rex',        icon:'👑', kc:441,  notable:false},
+  {name:'Thermonuclear Smokedev',icon:'💨',kc:88,   notable:false},
+];
+
+const bossGrid = document.getElementById('boss-grid');
+BOSSES.forEach(b => {
+  bossGrid.innerHTML += `
+    <div class="boss-row">
+      <div class="boss-row-icon">${b.icon}</div>
+      <div class="boss-row-name">${b.name}</div>
+      <div class="boss-row-kc ${b.notable ? 'notable' : ''}">${b.kc.toLocaleString()}</div>
+    </div>`;
+});
+
+// ══ LB HISTORY DATA ══
+const LB_HISTORY = [
+  {
+    week:'Week 24', date:'24–30 Mar 2025',
+    entries:[
+      {cat:'XP Gains',  val:'84.2M', rank:'I',  rankCls:'r1', barPct:100, valCls:''},
+      {cat:'Boss KC',   val:'287',   rank:'II', rankCls:'r2', barPct:70,  valCls:'gold'},
+      {cat:'GP Earned', val:'1.24B', rank:'II', rankCls:'r2', barPct:65,  valCls:'gold'},
+    ]
+  },
+  {
+    week:'Week 23', date:'17–23 Mar 2025',
+    entries:[
+      {cat:'XP Gains',  val:'61.2M', rank:'II', rankCls:'r2', barPct:73,  valCls:''},
+      {cat:'Boss KC',   val:'412',   rank:'I',  rankCls:'r1', barPct:100, valCls:'gold'},
+      {cat:'GP Earned', val:'880M',  rank:'III',rankCls:'r3', barPct:55,  valCls:'gold'},
+    ]
+  },
+  {
+    week:'Week 22', date:'10–16 Mar 2025',
+    entries:[
+      {cat:'XP Gains',  val:'92.4M', rank:'I',  rankCls:'r1', barPct:100, valCls:''},
+      {cat:'Boss KC',   val:'314',   rank:'III',rankCls:'r3', barPct:55,  valCls:'gold'},
+      {cat:'PvP Kills', val:'44',    rank:'I',  rankCls:'r1', barPct:100, valCls:''},
+    ]
+  },
+  {
+    week:'Week 21', date:'3–9 Mar 2025',
+    entries:[
+      {cat:'XP Gains',  val:'44.8M', rank:'III',rankCls:'r3', barPct:52,  valCls:''},
+      {cat:'Boss KC',   val:'198',   rank:'IV', rankCls:'',   barPct:40,  valCls:'gold'},
+      {cat:'GP Earned', val:'2.1B',  rank:'I',  rankCls:'r1', barPct:100, valCls:'gold'},
+    ]
+  },
+];
+
+const lbHistory = document.getElementById('lb-history');
+LB_HISTORY.forEach(w => {
+  let rows = w.entries.map(e => `
+    <div class="lbh-row">
+      <div class="lbh-cat">${e.cat}</div>
+      <div class="lbh-bar-wrap"><div class="lbh-bar" style="width:${e.barPct}%"></div></div>
+      <div class="lbh-val ${e.valCls}">${e.val}</div>
+      <div class="lbh-rank-badge ${e.rankCls}">${e.rank}</div>
+    </div>`).join('');
+
+  lbHistory.innerHTML += `
+    <div class="lbh-week">
+      <div class="lbh-week-head">
+        <span class="lbh-week-title">${w.week}</span>
+        <span class="lbh-week-date">${w.date}</span>
+      </div>
+      ${rows}
+    </div>`;
+});
+
+// ══ TAB SWITCHING ══
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+
+  // Animate skill bars when skills tab opens
+  if (id === 'skills') {
+    setTimeout(() => {
+      document.querySelectorAll('.skill-bar[data-w]').forEach(b => { b.style.width = b.dataset.w; });
+    }, 100);
+  }
+}
+
+// ══ SCROLL REVEAL ══
+const obs = new IntersectionObserver(
+  es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+  { threshold: 0.08 }
+);
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Animate skill bars on initial load (skills tab is default)
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.skill-bar[data-w]').forEach(b => { b.style.width = b.dataset.w; });
+  }, 400);
+});
+</script>
+</body>
+</html>
