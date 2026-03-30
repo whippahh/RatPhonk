@@ -14,19 +14,19 @@ async function womFetch(path) {
 
 export async function syncMemberList() {
   if (!WOM_GROUP_ID) return console.warn('[WOM] No WOM_GROUP_ID set');
-  console.log('[WOM] Syncing member list...');
+  console.log('[WOM] Syncing member list via hiscores endpoint...');
   try {
-    const data = await womFetch(`/groups/${WOM_GROUP_ID}/memberships`);
-const memberships = data;
-    for (const m of memberships) {
-      const { player } = m;
+    const data = await womFetch(`/groups/${WOM_GROUP_ID}/hiscores?metric=overall&limit=50`);
+    for (const entry of data) {
+      const player = entry.player;
+      if (!player) continue;
       db.prepare(`
         INSERT INTO members (rsn, wom_player_id, is_verified)
         VALUES (?, ?, 1)
         ON CONFLICT(rsn) DO UPDATE SET wom_player_id = excluded.wom_player_id
       `).run(player.displayName, player.id);
     }
-    console.log(`[WOM] Synced ${memberships.length} members`);
+    console.log(`[WOM] Synced ${data.length} members via hiscores`);
   } catch (err) {
     console.error('[WOM] Member sync failed:', err.message);
   }
@@ -90,7 +90,7 @@ export async function takeSnapshots() {
       }
 
       success++;
-      await new Promise(r => setTimeout(r, 400)); // 400ms rate limit buffer
+      await new Promise(r => setTimeout(r, 400));
 
     } catch (err) {
       console.warn(`[WOM] Snapshot failed for ${member.rsn}: ${err.message}`);
@@ -118,8 +118,8 @@ function managePeriodBoundary(periodType) {
   const startSnap = db.prepare('SELECT id FROM xp_snapshots ORDER BY captured_at DESC LIMIT 1').get();
   if (startSnap) {
     const label = periodType === 'weekly'
-      ? `Week of ${new Date().toISOString().slice(0,10)}`
-      : `Month of ${new Date().toISOString().slice(0,7)}`;
+      ? `Week of ${new Date().toISOString().slice(0, 10)}`
+      : `Month of ${new Date().toISOString().slice(0, 7)}`;
     db.prepare('INSERT INTO leaderboard_periods (label,period_type,starts_at,snapshot_start_id) VALUES (?,?,?,?)')
       .run(label, periodType, now, startSnap.id);
     console.log(`[WOM] Opened new ${periodType} period`);
