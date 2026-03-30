@@ -323,16 +323,8 @@ const start = async () => {
     startBot();
     startCrons();
     await syncMemberList();
-    await takeSnapshots();
-
-    // One-time admin setup — remove after first run
-    if (process.env.ADMIN_RSN) {
-      const result = db.prepare(
-        "UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE"
-      ).run(process.env.ADMIN_RSN);
-      console.log(`[SETUP] Admin promoted: ${process.env.ADMIN_RSN} (${result.changes} rows updated)`);
-    }
-
+    // Delay initial snapshots to avoid memory spike on startup
+    setTimeout(takeSnapshots, 30000);
   } catch (err) {
     app.log.error(err);
     process.exit(1);
