@@ -187,7 +187,7 @@ app.post('/auth/link-rsn', async (req, reply) => {
 
   db.prepare('UPDATE applications SET invite_used=1 WHERE id=?').run(application.id);
 
-  req.authData?.memberId || req.session.memberId = result.lastInsertRowid;
+  req.session.memberId = result.lastInsertRowid;
   req.session.role     = 'member';
   delete req.session.pendingDiscord;
 
