@@ -20,7 +20,12 @@ await app.register(cors, {
 await app.register(cookie);
 await app.register(session, {
   secret: process.env.SESSION_SECRET || 'changeme_32chars_minimum_please!!',
-  cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000 },
+  cookie: {
+    secure:   true,
+    sameSite: 'none',
+    httpOnly: true,
+    maxAge:   7 * 24 * 60 * 60 * 1000,
+  },
   saveUninitialized: false,
 });
 
@@ -303,6 +308,16 @@ app.get('/api/members/:rsn', (req, reply) => {
   ).get(member.id);
 
   reply.send({ ...member, snapshot: snap });
+});
+
+app.post('/api/admin/sync', { preHandler: requireAdmin }, async (req, reply) => {
+  try {
+    await syncMemberList();
+    await takeSnapshots();
+    reply.send({ success: true, message: 'WOM sync complete' });
+  } catch(e) {
+    reply.status(500).send({ error: e.message });
+  }
 });
 
 app.patch('/api/admin/members/:id', { preHandler: requireAdmin }, (req, reply) => {
