@@ -801,7 +801,7 @@ function timeAgo(ts) {
 // ── NAV AUTH ─────────────────────────────────────────────────
 async function updateNavAuth() {
   try {
-    const res = await fetch('https://ratphonk-production.up.railway.app/auth/me', { credentials:'include' });
+    const res = await authFetch('https://ratphonk-production.up.railway.app/auth/me');
     const btn = document.getElementById('nav-login');
     if (res.ok) {
       const me = await res.json();

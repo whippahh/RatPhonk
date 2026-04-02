@@ -1069,7 +1069,7 @@ async function loadDashboard() {
     document.getElementById('ov-inactive').textContent = '—'; // no inactive tracking yet
 
     // Events count
-    const evRes = await fetch(`${API}/api/events`);
+    const evRes = await authFetch(`${API}/api/events`);
     if (evRes.ok) {
       const evs = await evRes.json();
       const now = Math.floor(Date.now()/1000);
@@ -1176,7 +1176,7 @@ function filterApps(val) {
 async function approveApp(id, rsn, btn) {
   btn.disabled = true; btn.textContent = '…';
   try {
-    const res = await fetch(`${API}/api/admin/applications/${id}/approve`, {
+    const res = await authFetch(`${API}/api/admin/applications/${id}/approve`, {
       method:'POST', credentials:'include'
     });
     if (res.ok) {
@@ -1207,7 +1207,7 @@ async function confirmReject() {
   const { id, rsn } = rejectTarget;
   closeModal('reject-modal');
   try {
-    const res = await fetch(`${API}/api/admin/applications/${id}/reject`, {
+    const res = await authFetch(`${API}/api/admin/applications/${id}/reject`, {
       method:'POST', credentials:'include',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ reason: document.getElementById('reject-reason').value.trim() })
@@ -1286,7 +1286,7 @@ function filterMembers() {
 async function changeRole(id, rsn, sel) {
   const role = sel.value.toLowerCase();
   try {
-    const res = await fetch(`${API}/api/admin/members/${id}`, {
+    const res = await authFetch(`${API}/api/admin/members/${id}`, {
       method:'PATCH', credentials:'include',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ role })
@@ -1309,7 +1309,7 @@ async function confirmRSNEdit() {
   if (!newRSN || !rsnEditTarget) return;
   closeModal('rsn-modal');
   try {
-    const res = await fetch(`${API}/api/admin/members/${rsnEditTarget.id}`, {
+    const res = await authFetch(`${API}/api/admin/members/${rsnEditTarget.id}`, {
       method:'PATCH', credentials:'include',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ rsn: newRSN })
@@ -1327,7 +1327,7 @@ async function removeMember(id, rsn) {
 // ── EVENTS ────────────────────────────────────────────────────
 async function loadEvents() {
   try {
-    const res = await fetch(`${API}/api/events`);
+    const res = await authFetch(`${API}/api/events`);
     if (!res.ok) return;
     const events = await res.json();
     const now = Math.floor(Date.now()/1000);
@@ -1390,8 +1390,8 @@ async function createEvent() {
     ? Math.floor(new Date(`${dateVal}T${timeVal}:00Z`).getTime()/1000)
     : Math.floor(Date.now()/1000);
   try {
-    const res = await fetch(`${API}/api/events`, {
-      method:'POST', credentials:'include',
+    const res = await authFetch(`${API}/api/events`, {
+      method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         title:         name,
@@ -1468,7 +1468,7 @@ async function triggerSync() {
   const btn = document.getElementById('sync-btn');
   btn.textContent = '🔄 Syncing...'; btn.disabled = true;
   try {
-    const res = await fetch('https://ratphonk-production.up.railway.app/api/admin/sync', {
+    const res = await authFetch('https://ratphonk-production.up.railway.app/api/admin/sync', {
       method: 'POST', credentials: 'include'
     });
     const d = await res.json();

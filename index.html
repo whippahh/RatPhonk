@@ -651,10 +651,8 @@
   <div class="float-l">
     <div class="panel">
       <div class="panel-head">Current PvP Leaderboard</div>
-      <div class="panel-body">
-        <div class="pvp-row"><span class="pvp-rank">1</span><span class="pvp-icon">🐀</span><span class="pvp-name">R4TKING</span><span class="pvp-kc">660</span></div>
-        <div class="pvp-row"><span class="pvp-rank">2</span><span class="pvp-icon">🐀</span><span class="pvp-name">skullcrushr</span><span class="pvp-kc">196</span></div>
-        <div class="pvp-row"><span class="pvp-rank">3</span><span class="pvp-icon">🐀</span><span class="pvp-name">Ratashasam</span><span class="pvp-kc">99</span></div>
+      <div class="panel-body" id="pvp-panel-body">
+        <div class="pvp-row" style="color:var(--text-dim);font-style:italic;font-size:13px">Loading…</div>
       </div>
     </div>
   </div>
@@ -663,10 +661,8 @@
   <div class="float-r">
     <div class="panel">
       <div class="panel-head">Upcoming Clan Event</div>
-      <div class="panel-body">
-        <span class="ev-live"></span>
-        <div class="ev-name">Raid Night</div>
-        <div class="ev-detail">Halvistor &nbsp;·&nbsp; 22:00</div>
+      <div class="panel-body" id="event-panel-body">
+        <div style="color:var(--text-dim);font-style:italic;font-size:13px">Loading…</div>
       </div>
     </div>
   </div>
@@ -1083,11 +1079,52 @@ const obs = new IntersectionObserver(
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
+// ── FLOATING PANELS ───────────────────────────────────────────
+async function loadFloatingPanels() {
+  // PvP leaderboard panel — top 3 from xp leaderboard (public)
+  try {
+    const res = await fetch(`${API}/api/leaderboards?category=xp&period=weekly`);
+    const { entries } = await res.json();
+    const el = document.getElementById('pvp-panel-body');
+    if (el && entries?.length) {
+      el.innerHTML = entries.slice(0,3).map((e,i) => `
+        <div class="pvp-row">
+          <span class="pvp-rank">${i+1}</span>
+          <span class="pvp-icon">🐀</span>
+          <span class="pvp-name">${e.rsn}</span>
+          <span class="pvp-kc">${e.value >= 1e6 ? (e.value/1e6).toFixed(1)+'M' : e.value.toLocaleString()}</span>
+        </div>`).join('');
+    } else if (el) {
+      el.innerHTML = '<div style="color:var(--text-dim);font-style:italic;font-size:13px">No data yet</div>';
+    }
+  } catch(e) {}
+
+  // Upcoming event panel
+  try {
+    const res = await fetch(`${API}/api/events`);
+    const events = await res.json();
+    const now = Math.floor(Date.now()/1000);
+    const next = events.find(e => e.starts_at > now && !e.is_cancelled);
+    const el = document.getElementById('event-panel-body');
+    if (el && next) {
+      const d = new Date(next.starts_at * 1000);
+      const time = d.toLocaleTimeString('en-AU', {hour:'2-digit', minute:'2-digit'}) + ' UTC';
+      el.innerHTML = `
+        <span class="ev-live"></span>
+        <div class="ev-name">${next.title}</div>
+        <div class="ev-detail">${next.description || ''} &nbsp;·&nbsp; ${time}</div>`;
+    } else if (el) {
+      el.innerHTML = '<div style="color:var(--text-dim);font-style:italic;font-size:13px">No upcoming events</div>';
+    }
+  } catch(e) {}
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 loadStats();
 loadLeaderboards();
 loadDrops();
 updateNavAuth();
+loadFloatingPanels();
 </script>
 </body>
 </html>
