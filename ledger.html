@@ -618,6 +618,28 @@
 </div>
 
 <script>
+// ── AUTH TOKEN HELPERS ────────────────────────────────────────
+// Token is passed in URL after OAuth, stored in localStorage
+// Sent as X-Auth-Token header on all API requests
+const _token = new URLSearchParams(window.location.search).get('token');
+if (_token) {
+  localStorage.setItem('rp_token', _token);
+  // Clean token from URL without reload
+  const url = new URL(window.location.href);
+  url.searchParams.delete('token');
+  window.history.replaceState({}, '', url.toString());
+}
+function getToken() { return localStorage.getItem('rp_token'); }
+function authHeaders() {
+  const t = getToken();
+  return t ? { 'X-Auth-Token': t } : {};
+}
+function authFetch(url, opts = {}) {
+  opts.headers = { ...(opts.headers || {}), ...authHeaders() };
+  opts.credentials = 'include'; // keep for session fallback
+  return fetch(url, opts);
+}
+
 const API = 'https://ratphonk-production.up.railway.app';
 const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 
@@ -648,7 +670,7 @@ let isAuthed = false;
 
 async function checkAuth() {
   try {
-    const res = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    const res = await authFetch(`${API}/auth/me`, {  });
     if (res.ok) {
       const me = await res.json();
       isAuthed = true;
@@ -699,7 +721,7 @@ async function loadPvp() {
 
   feed.innerHTML = '<div class="empty">Loading…</div>';
   try {
-    const res = await fetch(`${API}/api/pvp?limit=50`, { credentials: 'include' });
+    const res = await authFetch(`${API}/api/pvp?limit=50`, {  });
     if (res.status === 401) { showAuthGate('pvp-feed'); return; }
     const kills = await res.json();
 
@@ -748,7 +770,7 @@ async function loadDrops() {
 
   feed.innerHTML = '<div class="empty">Loading…</div>';
   try {
-    const res = await fetch(`${API}/api/drops?limit=50`, { credentials: 'include' });
+    const res = await authFetch(`${API}/api/drops?limit=50`, {  });
     if (res.status === 401) { showAuthGate('drop-feed'); return; }
     const drops = await res.json();
 

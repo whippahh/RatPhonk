@@ -988,6 +988,28 @@
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
+// ── AUTH TOKEN HELPERS ────────────────────────────────────────
+// Token is passed in URL after OAuth, stored in localStorage
+// Sent as X-Auth-Token header on all API requests
+const _token = new URLSearchParams(window.location.search).get('token');
+if (_token) {
+  localStorage.setItem('rp_token', _token);
+  // Clean token from URL without reload
+  const url = new URL(window.location.href);
+  url.searchParams.delete('token');
+  window.history.replaceState({}, '', url.toString());
+}
+function getToken() { return localStorage.getItem('rp_token'); }
+function authHeaders() {
+  const t = getToken();
+  return t ? { 'X-Auth-Token': t } : {};
+}
+function authFetch(url, opts = {}) {
+  opts.headers = { ...(opts.headers || {}), ...authHeaders() };
+  opts.credentials = 'include'; // keep for session fallback
+  return fetch(url, opts);
+}
+
 const API = 'https://ratphonk-production.up.railway.app';
 let ME = null;
 let allApps = [];
@@ -1004,7 +1026,7 @@ function timeAgo(ts) {
 // ── AUTH GATE ─────────────────────────────────────────────────
 async function init() {
   try {
-    const res = await fetch(`${API}/auth/me`, { credentials:'include' });
+    const res = await authFetch(`${API}/auth/me`, {  });
     if (!res.ok) { redirectToLogin(); return; }
     ME = await res.json();
     if (ME.role !== 'admin' && ME.role !== 'officer') { redirectToLogin(); return; }
@@ -1082,7 +1104,7 @@ async function loadDashboard() {
 // ── APPLICATIONS ──────────────────────────────────────────────
 async function loadApplications() {
   try {
-    const res = await fetch(`${API}/api/admin/applications`, { credentials:'include' });
+    const res = await authFetch(`${API}/api/admin/applications`, {  });
     if (!res.ok) return;
     allApps = await res.json();
     renderApps('pending');
@@ -1211,7 +1233,7 @@ function switchAppTab(tab, btn) {
 // ── MEMBERS ───────────────────────────────────────────────────
 async function loadMembers() {
   try {
-    const res = await fetch(`${API}/api/members`, { credentials:'include' });
+    const res = await authFetch(`${API}/api/members`, {  });
     if (!res.ok) return;
     allMembers = await res.json();
     renderMembers(allMembers);

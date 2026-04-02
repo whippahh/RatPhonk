@@ -9,6 +9,32 @@ import { startCrons, syncMemberList, takeSnapshots } from './wom-sync.js';
 
 const app = Fastify({ logger: true });
 
+// ── AUTH TOKENS (replaces cookie sessions for cross-origin) ──
+// Simple in-memory store: token -> { memberId, role, rsn, expires }
+const authTokens = new Map();
+function createToken(member) {
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(24)))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+  authTokens.set(token, {
+    memberId: member.id,
+    role:     member.role,
+    rsn:      member.rsn,
+    expires:  Date.now() + 7 * 24 * 60 * 60 * 1000,
+  });
+  return token;
+}
+function getTokenData(req) {
+  const header = req.headers['x-auth-token'];
+  if (!header) return null;
+  const data = authTokens.get(header);
+  if (!data || data.expires < Date.now()) { authTokens.delete(header); return null; }
+  return data;
+}
+// Clean up expired tokens every hour
+setInterval(() => {
+  for (const [k,v] of authTokens) { if (v.expires < Date.now()) authTokens.delete(k); }
+}, 3600000);
+
 await app.register(cors, {
   origin: [
     'https://whippahh.github.io',
@@ -16,6 +42,8 @@ await app.register(cors, {
     'http://localhost:3000',
   ],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'X-Auth-Token'],
+  exposedHeaders: ['X-Auth-Token'],
 });
 await app.register(cookie);
 await app.register(session, {
@@ -31,10 +59,19 @@ await app.register(session, {
 
 // ── MIDDLEWARE ────────────────────────────────────────────────
 function requireAuth(req, reply, done) {
+  const tokenData = getTokenData(req);
+  if (tokenData) { req.authData = tokenData; return done(); }
   if (!req.session.memberId) return reply.status(401).send({ error: 'Not authenticated' });
   done();
 }
 function requireAdmin(req, reply, done) {
+  const tokenData = getTokenData(req);
+  if (tokenData) {
+    if (tokenData.role !== 'admin' && tokenData.role !== 'officer')
+      return reply.status(403).send({ error: 'Forbidden' });
+    req.authData = tokenData;
+    return done();
+  }
   if (!req.session.memberId) return reply.status(401).send({ error: 'Not authenticated' });
   const member = db.prepare('SELECT role FROM members WHERE id=?').get(req.session.memberId);
   if (!member || !['admin','officer'].includes(member.role))
@@ -103,14 +140,15 @@ app.get('/auth/discord/callback', async (req, reply) => {
   const member = db.prepare('SELECT * FROM members WHERE discord_id=?').get(String(discordUser.id));
 
   if (member) {
-    // Existing member — log them in regardless of intent
-    req.session.memberId = member.id;
-    req.session.role     = member.role;
-    reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(member.rsn)}`);
+    // Existing member — create token and pass in redirect
+    const token = createToken(member);
+    app.log.info(`[auth] Logged in: ${member.rsn} (id:${member.id}) token:${token.slice(0,8)}...`);
+    reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(member.rsn)}&token=${token}`);
   } else if (intent === 'apply') {
     // New user applying — store Discord identity in session, redirect to apply form
     req.session.pendingDiscord = { id: String(discordUser.id), username: discordUser.username, tag: discordUser.username };
     reply.redirect(`${process.env.FRONTEND_URL}/index.html?apply=1`);
+    // Note: pendingDiscord stored in session for apply flow
   } else {
     // New user tried to log in — check if they have an approved application
     const approvedApp = db.prepare(
@@ -122,9 +160,9 @@ app.get('/auth/discord/callback', async (req, reply) => {
       const result = db.prepare(
         `INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)`
       ).run(String(discordUser.id), discordUser.username, approvedApp.rsn, approvedApp.wom_player_id);
-      req.session.memberId = result.lastInsertRowid;
-      req.session.role     = 'member';
-      reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(approvedApp.rsn)}`);
+      const newMember = { id: result.lastInsertRowid, role: 'member', rsn: approvedApp.rsn };
+      const token = createToken(newMember);
+      reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(approvedApp.rsn)}&token=${token}`);
     } else {
       // No account, no approved app — send to apply
       reply.redirect(`${process.env.FRONTEND_URL}/index.html?notfound=1`);
@@ -149,7 +187,7 @@ app.post('/auth/link-rsn', async (req, reply) => {
 
   db.prepare('UPDATE applications SET invite_used=1 WHERE id=?').run(application.id);
 
-  req.session.memberId = result.lastInsertRowid;
+  req.authData?.memberId || req.session.memberId = result.lastInsertRowid;
   req.session.role     = 'member';
   delete req.session.pendingDiscord;
 
@@ -166,8 +204,8 @@ app.get('/auth/debug', async (req, reply) => {
 });
 
 app.get('/auth/me', { preHandler: requireAuth }, (req, reply) => {
-  const member = db.prepare('SELECT id, rsn, discord_tag, role FROM members WHERE id=?')
-    .get(req.session.memberId);
+  const id = req.authData?.memberId || req.authData?.memberId || req.session.memberId;
+  const member = db.prepare('SELECT id, rsn, discord_tag, role FROM members WHERE id=?').get(id);
   reply.send(member);
 });
 
@@ -219,7 +257,7 @@ app.post('/api/admin/applications/:id/approve', { preHandler: requireAdmin }, as
   // Mark approved
   db.prepare(
     "UPDATE applications SET status='approved', reviewed_by=?, reviewed_at=unixepoch() WHERE id=?"
-  ).run(req.session.memberId, req.params.id);
+  ).run(req.authData?.memberId || req.session.memberId, req.params.id);
 
   // If Discord ID was captured at apply time, create member record immediately
   if (application.discord_id) {
@@ -241,7 +279,7 @@ app.post('/api/admin/applications/:id/reject', { preHandler: requireAdmin }, (re
   const { reason } = req.body;
   db.prepare(
     "UPDATE applications SET status='rejected', reviewed_by=?, reviewed_at=unixepoch(), reject_reason=? WHERE id=?"
-  ).run(req.session.memberId, reason, req.params.id);
+  ).run(req.authData?.memberId || req.session.memberId, reason, req.params.id);
   reply.send({ success: true });
 });
 
@@ -377,7 +415,7 @@ app.post('/api/events', { preHandler: requireAdmin }, (req, reply) => {
   const { title, description, event_type, starts_at, ends_at, max_attendees } = req.body;
   const result = db.prepare(
     'INSERT INTO events (created_by,title,description,event_type,starts_at,ends_at,max_attendees) VALUES (?,?,?,?,?,?,?)'
-  ).run(req.session.memberId, title, description, event_type, starts_at, ends_at, max_attendees);
+  ).run(req.authData?.memberId || req.session.memberId, title, description, event_type, starts_at, ends_at, max_attendees);
   reply.send({ id: result.lastInsertRowid });
 });
 

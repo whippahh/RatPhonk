@@ -1056,6 +1056,28 @@
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
+// ── AUTH TOKEN HELPERS ────────────────────────────────────────
+// Token is passed in URL after OAuth, stored in localStorage
+// Sent as X-Auth-Token header on all API requests
+const _token = new URLSearchParams(window.location.search).get('token');
+if (_token) {
+  localStorage.setItem('rp_token', _token);
+  // Clean token from URL without reload
+  const url = new URL(window.location.href);
+  url.searchParams.delete('token');
+  window.history.replaceState({}, '', url.toString());
+}
+function getToken() { return localStorage.getItem('rp_token'); }
+function authHeaders() {
+  const t = getToken();
+  return t ? { 'X-Auth-Token': t } : {};
+}
+function authFetch(url, opts = {}) {
+  opts.headers = { ...(opts.headers || {}), ...authHeaders() };
+  opts.credentials = 'include'; // keep for session fallback
+  return fetch(url, opts);
+}
+
 const API = 'https://ratphonk-production.up.railway.app';
 
 // ── NAV AUTH ─────────────────────────────────────────────────
