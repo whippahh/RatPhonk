@@ -100,7 +100,7 @@ app.get('/auth/discord/callback', async (req, reply) => {
   const intent = req.session.oauthIntent || 'login';
   delete req.session.oauthIntent;
 
-  const member = db.prepare('SELECT * FROM members WHERE discord_id=?').get(discordUser.id);
+  const member = db.prepare('SELECT * FROM members WHERE discord_id=?').get(String(discordUser.id));
 
   if (member) {
     // Existing member — log them in regardless of intent
@@ -109,19 +109,19 @@ app.get('/auth/discord/callback', async (req, reply) => {
     reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(member.rsn)}`);
   } else if (intent === 'apply') {
     // New user applying — store Discord identity in session, redirect to apply form
-    req.session.pendingDiscord = { id: discordUser.id, username: discordUser.username, tag: discordUser.username };
+    req.session.pendingDiscord = { id: String(discordUser.id), username: discordUser.username, tag: discordUser.username };
     reply.redirect(`${process.env.FRONTEND_URL}/index.html?apply=1`);
   } else {
     // New user tried to log in — check if they have an approved application
     const approvedApp = db.prepare(
       "SELECT * FROM applications WHERE discord_id=? AND status='approved'"
-    ).get(discordUser.id);
+    ).get(String(discordUser.id));
 
     if (approvedApp) {
       // Approved — create member record and log them in
       const result = db.prepare(
         `INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)`
-      ).run(discordUser.id, discordUser.username, approvedApp.rsn, approvedApp.wom_player_id);
+      ).run(String(discordUser.id), discordUser.username, approvedApp.rsn, approvedApp.wom_player_id);
       req.session.memberId = result.lastInsertRowid;
       req.session.role     = 'member';
       reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(approvedApp.rsn)}`);
