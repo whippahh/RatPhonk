@@ -65,13 +65,33 @@ app.get('/auth/discord/callback', async (req, reply) => {
       redirect_uri:  process.env.DISCORD_REDIRECT_URI,
     }),
   });
-  const tokens = await tokenRes.json();
-  if (!tokens.access_token) return reply.status(400).send({ error: 'OAuth failed' });
+
+  // Guard: Discord sometimes returns HTML on bad credentials
+  const tokenText = await tokenRes.text();
+  let tokens;
+  try { tokens = JSON.parse(tokenText); }
+  catch(e) {
+    app.log.error('Discord token exchange returned non-JSON: ' + tokenText.slice(0, 200));
+    return reply.status(500).send({ error: 'Discord token exchange failed — check DISCORD_CLIENT_SECRET and DISCORD_REDIRECT_URI env vars' });
+  }
+  if (!tokens.access_token) {
+    app.log.error('Discord token exchange error: ' + JSON.stringify(tokens));
+    return reply.redirect(`${process.env.FRONTEND_URL}/index.html?notfound=1`);
+  }
 
   const userRes = await fetch('https://discord.com/api/users/@me', {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   });
-  const discordUser = await userRes.json();
+  const userText = await userRes.text();
+  let discordUser;
+  try { discordUser = JSON.parse(userText); }
+  catch(e) {
+    return reply.status(500).send({ error: 'Failed to fetch Discord user' });
+  }
+  if (!discordUser.id) {
+    app.log.error('Discord user fetch failed: ' + JSON.stringify(discordUser));
+    return reply.status(500).send({ error: 'Discord user fetch failed' });
+  }
   const intent = req.session.oauthIntent || 'login';
   delete req.session.oauthIntent;
 
