@@ -453,13 +453,14 @@
 <div class="page">
 
 <!-- NAV -->
-<nav>
-  <a href="ratphonk_final.html" class="nav-link">Home</a>
-  <a href="leaderboards.html"   class="nav-link">Leaderboards</a>
-  <a href="#"                   class="nav-link">Bingo &amp; Comps</a>
-  <a href="#"                   class="nav-link">Event Calendar</a>
-  <a href="#"                   class="nav-link">Rat Profiles</a>
-  <a href="#"                   class="nav-link active">The Ledger</a>
+<nav id="main-nav">
+  <a href="index.html"        class="nav-link">Home</a>
+  <a href="leaderboards.html" class="nav-link">Leaderboards</a>
+  <a href="bingo.html"        class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"                 class="nav-link">Event Calendar</a>
+  <a href="profile.html"      class="nav-link">Rat Profiles</a>
+  <a href="ledger.html"       class="nav-link active">The Ledger</a>
+  <a href="https://ratphonk-production.up.railway.app/auth/discord" class="nav-link" id="nav-login" style="color:var(--glow);margin-left:auto;border-left:1px solid var(--border)">⚔ Login</a>
 </nav>
 
 <!-- PAGE HEADER -->
@@ -617,108 +618,180 @@
 </div>
 
 <script>
-// ══ DATA ══
-const PVP_DATA = [
-  { killer:'R4TKING',    victim:'PKwarrior88', loc:'Revenant Caves',      loot:'12.4M',  lootRaw:12400000,  time:'2h ago',  verified:true,  tags:['Clan Trip'] },
-  { killer:'skullcrushr',victim:'ZulrahGrind', loc:'Wilderness (lvl 44)', loot:'8.1M',   lootRaw:8100000,   time:'5h ago',  verified:true,  tags:[] },
-  { killer:'R4TKING',    victim:'IronNoob',    loc:'Edgeville',           loot:'240K',   lootRaw:240000,    time:'1d ago',  verified:true,  tags:[] },
-  { killer:'Ratashasam', victim:'BossHunter99',loc:'Wilderness (lvl 52)', loot:'44.8M',  lootRaw:44800000,  time:'1d ago',  verified:true,  tags:['Clan Trip','Big Loot'] },
-  { killer:'ratcaller',  victim:'slayer_main', loc:'Chaos Altar',         loot:'6.2M',   lootRaw:6200000,   time:'2d ago',  verified:true,  tags:[] },
-  { killer:'skullcrushr',victim:'raid_pker420',loc:'Revenant Caves',      loot:'18.9M',  lootRaw:18900000,  time:'2d ago',  verified:false, tags:['Clan Trip'] },
-  { killer:'R4TKING',    victim:'GWD_Farmer',  loc:'Wilderness (lvl 38)', loot:'3.4M',   lootRaw:3400000,   time:'3d ago',  verified:true,  tags:[] },
-  { killer:'theratking', victim:'purenoob99',  loc:'Edgeville',           loot:'1.8M',   lootRaw:1800000,   time:'4d ago',  verified:true,  tags:[] },
-];
+const API = 'https://ratphonk-production.up.railway.app';
+const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 
-const DROP_DATA = [
-  {
-    item:'Scythe of vitur', boss:'Theatre of Blood', tier:'s',
-    member:'R4TKING', value:'1,240M', valueRaw:1240000000,
-    time:'2h ago', verified:true,
-    split:true,
-    members:[
-      {name:'R4TKING',    cut:'413M'},
-      {name:'skullcrushr',cut:'413M'},
-      {name:'vorkath_btw',cut:'414M'},
-    ]
-  },
-  {
-    item:"Tumeken's shadow", boss:'Tombs of Amascut', tier:'s',
-    member:'vorkath_btw', value:'890M', valueRaw:890000000,
-    time:'6h ago', verified:true,
-    split:true,
-    members:[
-      {name:'vorkath_btw',cut:'178M'},
-      {name:'R4TKING',    cut:'178M'},
-      {name:'raid_lord',  cut:'178M'},
-      {name:'goblinhuntr',cut:'178M'},
-      {name:'im_sleepy99',cut:'178M'},
-    ]
-  },
-  {
-    item:'Twisted bow', boss:'Chambers of Xeric', tier:'s',
-    member:'goblinhuntr', value:'1,770M', valueRaw:1770000000,
-    time:'1d ago', verified:true,
-    split:false, members:[]
-  },
-  {
-    item:'Elysian sigil', boss:'Corporeal Beast', tier:'a',
-    member:'skullcrushr', value:'740M', valueRaw:740000000,
-    time:'2d ago', verified:true,
-    split:true,
-    members:[
-      {name:'skullcrushr',cut:'370M'},
-      {name:'R4TKING',    cut:'370M'},
-    ]
-  },
-  {
-    item:'Bandos chestplate', boss:'General Graardor', tier:'b',
-    member:'im_sleepy99', value:'18.4M', valueRaw:18400000,
-    time:'2d ago', verified:true,
-    split:false, members:[]
-  },
-  {
-    item:'Primordial crystal', boss:'Cerberus', tier:'a',
-    member:'Ratashasam', value:'44.1M', valueRaw:44100000,
-    time:'3d ago', verified:false,
-    split:false, members:[]
-  },
-  {
-    item:'Vorkath head (99th kill)', boss:'Vorkath', tier:'b',
-    member:'vorkath_btw', value:'—', valueRaw:0,
-    time:'3d ago', verified:true,
-    split:false, members:[]
-  },
-  {
-    item:'Magma mutagen', boss:'Zulrah', tier:'a',
-    member:'ratcaller', value:'280M', valueRaw:280000000,
-    time:'4d ago', verified:true,
-    split:false, members:[]
-  },
-];
+function fmtGp(v) {
+  if (!v) return '—';
+  if (v >= 1e9) return (v/1e9).toFixed(2).replace(/\.?0+$/,'') + 'B';
+  if (v >= 1e6) return (v/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M';
+  if (v >= 1e3) return (v/1e3).toFixed(0) + 'K';
+  return v.toLocaleString();
+}
 
-const PVP_GP = [
-  {name:'R4TKING',    gp:'4.84B', raw:4840000000},
-  {name:'skullcrushr',gp:'4.10B', raw:4100000000},
-  {name:'Ratashasam', gp:'2.99B', raw:2990000000},
-  {name:'ratcaller',  gp:'2.44B', raw:2440000000},
-  {name:'theratking', gp:'1.99B', raw:1990000000},
-  {name:'goblinhuntr',gp:'1.61B', raw:1610000000},
-  {name:'phonkmaster',gp:'1.24B', raw:1240000000},
-  {name:'vorkath_btw',gp:'988M',  raw:988000000},
-];
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts * 1000) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
 
-const DROP_GP = [
-  {name:'R4TKING',    gp:'84.1B', raw:84100000000},
-  {name:'raid_lord',  gp:'71.4B', raw:71400000000},
-  {name:'vorkath_btw',gp:'58.8B', raw:58800000000},
-  {name:'skullcrushr',gp:'44.2B', raw:44200000000},
-  {name:'goblinhuntr',gp:'38.1B', raw:38100000000},
-  {name:'im_sleepy99',gp:'28.4B', raw:28400000000},
-  {name:'Ratashasam', gp:'19.8B', raw:19800000000},
-  {name:'ratcaller',  gp:'14.1B', raw:14100000000},
-];
+function tierFromValue(gp) {
+  if (gp >= 500e6) return 's';
+  if (gp >= 50e6)  return 'a';
+  return 'b';
+}
 
-// ══ RENDER PVP ══
+// ── AUTH STATE ────────────────────────────────────────────────
+let isAuthed = false;
+
+async function checkAuth() {
+  try {
+    const res = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if (res.ok) {
+      const me = await res.json();
+      isAuthed = true;
+      const btn = document.getElementById('nav-login');
+      if (btn) { btn.textContent = `🐀 ${me.rsn}`; btn.href = `profile.html?rsn=${encodeURIComponent(me.rsn)}`; btn.style.color = 'var(--parch-lt)'; }
+      return me;
+    }
+  } catch(e) {}
+  return null;
+}
+
+// ── LOAD SUMMARY STATS ────────────────────────────────────────
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const d = await res.json();
+    const items = document.querySelectorAll('.sum-item');
+    // [0] PK Kills, [1] GP Looted PvP, [2] Total Drops, [3] GP from Drops, [4] GP Split
+    if (items[0]) items[0].querySelector('.sum-val').textContent = d.killCount?.toLocaleString() ?? '—';
+    if (items[2]) items[2].querySelector('.sum-val').textContent = d.dropCount?.toLocaleString() ?? '—';
+    if (items[3]) items[3].querySelector('.sum-val').textContent = fmtGp(d.dropGp);
+  } catch(e) {}
+}
+
+// ── AUTH GATE DISPLAY ─────────────────────────────────────────
+function showAuthGate(containerId) {
+  document.getElementById(containerId).innerHTML = `
+    <div style="padding:60px;text-align:center">
+      <div style="font-size:28px;margin-bottom:16px">🔒</div>
+      <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.15em;color:var(--text-dim);margin-bottom:20px">
+        MEMBERS ONLY — LOG IN TO VIEW THE LEDGER
+      </div>
+      <a href="https://ratphonk-production.up.railway.app/auth/discord"
+         style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+                padding:12px 32px;border:2px solid var(--glow);color:var(--glow);background:rgba(38,63,34,.2);
+                text-decoration:none;display:inline-block;transition:all .2s">
+        ⚔ Login with Discord
+      </a>
+    </div>`;
+}
+
+// ── LOAD PVP ─────────────────────────────────────────────────
+async function loadPvp() {
+  const feed = document.getElementById('pvp-feed');
+  const gpGrid = document.getElementById('pvp-gp-grid');
+
+  if (!isAuthed) { showAuthGate('pvp-feed'); gpGrid.innerHTML = ''; return; }
+
+  feed.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/pvp?limit=50`, { credentials: 'include' });
+    if (res.status === 401) { showAuthGate('pvp-feed'); return; }
+    const kills = await res.json();
+
+    if (!kills.length) {
+      feed.innerHTML = '<div class="empty">No PvP kills logged yet. Go touch some skulls.</div>';
+      gpGrid.innerHTML = '';
+      document.getElementById('pvp-count').textContent = '0 kills';
+      return;
+    }
+
+    pvpData = kills;
+    renderPvp(kills);
+
+    // GP totals by member
+    const byMember = {};
+    kills.forEach(k => {
+      if (!byMember[k.killer_rsn]) byMember[k.killer_rsn] = 0;
+      byMember[k.killer_rsn] += k.loot_gp || 0;
+    });
+    const sorted = Object.entries(byMember).sort((a,b) => b[1]-a[1]).slice(0,8);
+    const top = sorted[0]?.[1] || 1;
+    gpGrid.innerHTML = sorted.map(([name, gp], i) => {
+      const cls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+      const pct = Math.round((gp/top)*100);
+      return `<div class="gp-card ${cls}" onclick="window.location='profile.html?rsn=${encodeURIComponent(name)}'">
+        <div class="gp-rank">${ROMAN[i]}</div>
+        <div class="gp-info">
+          <div class="gp-name">${name}</div>
+          <div class="gp-bar-wrap"><div class="gp-bar" style="width:0%" data-w="${pct}%"></div></div>
+        </div>
+        <div class="gp-amount">${fmtGp(gp)}</div>
+      </div>`;
+    }).join('');
+    setTimeout(animateBars, 200);
+  } catch(e) {
+    feed.innerHTML = '<div class="empty">Could not load PvP data.</div>';
+  }
+}
+
+// ── LOAD DROPS ────────────────────────────────────────────────
+async function loadDrops() {
+  const feed = document.getElementById('drop-feed');
+  const gpGrid = document.getElementById('drop-gp-grid');
+
+  if (!isAuthed) { showAuthGate('drop-feed'); gpGrid.innerHTML = ''; return; }
+
+  feed.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/drops?limit=50`, { credentials: 'include' });
+    if (res.status === 401) { showAuthGate('drop-feed'); return; }
+    const drops = await res.json();
+
+    if (!drops.length) {
+      feed.innerHTML = '<div class="empty">No drops logged yet. Go get some loot.</div>';
+      gpGrid.innerHTML = '';
+      document.getElementById('drop-count').textContent = '0 drops';
+      return;
+    }
+
+    dropData = drops;
+    renderDrops(drops);
+
+    // GP totals by member
+    const byMember = {};
+    drops.forEach(d => {
+      const name = d.reporter_rsn;
+      if (!byMember[name]) byMember[name] = 0;
+      byMember[name] += d.item_value_gp || 0;
+    });
+    const sorted = Object.entries(byMember).sort((a,b) => b[1]-a[1]).slice(0,8);
+    const top = sorted[0]?.[1] || 1;
+    gpGrid.innerHTML = sorted.map(([name, gp], i) => {
+      const cls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+      const pct = Math.round((gp/top)*100);
+      return `<div class="gp-card ${cls}" onclick="window.location='profile.html?rsn=${encodeURIComponent(name)}'">
+        <div class="gp-rank">${ROMAN[i]}</div>
+        <div class="gp-info">
+          <div class="gp-name">${name}</div>
+          <div class="gp-bar-wrap"><div class="gp-bar" style="width:0%" data-w="${pct}%"></div></div>
+        </div>
+        <div class="gp-amount">${fmtGp(gp)}</div>
+      </div>`;
+    }).join('');
+    setTimeout(animateBars, 200);
+  } catch(e) {
+    feed.innerHTML = '<div class="empty">Could not load drop data.</div>';
+  }
+}
+
+// ── RENDER PVP ────────────────────────────────────────────────
+let pvpData = [], dropData = [];
+
 function renderPvp(data) {
   const feed = document.getElementById('pvp-feed');
   feed.innerHTML = data.length ? data.map(k => `
@@ -726,101 +799,68 @@ function renderPvp(data) {
       <div class="kill-card-inner">
         <div class="kill-main">
           <div class="kill-headline">
-            <a href="profile.html?rsn=${k.killer}" class="killer" style="text-decoration:none">${k.killer}</a>
+            <a href="profile.html?rsn=${encodeURIComponent(k.killer_rsn)}" class="killer" style="text-decoration:none">${k.killer_rsn}</a>
             <span class="arrow">☠</span>
-            <span class="victim">${k.victim}</span>
+            <span class="victim">${k.victim_rsn}</span>
           </div>
           <div class="kill-tags">
-            <span class="kill-tag loc">📍 ${k.loc}</span>
-            ${k.tags.map(t => `<span class="kill-tag clan">${t}</span>`).join('')}
+            ${k.location ? `<span class="kill-tag loc">📍 ${k.location}</span>` : ''}
+            ${k.source === 'trackscape' ? `<span class="kill-tag clan">TrackScape</span>` : ''}
           </div>
         </div>
         <div>
-          <div class="kill-loot">${k.loot}</div>
+          <div class="kill-loot">${fmtGp(k.loot_gp)}</div>
           <div class="kill-loot-note">Loot value</div>
         </div>
-        <div class="kill-time">${k.time}</div>
-        <span class="kill-verified ${k.verified ? 'yes' : 'pending'}">${k.verified ? '✓ Verified' : '⏳ Pending'}</span>
-        <button class="shot-btn">📷 Screenshot</button>
+        <div class="kill-time">${timeAgo(k.occurred_at)}</div>
+        <span class="kill-verified ${k.is_verified ? 'yes' : 'pending'}">${k.is_verified ? '✓ Verified' : '⏳ Pending'}</span>
       </div>
     </div>`).join('')
   : '<div class="empty">No kills match your filters.</div>';
   document.getElementById('pvp-count').textContent = `Showing ${data.length} kill${data.length!==1?'s':''}`;
 }
 
-// ══ RENDER DROPS ══
+// ── RENDER DROPS ─────────────────────────────────────────────
 function renderDrops(data) {
   const feed = document.getElementById('drop-feed');
   feed.innerHTML = data.length ? data.map(d => {
-    const splitPanel = d.split ? `
-      <div class="split-panel">
-        <span class="split-label">Split between</span>
-        <div class="split-members">
-          ${d.members.map((m,i) => `
-            <div class="split-member">
-              ${i > 0 ? '<div class="split-dot"></div>' : ''}
-              <a href="profile.html?rsn=${m.name}" class="split-member-name" style="text-decoration:none">${m.name}</a>
-              <span class="split-cut">${m.cut}</span>
-            </div>`).join('')}
-        </div>
-      </div>` : '';
-
+    const tier = tierFromValue(d.item_value_gp);
     return `
-      <div class="drop-card tier-${d.tier}">
+      <div class="drop-card tier-${tier}">
         <div class="drop-card-top">
           <div class="drop-main">
-            <div class="drop-item-name tier-${d.tier}">${d.item}</div>
+            <div class="drop-item-name tier-${tier}">${d.item_name}</div>
             <div class="drop-meta">
-              <strong><a href="profile.html?rsn=${d.member}" style="text-decoration:none;color:inherit">${d.member}</a></strong>
-              &nbsp;·&nbsp; ${d.boss}
+              <strong><a href="profile.html?rsn=${encodeURIComponent(d.reporter_rsn)}" style="text-decoration:none;color:inherit">${d.reporter_rsn}</a></strong>
+              &nbsp;·&nbsp; ${d.boss_name}
             </div>
             <div class="drop-tags">
-              <span class="drop-tag boss">⚔ ${d.boss}</span>
-              ${d.split
-                ? `<span class="drop-tag split">🤝 ${d.members.length}-way split</span>`
-                : `<span class="drop-tag solo">⭐ Solo drop</span>`}
+              <span class="drop-tag boss">⚔ ${d.boss_name}</span>
+              ${d.is_split
+                ? `<span class="drop-tag split">🤝 Split</span>`
+                : `<span class="drop-tag solo">⭐ Solo</span>`}
             </div>
           </div>
           <div>
-            <div class="drop-value">${d.value}</div>
+            <div class="drop-value">${fmtGp(d.item_value_gp)}</div>
             <div class="drop-value-note">GE value</div>
           </div>
-          <div class="drop-time">${d.time}</div>
-          <span class="drop-verified ${d.verified ? 'yes' : 'pending'}">${d.verified ? '✓ Verified' : '⏳ Pending'}</span>
+          <div class="drop-time">${timeAgo(d.occurred_at)}</div>
+          <span class="drop-verified ${d.is_verified ? 'yes' : 'pending'}">${d.is_verified ? '✓ Verified' : '⏳ Pending'}</span>
         </div>
-        ${splitPanel}
       </div>`;
   }).join('')
   : '<div class="empty">No drops match your filters.</div>';
   document.getElementById('drop-count').textContent = `Showing ${data.length} drop${data.length!==1?'s':''}`;
 }
 
-// ══ RENDER GP GRIDS ══
-function renderGpGrid(data, elId) {
-  const top = data[0].raw;
-  const el = document.getElementById(elId);
-  el.innerHTML = data.map((m, i) => {
-    const cls = i===0?'top1':i===1?'top2':i===2?'top3':'';
-    const pct = Math.round((m.raw/top)*100);
-    return `
-      <div class="gp-card ${cls}" onclick="window.location='profile.html?rsn=${m.name}'">
-        <div class="gp-rank">${['I','II','III','IV','V','VI','VII','VIII'][i]}</div>
-        <div class="gp-info">
-          <div class="gp-name">${m.name}</div>
-          <div class="gp-bar-wrap"><div class="gp-bar" style="width:0%" data-w="${pct}%"></div></div>
-        </div>
-        <div class="gp-amount">${m.gp}</div>
-      </div>`;
-  }).join('');
-}
-
-// ══ FILTERS ══
+// ── FILTERS ──────────────────────────────────────────────────
 function filterPvp() {
   const search = document.getElementById('pvp-search').value.toLowerCase();
   const loc    = document.getElementById('pvp-loc').value;
-  const filtered = PVP_DATA.filter(k =>
-    (!search || k.killer.toLowerCase().includes(search) || k.victim.toLowerCase().includes(search)) &&
-    (!loc    || k.loc === loc)
+  const filtered = pvpData.filter(k =>
+    (!search || (k.killer_rsn||'').toLowerCase().includes(search) || (k.victim_rsn||'').toLowerCase().includes(search)) &&
+    (!loc    || k.location === loc)
   );
   renderPvp(filtered);
 }
@@ -829,44 +869,41 @@ function filterDrops() {
   const search = document.getElementById('drop-search').value.toLowerCase();
   const boss   = document.getElementById('drop-boss').value;
   const type   = document.getElementById('drop-type').value;
-  const filtered = DROP_DATA.filter(d =>
-    (!search || d.item.toLowerCase().includes(search) || d.member.toLowerCase().includes(search)) &&
-    (!boss   || d.boss === boss) &&
-    (!type   || (type === 'split' ? d.split : !d.split))
+  const filtered = dropData.filter(d =>
+    (!search || (d.item_name||'').toLowerCase().includes(search) || (d.reporter_rsn||'').toLowerCase().includes(search)) &&
+    (!boss   || d.boss_name === boss) &&
+    (!type   || (type === 'split' ? d.is_split : !d.is_split))
   );
   renderDrops(filtered);
 }
 
-// ══ VIEW TOGGLE ══
+// ── VIEW TOGGLE ───────────────────────────────────────────────
 function setView(v, btn) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
   document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Animate GP bars for the newly visible view
   setTimeout(animateBars, 150);
 }
 
-// ══ ANIMATE BARS ══
 function animateBars() {
-  document.querySelectorAll('.gp-bar[data-w]').forEach(b => {
-    b.style.width = b.dataset.w;
-  });
+  document.querySelectorAll('.gp-bar[data-w]').forEach(b => { b.style.width = b.dataset.w; });
 }
 
-// ══ SCROLL REVEAL ══
+// ── SCROLL REVEAL ─────────────────────────────────────────────
 const obs = new IntersectionObserver(
   es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
-  { threshold:0.08 }
+  { threshold: 0.08 }
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// ══ INIT ══
-renderPvp(PVP_DATA);
-renderDrops(DROP_DATA);
-renderGpGrid(PVP_GP,  'pvp-gp-grid');
-renderGpGrid(DROP_GP, 'drop-gp-grid');
-setTimeout(animateBars, 500);
+// ── INIT ─────────────────────────────────────────────────────
+(async () => {
+  await checkAuth();
+  loadStats();
+  loadPvp();
+  loadDrops();
+})();
 </script>
 </body>
 </html>

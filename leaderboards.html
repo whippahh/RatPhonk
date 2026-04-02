@@ -492,12 +492,12 @@
 
 <!-- NAV -->
 <nav>
-  <a href="index.html"    class="nav-link">Home</a>
-  <a href="#"             class="nav-link active">Leaderboards</a>
-  <a href="#"             class="nav-link">Bingo &amp; Comps</a>
-  <a href="#"             class="nav-link">Event Calendar</a>
-  <a href="#"             class="nav-link">Rat Profiles</a>
-  <a href="#"             class="nav-link">The Ledger</a>
+  <a href="index.html"        class="nav-link">Home</a>
+  <a href="leaderboards.html" class="nav-link active">Leaderboards</a>
+  <a href="bingo.html"        class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"                 class="nav-link">Event Calendar</a>
+  <a href="profile.html"      class="nav-link">Rat Profiles</a>
+  <a href="ledger.html"       class="nav-link">The Ledger</a>
 </nav>
 
 <!-- PAGE HEADER -->
@@ -614,228 +614,52 @@
 </div>
 
 <script>
-// ══ DATA ══
-const DATA = {
-  xp: {
-    label: 'XP Gains',
-    unit: 'XP',
-    icon: '⚔',
-    valueClass: '',
-    weekly: [
-      { name:'R4TKING',    icon:'🐀', value:'84.2M', raw:84200000, sub:'Slayer focus',    delta:'up',   rank:'I'   },
-      { name:'skullcrushr',icon:'🐀', value:'61.8M', raw:61800000, sub:'Farming runs',   delta:'same', rank:'II'  },
-      { name:'goblinhuntr',icon:'🐀', value:'49.1M', raw:49100000, sub:'Agility grind',  delta:'up',   rank:'III' },
-      { name:'im_sleepy99',icon:'🐀', value:'38.4M', raw:38400000, sub:'Mixed skills',   delta:'down', rank:'IV'  },
-      { name:'vorkath_btw',icon:'🐀', value:'27.3M', raw:27300000, sub:'Magic training', delta:'up',   rank:'V'   },
-      { name:'raid_lord',  icon:'🐀', value:'22.1M', raw:22100000, sub:'Prayer',         delta:'same', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'18.7M', raw:18700000, sub:'Construction',   delta:'down', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'14.2M', raw:14200000, sub:'Woodcutting',    delta:'up',   rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'11.9M', raw:11900000, sub:'Firemaking',     delta:'same', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'8.4M',  raw:8400000,  sub:'Fishing',        delta:'down', rank:'X'   },
-    ],
-    monthly: [
-      { name:'vorkath_btw',icon:'🐀', value:'312M', raw:312000000, sub:'Consistent grind', delta:'up',   rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'287M', raw:287000000, sub:'Slayer focus',    delta:'same', rank:'II'  },
-      { name:'skullcrushr',icon:'🐀', value:'241M', raw:241000000, sub:'Farming',         delta:'up',   rank:'III' },
-      { name:'raid_lord',  icon:'🐀', value:'198M', raw:198000000, sub:'Mixed',           delta:'down', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'176M', raw:176000000, sub:'Agility',         delta:'same', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'154M', raw:154000000, sub:'Mixed',           delta:'up',   rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'122M', raw:122000000, sub:'Construction',    delta:'same', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'98M',  raw:98000000,  sub:'Woodcutting',     delta:'down', rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'74M',  raw:74000000,  sub:'Various',         delta:'up',   rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'61M',  raw:61000000,  sub:'Fishing',         delta:'same', rank:'X'   },
-    ],
-    alltime: [
-      { name:'raid_lord',  icon:'🐀', value:'2.41B', raw:2410000000, sub:'Veteran',    delta:'same', rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'2.18B', raw:2180000000, sub:'Co-founder', delta:'same', rank:'II'  },
-      { name:'vorkath_btw',icon:'🐀', value:'1.94B', raw:1940000000, sub:'OG member',  delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'1.72B', raw:1720000000, sub:'Veteran',    delta:'same', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'1.41B', raw:1410000000, sub:'Officer',    delta:'same', rank:'V'   },
-      { name:'Ratashasam', icon:'🐀', value:'1.18B', raw:1180000000, sub:'Member',     delta:'same', rank:'VI'  },
-      { name:'im_sleepy99',icon:'🐀', value:'987M',  raw:987000000,  sub:'Member',     delta:'down', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'812M',  raw:812000000,  sub:'Member',     delta:'up',   rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'698M',  raw:698000000,  sub:'Member',     delta:'same', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'544M',  raw:544000000,  sub:'Member',     delta:'same', rank:'X'   },
-    ]
-  },
-  boss: {
-    label: 'Boss KC',
-    unit: 'KC',
-    icon: '☠',
-    valueClass: 'kc',
-    weekly: [
-      { name:'vorkath_btw',icon:'🐀', value:'412', raw:412, sub:'Vorkath mainly',  delta:'up',   rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'287', raw:287, sub:'ToB + ToA',       delta:'same', rank:'II'  },
-      { name:'raid_lord',  icon:'🐀', value:'201', raw:201, sub:'CoX specialist',  delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'188', raw:188, sub:'Mixed bosses',    delta:'down', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'143', raw:143, sub:'Wildy bosses',    delta:'up',   rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'118', raw:118, sub:'GWD grind',       delta:'same', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'94',  raw:94,  sub:'Cerberus',        delta:'down', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'76',  raw:76,  sub:'Nightmare',       delta:'same', rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'58',  raw:58,  sub:'KQ + DKS',        delta:'up',   rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'41',  raw:41,  sub:'Mixed',           delta:'down', rank:'X'   },
-    ],
-    monthly: [
-      { name:'raid_lord',  icon:'🐀', value:'1,842', raw:1842, sub:'CoX specialist',  delta:'up',   rank:'I'   },
-      { name:'vorkath_btw',icon:'🐀', value:'1,611', raw:1611, sub:'Vorkath mainly',  delta:'same', rank:'II'  },
-      { name:'R4TKING',    icon:'🐀', value:'1,298', raw:1298, sub:'ToB + ToA',       delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'1,044', raw:1044, sub:'Mixed bosses',    delta:'down', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'876',   raw:876,  sub:'Wildy bosses',    delta:'same', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'712',   raw:712,  sub:'GWD grind',       delta:'up',   rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'588',   raw:588,  sub:'Cerberus',        delta:'same', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'441',   raw:441,  sub:'Nightmare',       delta:'down', rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'388',   raw:388,  sub:'KQ + DKS',        delta:'up',   rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'294',   raw:294,  sub:'Mixed',           delta:'same', rank:'X'   },
-    ],
-    alltime: [
-      { name:'vorkath_btw',icon:'🐀', value:'18,441', raw:18441, sub:'Vorkath legend', delta:'same', rank:'I'   },
-      { name:'raid_lord',  icon:'🐀', value:'16,882', raw:16882, sub:'CoX veteran',    delta:'same', rank:'II'  },
-      { name:'R4TKING',    icon:'🐀', value:'14,201', raw:14201, sub:'All-rounder',    delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'11,988', raw:11988, sub:'Mixed',          delta:'same', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'9,412',  raw:9412,  sub:'Wildy bosses',   delta:'same', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'7,841',  raw:7841,  sub:'GWD grind',      delta:'down', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'6,102',  raw:6102,  sub:'Cerberus',       delta:'same', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'4,887',  raw:4887,  sub:'Nightmare',      delta:'up',   rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'3,944',  raw:3944,  sub:'KQ + DKS',       delta:'same', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'2,811',  raw:2811,  sub:'Mixed',          delta:'down', rank:'X'   },
-    ]
-  },
-  pvp: {
-    label: 'PvP Kills',
-    unit: 'Kills',
-    icon: '💀',
-    valueClass: 'pvp',
-    weekly: [
-      { name:'R4TKING',    icon:'🐀', value:'88',  raw:88,  sub:'K/D 4.2',  delta:'up',   rank:'I'   },
-      { name:'skullcrushr',icon:'🐀', value:'62',  raw:62,  sub:'K/D 3.8',  delta:'same', rank:'II'  },
-      { name:'Ratashasam', icon:'🐀', value:'44',  raw:44,  sub:'K/D 2.9',  delta:'up',   rank:'III' },
-      { name:'ratcaller',  icon:'🐀', value:'38',  raw:38,  sub:'K/D 3.1',  delta:'down', rank:'IV'  },
-      { name:'theratking', icon:'🐀', value:'31',  raw:31,  sub:'K/D 2.4',  delta:'same', rank:'V'   },
-      { name:'goblinhuntr',icon:'🐀', value:'24',  raw:24,  sub:'K/D 1.9',  delta:'up',   rank:'VI'  },
-      { name:'vorkath_btw',icon:'🐀', value:'18',  raw:18,  sub:'K/D 2.2',  delta:'same', rank:'VII' },
-      { name:'phonkmaster',icon:'🐀', value:'14',  raw:14,  sub:'K/D 1.6',  delta:'down', rank:'VIII'},
-      { name:'raid_lord',  icon:'🐀', value:'9',   raw:9,   sub:'K/D 1.1',  delta:'same', rank:'IX'  },
-      { name:'im_sleepy99',icon:'🐀', value:'6',   raw:6,   sub:'K/D 0.8',  delta:'down', rank:'X'   },
-    ],
-    monthly: [
-      { name:'skullcrushr',icon:'🐀', value:'312', raw:312, sub:'K/D 4.1',  delta:'up',   rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'298', raw:298, sub:'K/D 3.9',  delta:'same', rank:'II'  },
-      { name:'Ratashasam', icon:'🐀', value:'201', raw:201, sub:'K/D 2.7',  delta:'up',   rank:'III' },
-      { name:'ratcaller',  icon:'🐀', value:'178', raw:178, sub:'K/D 2.9',  delta:'same', rank:'IV'  },
-      { name:'theratking', icon:'🐀', value:'144', raw:144, sub:'K/D 2.2',  delta:'down', rank:'V'   },
-      { name:'goblinhuntr',icon:'🐀', value:'112', raw:112, sub:'K/D 1.8',  delta:'same', rank:'VI'  },
-      { name:'phonkmaster',icon:'🐀', value:'88',  raw:88,  sub:'K/D 1.6',  delta:'up',   rank:'VII' },
-      { name:'vorkath_btw',icon:'🐀', value:'64',  raw:64,  sub:'K/D 2.0',  delta:'same', rank:'VIII'},
-      { name:'raid_lord',  icon:'🐀', value:'44',  raw:44,  sub:'K/D 1.2',  delta:'down', rank:'IX'  },
-      { name:'im_sleepy99',icon:'🐀', value:'28',  raw:28,  sub:'K/D 0.7',  delta:'down', rank:'X'   },
-    ],
-    alltime: [
-      { name:'R4TKING',    icon:'🐀', value:'4,841', raw:4841, sub:'K/D 4.4',  delta:'same', rank:'I'   },
-      { name:'skullcrushr',icon:'🐀', value:'4,102', raw:4102, sub:'K/D 3.7',  delta:'same', rank:'II'  },
-      { name:'Ratashasam', icon:'🐀', value:'2,988', raw:2988, sub:'K/D 2.8',  delta:'up',   rank:'III' },
-      { name:'ratcaller',  icon:'🐀', value:'2,441', raw:2441, sub:'K/D 2.9',  delta:'same', rank:'IV'  },
-      { name:'theratking', icon:'🐀', value:'1,988', raw:1988, sub:'K/D 2.1',  delta:'same', rank:'V'   },
-      { name:'goblinhuntr',icon:'🐀', value:'1,612', raw:1612, sub:'K/D 1.7',  delta:'down', rank:'VI'  },
-      { name:'phonkmaster',icon:'🐀', value:'1,244', raw:1244, sub:'K/D 1.5',  delta:'same', rank:'VII' },
-      { name:'vorkath_btw',icon:'🐀', value:'988',   raw:988,  sub:'K/D 2.0',  delta:'same', rank:'VIII'},
-      { name:'raid_lord',  icon:'🐀', value:'712',   raw:712,  sub:'K/D 1.1',  delta:'down', rank:'IX'  },
-      { name:'im_sleepy99',icon:'🐀', value:'441',   raw:441,  sub:'K/D 0.8',  delta:'up',   rank:'X'   },
-    ]
-  },
-  gp: {
-    label: 'GP Earned',
-    unit: 'GP',
-    icon: '💰',
-    valueClass: 'gold',
-    weekly: [
-      { name:'goblinhuntr',icon:'🐀', value:'1.77B', raw:1770000000, sub:'Twisted bow drop', delta:'up',   rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'1.24B', raw:1240000000, sub:'Scythe split',     delta:'same', rank:'II'  },
-      { name:'vorkath_btw',icon:'🐀', value:'890M',  raw:890000000,  sub:'Tumeken split',    delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'740M',  raw:740000000,  sub:'Elysian split',    delta:'same', rank:'IV'  },
-      { name:'raid_lord',  icon:'🐀', value:'412M',  raw:412000000,  sub:'CoX drops',        delta:'down', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'284M',  raw:284000000,  sub:'Bandos drop',      delta:'same', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'198M',  raw:198000000,  sub:'Mixed drops',      delta:'up',   rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'142M',  raw:142000000,  sub:'Wildy drops',      delta:'same', rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'88M',   raw:88000000,   sub:'Various',          delta:'down', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'44M',   raw:44000000,   sub:'GWD drops',        delta:'same', rank:'X'   },
-    ],
-    monthly: [
-      { name:'raid_lord',  icon:'🐀', value:'8.4B',  raw:8400000000, sub:'CoX MVP',          delta:'up',   rank:'I'   },
-      { name:'R4TKING',    icon:'🐀', value:'6.1B',  raw:6100000000, sub:'All-rounder',      delta:'same', rank:'II'  },
-      { name:'vorkath_btw',icon:'🐀', value:'4.8B',  raw:4800000000, sub:'Vorkath pet inc.', delta:'up',   rank:'III' },
-      { name:'goblinhuntr',icon:'🐀', value:'3.9B',  raw:3900000000, sub:'Twisted bow',      delta:'same', rank:'IV'  },
-      { name:'skullcrushr',icon:'🐀', value:'2.7B',  raw:2700000000, sub:'PvP + PvM',        delta:'down', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'1.8B',  raw:1800000000, sub:'Bandos grind',     delta:'same', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'1.2B',  raw:1200000000, sub:'Mixed drops',      delta:'up',   rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'880M',  raw:880000000,  sub:'Wildy PKing',      delta:'same', rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'612M',  raw:612000000,  sub:'Various',          delta:'down', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'441M',  raw:441000000,  sub:'GWD grind',        delta:'same', rank:'X'   },
-    ],
-    alltime: [
-      { name:'R4TKING',    icon:'🐀', value:'84.1B',  raw:84100000000, sub:'Co-founder haul',  delta:'same', rank:'I'   },
-      { name:'raid_lord',  icon:'🐀', value:'71.4B',  raw:71400000000, sub:'CoX legend',       delta:'same', rank:'II'  },
-      { name:'vorkath_btw',icon:'🐀', value:'58.8B',  raw:58800000000, sub:'Vorkath machine',  delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'44.2B',  raw:44200000000, sub:'PvP + PvM',        delta:'same', rank:'IV'  },
-      { name:'goblinhuntr',icon:'🐀', value:'38.1B',  raw:38100000000, sub:'Twisted bow ×3',   delta:'same', rank:'V'   },
-      { name:'im_sleepy99',icon:'🐀', value:'28.4B',  raw:28400000000, sub:'GWD main',         delta:'down', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'19.8B',  raw:19800000000, sub:'Mixed',            delta:'same', rank:'VII' },
-      { name:'ratcaller',  icon:'🐀', value:'14.1B',  raw:14100000000, sub:'Wildy PKing',      delta:'up',   rank:'VIII'},
-      { name:'phonkmaster',icon:'🐀', value:'9.4B',   raw:9400000000,  sub:'Various',          delta:'same', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'6.2B',   raw:6200000000,  sub:'GWD grind',        delta:'same', rank:'X'   },
-    ]
-  },
-  clog: {
-    label: 'Collection Log',
-    unit: 'Slots',
-    icon: '📖',
-    valueClass: '',
-    weekly: [
-      { name:'im_sleepy99',icon:'🐀', value:'28',  raw:28,  sub:'1,284 / 1,477 total', delta:'up',   rank:'I'   },
-      { name:'raid_lord',  icon:'🐀', value:'21',  raw:21,  sub:'1,341 / 1,477 total', delta:'same', rank:'II'  },
-      { name:'vorkath_btw',icon:'🐀', value:'17',  raw:17,  sub:'1,198 / 1,477 total', delta:'up',   rank:'III' },
-      { name:'R4TKING',    icon:'🐀', value:'14',  raw:14,  sub:'1,402 / 1,477 total', delta:'same', rank:'IV'  },
-      { name:'phonkmaster',icon:'🐀', value:'11',  raw:11,  sub:'988 / 1,477 total',   delta:'down', rank:'V'   },
-      { name:'Ratashasam', icon:'🐀', value:'9',   raw:9,   sub:'812 / 1,477 total',   delta:'same', rank:'VI'  },
-      { name:'skullcrushr',icon:'🐀', value:'7',   raw:7,   sub:'1,088 / 1,477 total', delta:'up',   rank:'VII' },
-      { name:'goblinhuntr',icon:'🐀', value:'5',   raw:5,   sub:'944 / 1,477 total',   delta:'same', rank:'VIII'},
-      { name:'ratcaller',  icon:'🐀', value:'4',   raw:4,   sub:'677 / 1,477 total',   delta:'down', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'2',   raw:2,   sub:'512 / 1,477 total',   delta:'same', rank:'X'   },
-    ],
-    monthly: [
-      { name:'raid_lord',  icon:'🐀', value:'88',  raw:88,  sub:'1,341 / 1,477 total', delta:'up',   rank:'I'   },
-      { name:'im_sleepy99',icon:'🐀', value:'74',  raw:74,  sub:'1,284 / 1,477 total', delta:'same', rank:'II'  },
-      { name:'R4TKING',    icon:'🐀', value:'61',  raw:61,  sub:'1,402 / 1,477 total', delta:'up',   rank:'III' },
-      { name:'vorkath_btw',icon:'🐀', value:'54',  raw:54,  sub:'1,198 / 1,477 total', delta:'same', rank:'IV'  },
-      { name:'phonkmaster',icon:'🐀', value:'42',  raw:42,  sub:'988 / 1,477 total',   delta:'down', rank:'V'   },
-      { name:'skullcrushr',icon:'🐀', value:'38',  raw:38,  sub:'1,088 / 1,477 total', delta:'same', rank:'VI'  },
-      { name:'Ratashasam', icon:'🐀', value:'31',  raw:31,  sub:'812 / 1,477 total',   delta:'up',   rank:'VII' },
-      { name:'goblinhuntr',icon:'🐀', value:'24',  raw:24,  sub:'944 / 1,477 total',   delta:'same', rank:'VIII'},
-      { name:'ratcaller',  icon:'🐀', value:'18',  raw:18,  sub:'677 / 1,477 total',   delta:'down', rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'11',  raw:11,  sub:'512 / 1,477 total',   delta:'same', rank:'X'   },
-    ],
-    alltime: [
-      { name:'R4TKING',    icon:'🐀', value:'1,402', raw:1402, sub:'94.9% complete',   delta:'same', rank:'I'   },
-      { name:'raid_lord',  icon:'🐀', value:'1,341', raw:1341, sub:'90.8% complete',   delta:'same', rank:'II'  },
-      { name:'im_sleepy99',icon:'🐀', value:'1,284', raw:1284, sub:'86.9% complete',   delta:'up',   rank:'III' },
-      { name:'skullcrushr',icon:'🐀', value:'1,088', raw:1088, sub:'73.7% complete',   delta:'same', rank:'IV'  },
-      { name:'vorkath_btw',icon:'🐀', value:'1,198', raw:1198, sub:'81.1% complete',   delta:'same', rank:'V'   },
-      { name:'goblinhuntr',icon:'🐀', value:'944',   raw:944,  sub:'63.9% complete',   delta:'down', rank:'VI'  },
-      { name:'phonkmaster',icon:'🐀', value:'988',   raw:988,  sub:'66.9% complete',   delta:'same', rank:'VII' },
-      { name:'Ratashasam', icon:'🐀', value:'812',   raw:812,  sub:'55.0% complete',   delta:'same', rank:'VIII'},
-      { name:'ratcaller',  icon:'🐀', value:'677',   raw:677,  sub:'45.8% complete',   delta:'up',   rank:'IX'  },
-      { name:'theratking', icon:'🐀', value:'512',   raw:512,  sub:'34.7% complete',   delta:'same', rank:'X'   },
-    ]
-  }
+// ══ CONFIG ══
+const API = 'https://ratphonk-production.up.railway.app';
+
+const CAT_META = {
+  xp:   { label:'XP Gains',        unit:'XP',    icon:'⚔',  valueClass:'' },
+  boss: { label:'Boss KC',         unit:'KC',    icon:'☠',  valueClass:'kc' },
+  pvp:  { label:'PvP Kills',       unit:'Kills', icon:'💀', valueClass:'pvp' },
+  gp:   { label:'GP Earned',       unit:'GP',    icon:'💰', valueClass:'gold' },
+  clog: { label:'Collection Log',  unit:'Slots', icon:'📖', valueClass:'' },
 };
 
 const PERIOD_LABELS = {
-  weekly: { label:'Weekly Gains', badge:'This Week', desc:'XP gained since Monday 00:00 UTC' },
-  monthly: { label:'Monthly Gains', badge:'April 2025', desc:'XP gained since 1st April 00:00 UTC' },
-  alltime: { label:'All Time', badge:'All Time', desc:'Total accumulated since clan founding' }
+  weekly:  { label:'Weekly Gains',  badge:'This Week', desc:'XP gained since Monday 00:00 UTC' },
+  monthly: { label:'Monthly Gains', badge:'This Month', desc:'XP gained since 1st of the month' },
+  alltime: { label:'All Time',      badge:'All Time',   desc:'Total accumulated since clan founding' },
 };
+
+// Categories the backend supports (pvp + gp come from ledger, not xp_snapshots — keep as coming soon)
+const BACKEND_CATS = new Set(['xp','boss','clog']);
 
 let currentCat = 'xp';
 let currentPeriod = 'weekly';
+let lastFetch = {}; // cache: key = `${cat}-${period}`
+
+function fmtValue(raw, cat) {
+  if (cat === 'xp' || cat === 'gp') {
+    if (raw >= 1e9) return (raw / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+    if (raw >= 1e6) return (raw / 1e6).toFixed(1).replace(/\.?0+$/, '') + 'M';
+    if (raw >= 1e3) return (raw / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'K';
+    return raw.toLocaleString();
+  }
+  return raw.toLocaleString();
+}
+
+const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
+
+async function fetchLeaderboard(cat, period) {
+  const key = `${cat}-${period}`;
+  if (lastFetch[key]) return lastFetch[key];
+
+  const res = await fetch(`${API}/api/leaderboards?category=${cat}&period=${period}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  lastFetch[key] = data;
+  return data;
+}
 
 function setCategory(cat, btn) {
   currentCat = cat;
@@ -851,138 +675,170 @@ function setPeriod(period, btn) {
   render();
 }
 
-function render() {
-  const cat = DATA[currentCat];
-  const rows = cat[currentPeriod];
+async function render() {
+  const main = document.getElementById('lb-main');
+  const meta = CAT_META[currentCat];
   const pl = PERIOD_LABELS[currentPeriod];
-  const top = rows[0].raw;
-  const vc = cat.valueClass;
 
-  // Podium cards (top 3)
+  // Show loading state
+  main.innerHTML = `<div class="board-empty">⚔ Loading rankings…</div>`;
+
+  // PvP and GP aren't in xp_snapshots yet — show placeholder
+  if (!BACKEND_CATS.has(currentCat)) {
+    main.innerHTML = `
+      <div class="board-header" style="opacity:1">
+        <div>
+          <div class="board-title">${meta.icon} ${meta.label} <span>·</span> ${pl.label}</div>
+          <div class="board-subtitle">Coming soon — data will populate once TrackScape bot is logging drops &amp; kills.</div>
+        </div>
+      </div>
+      <div class="board-empty" style="padding:80px">
+        <div style="font-size:32px;margin-bottom:16px">${meta.icon}</div>
+        <div>${meta.label} leaderboard coming soon.</div>
+      </div>`;
+    return;
+  }
+
+  let entries, periodMeta;
+  try {
+    const data = await fetchLeaderboard(currentCat, currentPeriod);
+    entries = data.entries || [];
+    periodMeta = data.period;
+  } catch (e) {
+    main.innerHTML = `<div class="board-empty">Failed to load rankings — backend may be waking up. Refresh in a moment.</div>`;
+    return;
+  }
+
+  if (!entries.length) {
+    main.innerHTML = `
+      <div class="board-header" style="opacity:1">
+        <div>
+          <div class="board-title">${meta.icon} ${meta.label} <span>·</span> ${pl.label}</div>
+          <div class="board-subtitle">${pl.desc}</div>
+        </div>
+      </div>
+      <div class="board-empty">No data yet — sync will populate this once the cron runs.</div>`;
+    return;
+  }
+
+  const top = entries[0].value || 1;
+  const vc = meta.valueClass;
+
+  // Podium (top 3, or fewer if not enough entries)
+  const podiumEntries = entries.slice(0, Math.min(3, entries.length));
+  // Reorder: 2nd, 1st, 3rd for visual podium layout
+  const podiumOrder = podiumEntries.length === 3
+    ? [podiumEntries[1], podiumEntries[0], podiumEntries[2]]
+    : podiumEntries;
+  const podiumClasses = ['second','first','third'];
+
   const podiumHTML = `
     <div class="podium">
-      ${[1,0,2].map(i => {
-        const r = rows[i];
-        const isFirst = i === 0;
-        const cls = ['second','first','third'][i === 0 ? 1 : i === 1 ? 0 : 2];
-        const realCls = i === 0 ? 'first' : i === 1 ? 'second' : 'third';
-        return \`
-        <div class="podium-card \${realCls}" onclick="window.location='profile.html?rsn=\${r.name}'">
-          \${isFirst ? '<span class="podium-crown">👑</span>' : ''}
-          <div class="delta \${r.delta}">\${r.delta === 'up' ? '▲' : r.delta === 'down' ? '▼' : '—'}</div>
-          <div class="podium-rank">\${r.rank}</div>
-          <div class="podium-avatar">\${r.icon}</div>
-          <span class="podium-name">\${r.name}</span>
-          <div class="podium-value \${vc}">\${r.value}</div>
-          <span class="podium-unit">\${cat.unit} \${pl.badge}</span>
-        </div>\`;
+      ${podiumOrder.map((r, i) => {
+        const actualIdx = podiumEntries.length === 3 ? [1,0,2][i] : i;
+        const cls = podiumClasses[i] || '';
+        const isFirst = cls === 'first';
+        return `
+        <div class="podium-card ${cls}" onclick="window.location='profile.html?rsn=${encodeURIComponent(r.rsn)}'">
+          ${isFirst ? '<span class="podium-crown">👑</span>' : ''}
+          <div class="podium-rank">${ROMAN[actualIdx]}</div>
+          <div class="podium-avatar">🐀</div>
+          <span class="podium-name">${r.rsn}</span>
+          <div class="podium-value ${vc}">${fmtValue(r.value, currentCat)}</div>
+          <span class="podium-unit">${meta.unit} · ${pl.badge}</span>
+        </div>`;
       }).join('')}
     </div>`;
 
-  // Table rows (4–10)
-  const tableRows = rows.slice(3).map((r, idx) => {
-    const pct = Math.round((r.raw / top) * 100);
+  // Table rows (4th onwards)
+  const tableRows = entries.slice(3).map((r, idx) => {
+    const pct = Math.round((r.value / top) * 100);
     const barCls = vc === 'gold' ? 'gold' : vc === 'pvp' ? 'pvp' : '';
-    return \`
-      <tr class="r\${idx+4}" onclick="window.location='profile.html?rsn=\${r.name}'" style="cursor:pointer">
-        <td class="td-rank">\${r.rank}</td>
+    return `
+      <tr class="r${idx+4}" onclick="window.location='profile.html?rsn=${encodeURIComponent(r.rsn)}'" style="cursor:pointer">
+        <td class="td-rank">${ROMAN[idx+3]}</td>
         <td>
           <div class="td-member">
-            <div class="member-avatar">\${r.icon}</div>
+            <div class="member-avatar">🐀</div>
             <div>
-              <div class="member-name">\${r.name}</div>
-              <div class="member-title">\${r.sub}</div>
+              <div class="member-name">${r.rsn}</div>
+              <div class="member-title">&nbsp;</div>
             </div>
           </div>
         </td>
-        <td class="td-value \${vc}">\${r.value}</td>
-        <td class="td-sub">\${r.sub}</td>
+        <td class="td-value ${vc}">${fmtValue(r.value, currentCat)}</td>
+        <td class="td-sub">&nbsp;</td>
         <td class="td-bar">
-          <div class="bar-track"><div class="bar-fill \${barCls}" style="width:0%" data-width="\${pct}%"></div></div>
+          <div class="bar-track"><div class="bar-fill ${barCls}" style="width:0%" data-width="${pct}%"></div></div>
         </td>
-        <td class="td-delta"><span class="d-badge \${r.delta}">\${r.delta === 'up' ? '▲ Up' : r.delta === 'down' ? '▼ Down' : '— Same'}</span></td>
-      </tr>\`;
+        <td class="td-delta"><span class="d-badge same">—</span></td>
+      </tr>`;
   }).join('');
 
-  const periodDesc = {
-    weekly: 'Gains since Monday 00:00 UTC. Resets every week.',
-    monthly: 'Gains since 1st of the month. Resets monthly.',
-    alltime: 'Total accumulated stats since clan founding.'
-  }[currentPeriod];
+  const updatedAt = periodMeta?.starts_at
+    ? 'Period started ' + new Date(periodMeta.starts_at * 1000).toLocaleDateString('en-AU', {day:'numeric',month:'short'})
+    : 'Live data';
 
-  document.getElementById('lb-main').innerHTML = \`
+  main.innerHTML = `
     <div class="board-header">
       <div>
-        <div class="board-title">\${cat.icon} \${cat.label} <span>·</span> \${pl.label}</div>
-        <div class="board-subtitle">\${periodDesc}</div>
+        <div class="board-title">${meta.icon} ${meta.label} <span>·</span> ${pl.label}</div>
+        <div class="board-subtitle">${pl.desc}</div>
       </div>
       <div class="board-meta">
-        <span class="board-updated">Last updated</span>
-        <span class="board-period-badge">\${pl.badge}</span>
+        <span class="board-updated">${updatedAt}</span>
+        <span class="board-period-badge">${pl.badge}</span>
       </div>
     </div>
-    \${podiumHTML}
+    ${podiumHTML}
+    ${entries.length > 3 ? `
     <div class="lb-table-wrap">
       <table class="lb-table">
         <thead>
           <tr>
             <th>#</th>
             <th>Member</th>
-            <th class="right">\${cat.unit}</th>
+            <th class="right">${meta.unit}</th>
             <th class="right">Notes</th>
             <th class="right">Relative</th>
             <th class="right">Trend</th>
           </tr>
         </thead>
-        <tbody>\${tableRows}</tbody>
+        <tbody>${tableRows}</tbody>
       </table>
-    </div>
-  \`;
+    </div>` : ''}
+  `;
 
   // Animate bars in
   requestAnimationFrame(() => {
     document.querySelectorAll('.bar-fill[data-width]').forEach(b => {
       b.style.width = b.dataset.width;
     });
-  });
-
-  // Re-animate board header
-  document.querySelector('.board-header').style.animation = 'none';
-  document.querySelector('.podium').style.animation = 'none';
-  document.querySelector('.lb-table-wrap').style.animation = 'none';
-  requestAnimationFrame(() => {
     document.querySelector('.board-header').style.animation = 'fadeUp .5s ease forwards';
-    document.querySelector('.podium').style.animation = 'fadeUp .5s ease .1s forwards';
-    document.querySelector('.lb-table-wrap').style.animation = 'fadeUp .5s ease .2s forwards';
+    document.querySelector('.podium') && (document.querySelector('.podium').style.animation = 'fadeUp .5s ease .1s forwards');
+    document.querySelector('.lb-table-wrap') && (document.querySelector('.lb-table-wrap').style.animation = 'fadeUp .5s ease .2s forwards');
   });
 }
 
-// Countdown timers
+// ── Countdown timers ──
 function updateCountdowns() {
   const now = new Date();
-
-  // Next Monday 00:00 UTC
-  const nextMonday = new Date(now);
   const day = now.getUTCDay();
   const daysUntilMonday = (8 - day) % 7 || 7;
+  const nextMonday = new Date(now);
   nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday);
   nextMonday.setUTCHours(0,0,0,0);
-  const weeklyMs = nextMonday - now;
-  const wd = Math.floor(weeklyMs / 86400000);
-  const wh = Math.floor((weeklyMs % 86400000) / 3600000);
-  const wm = Math.floor((weeklyMs % 3600000) / 60000);
-  document.getElementById('weekly-countdown').textContent = wd + 'd ' + wh + 'h ' + wm + 'm';
+  const wMs = nextMonday - now;
+  const wd = Math.floor(wMs/86400000), wh = Math.floor((wMs%86400000)/3600000), wm = Math.floor((wMs%3600000)/60000);
+  document.getElementById('weekly-countdown').textContent = `${wd}d ${wh}h ${wm}m`;
 
-  // Next 1st of month 00:00 UTC
-  const nextFirst = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-  const monthlyMs = nextFirst - now;
-  const md = Math.floor(monthlyMs / 86400000);
-  const mh = Math.floor((monthlyMs % 86400000) / 3600000);
-  const mm = Math.floor((monthlyMs % 3600000) / 60000);
-  document.getElementById('monthly-countdown').textContent = md + 'd ' + mh + 'h ' + mm + 'm';
+  const nextFirst = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth()+1, 1));
+  const mMs = nextFirst - now;
+  const md = Math.floor(mMs/86400000), mh = Math.floor((mMs%86400000)/3600000), mm = Math.floor((mMs%3600000)/60000);
+  document.getElementById('monthly-countdown').textContent = `${md}d ${mh}h ${mm}m`;
 }
 
-// Init
+// ── Init ──
 render();
 updateCountdowns();
 setInterval(updateCountdowns, 60000);

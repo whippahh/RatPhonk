@@ -569,13 +569,14 @@
 <div class="page">
 
 <!-- ════════════════ NAV ════════════════ -->
-<nav>
-  <a href="#"             class="nav-link active">Home</a>
-  <a href="#leaderboards" class="nav-link">Leaderboards</a>
-  <a href="#"             class="nav-link">Bingo &amp; Comps</a>
-  <a href="#"             class="nav-link">Event Calendar</a>
-  <a href="#"             class="nav-link">Rat Profiles</a>
-  <a href="#"             class="nav-link">The Ledger</a>
+<nav id="main-nav">
+  <a href="index.html"        class="nav-link active">Home</a>
+  <a href="leaderboards.html" class="nav-link">Leaderboards</a>
+  <a href="bingo.html"        class="nav-link">Bingo &amp; Comps</a>
+  <a href="#"                 class="nav-link">Event Calendar</a>
+  <a href="profile.html"      class="nav-link">Rat Profiles</a>
+  <a href="ledger.html"       class="nav-link">The Ledger</a>
+  <a href="https://ratphonk-production.up.railway.app/auth/discord" class="nav-link" id="nav-login" style="color:var(--glow);margin-left:auto;border-left:1px solid var(--border)">⚔ Login</a>
 </nav>
 
 <!-- ════════════════ HERO ════════════════ -->
@@ -685,8 +686,8 @@
     </h1>
     <p class="hero-sub">Old School RuneScape. Absolute Domination. Join the Horde.</p>
     <div class="hero-btns">
-      <a href="#" class="btn btn-green">Join Clan Discord</a>
-      <a href="#apply" class="btn btn-stone">Apply to Rat Phonk</a>
+      <a href="https://discord.gg/8TxHGtF9am" class="btn btn-green" target="_blank" rel="noopener">Join Clan Discord</a>
+      <a href="https://ratphonk-production.up.railway.app/auth/discord?intent=apply" class="btn btn-stone">Apply to Rat Phonk</a>
     </div>
   </div>
 </section>
@@ -707,22 +708,14 @@
     <h2 class="s-title">The Rankings</h2>
     <div class="s-rule" style="justify-content:center"><div class="s-line"></div><div class="s-gem"></div><div class="s-line r"></div></div>
   </div>
-  <div class="lb-grid reveal">
+  <div class="lb-grid reveal" id="lb-preview">
     <div class="lb-card">
-      <div class="lb-head"><span class="lb-head-t">⚔ XP Gains</span><span class="lb-head-s">Week 24 · resets Mon</span></div>
-      <div class="lb-row r1"><div class="lb-rank">I</div><div class="lb-icon">🐀</div><div class="lb-name">R4TKING</div><div class="lb-val">84.2M</div><div class="lb-bar-row"><div class="lb-bar" style="width:100%"></div></div></div>
-      <div class="lb-row r2"><div class="lb-rank">II</div><div class="lb-icon">🐀</div><div class="lb-name">skullcrushr</div><div class="lb-val">61.8M</div><div class="lb-bar-row"><div class="lb-bar" style="width:73%"></div></div></div>
-      <div class="lb-row r3"><div class="lb-rank">III</div><div class="lb-icon">🐀</div><div class="lb-name">goblinhuntr</div><div class="lb-val">49.1M</div><div class="lb-bar-row"><div class="lb-bar" style="width:58%"></div></div></div>
-      <div class="lb-row"><div class="lb-rank">IV</div><div class="lb-icon">🐀</div><div class="lb-name">im_sleepy99</div><div class="lb-val">38.4M</div><div class="lb-bar-row"><div class="lb-bar" style="width:46%"></div></div></div>
-      <div class="lb-row"><div class="lb-rank">V</div><div class="lb-icon">🐀</div><div class="lb-name">vorkath_btw</div><div class="lb-val">27.3M</div><div class="lb-bar-row"><div class="lb-bar" style="width:32%"></div></div></div>
+      <div class="lb-head"><span class="lb-head-t">⚔ XP Gains</span><span class="lb-head-s" id="xp-period">Weekly</span></div>
+      <div id="xp-rows"><div style="padding:20px;font-style:italic;color:var(--text-dim);font-size:14px">Loading…</div></div>
     </div>
     <div class="lb-card">
-      <div class="lb-head"><span class="lb-head-t">☠ Boss Kill Count</span><span class="lb-head-s">Week 24 · resets Mon</span></div>
-      <div class="lb-row r1"><div class="lb-rank">I</div><div class="lb-icon">🐀</div><div class="lb-name">vorkath_btw</div><div class="lb-val kc">412 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:100%"></div></div></div>
-      <div class="lb-row r2"><div class="lb-rank">II</div><div class="lb-icon">🐀</div><div class="lb-name">R4TKING</div><div class="lb-val kc">287 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:70%"></div></div></div>
-      <div class="lb-row r3"><div class="lb-rank">III</div><div class="lb-icon">🐀</div><div class="lb-name">raid_lord</div><div class="lb-val kc">201 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:49%"></div></div></div>
-      <div class="lb-row"><div class="lb-rank">IV</div><div class="lb-icon">🐀</div><div class="lb-name">skullcrushr</div><div class="lb-val kc">188 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:46%"></div></div></div>
-      <div class="lb-row"><div class="lb-rank">V</div><div class="lb-icon">🐀</div><div class="lb-name">goblinhuntr</div><div class="lb-val kc">143 KC</div><div class="lb-bar-row"><div class="lb-bar gold" style="width:35%"></div></div></div>
+      <div class="lb-head"><span class="lb-head-t">☠ Boss Kill Count</span><span class="lb-head-s" id="boss-period">Weekly</span></div>
+      <div id="boss-rows"><div style="padding:20px;font-style:italic;color:var(--text-dim);font-size:14px">Loading…</div></div>
     </div>
   </div>
 </section>
@@ -734,11 +727,8 @@
     <h2 class="s-title">Recent Drops</h2>
     <div class="s-rule" style="justify-content:center"><div class="s-line"></div><div class="s-gem"></div><div class="s-line r"></div></div>
   </div>
-  <div class="drops-list reveal">
-    <div class="drop-row"><div><div class="drop-name">Scythe of vitur <span class="split-tag">3-way split</span></div><div class="drop-meta"><strong>R4TKING</strong> · Theatre of Blood</div></div><div><div class="drop-gp">1,240M</div><div class="drop-time">2h ago</div></div></div>
-    <div class="drop-row"><div><div class="drop-name">Tumeken's shadow <span class="split-tag">5-way split</span></div><div class="drop-meta"><strong>vorkath_btw</strong> · Tombs of Amascut</div></div><div><div class="drop-gp">890M</div><div class="drop-time">6h ago</div></div></div>
-    <div class="drop-row"><div><div class="drop-name">Twisted bow</div><div class="drop-meta"><strong>goblinhuntr</strong> · Chambers of Xeric</div></div><div><div class="drop-gp">1,770M</div><div class="drop-time">1d ago</div></div></div>
-    <div class="drop-row"><div><div class="drop-name">Elysian sigil <span class="split-tag">2-way split</span></div><div class="drop-meta"><strong>skullcrushr</strong> · Corporeal Beast</div></div><div><div class="drop-gp">740M</div><div class="drop-time">2d ago</div></div></div>
+  <div class="drops-list reveal" id="drops-list">
+    <div style="padding:30px;text-align:center;font-style:italic;color:var(--text-dim)">Loading recent drops…</div>
   </div>
 </section>
 
@@ -766,6 +756,10 @@
       <div id="form-content">
         <div class="form-heading">Apply to the Clan</div>
         <div class="form-note">Reviewed within 24–48 hours by an officer</div>
+
+        <!-- Discord link status — shown/hidden by JS -->
+        <div id="discord-status" style="display:none;margin-bottom:18px;padding:10px 14px;border:1px solid;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;"></div>
+
         <div class="fg">
           <label class="fl" for="rsn">Your RuneScape Name</label>
           <input class="fi" type="text" id="rsn" placeholder="ExactRSNHere" maxlength="12" autocomplete="off">
@@ -818,30 +812,119 @@
 </div>
 <script>
 const API = 'https://ratphonk-production.up.railway.app';
+const ROMAN = ['I','II','III','IV','V'];
 
-// ── LOAD REAL CLAN STATS ──────────────────────────────────────
+function fmtXP(v) {
+  if (v >= 1e9) return (v/1e9).toFixed(2).replace(/\.?0+$/,'') + 'B';
+  if (v >= 1e6) return (v/1e6).toFixed(1).replace(/\.?0+$/,'') + 'M';
+  if (v >= 1e3) return (v/1e3).toFixed(1) + 'K';
+  return v.toLocaleString();
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts * 1000) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+// ── STATS STRIP ───────────────────────────────────────────────
 async function loadStats() {
   try {
     const res = await fetch(`${API}/api/stats`);
-    const data = await res.json();
-    document.querySelector('.stat-b:nth-child(1) .stat-val').textContent = data.memberCount;
-    document.querySelector('.stat-b:nth-child(3) .stat-val').innerHTML = data.dropCount.toLocaleString();
-    document.querySelector('.stat-b:nth-child(4) .stat-val').textContent = data.killCount.toLocaleString();
-    const gp = data.dropGp;
-    const gpFormatted = gp >= 1e9 ? (gp/1e9).toFixed(1) + '<span class="u">B</span>'
-                      : gp >= 1e6 ? (gp/1e6).toFixed(1) + '<span class="u">M</span>'
-                      : gp.toLocaleString();
-    document.querySelector('.stat-b:nth-child(5) .stat-val').innerHTML = gpFormatted;
-  } catch (err) {
-    console.warn('Could not load stats:', err);
+    const d = await res.json();
+    const blks = document.querySelectorAll('.stat-blk');
+    // [0] Members, [1] XP, [2] Boss KC, [3] PK Kills, [4] GP Split
+    if (blks[0]) blks[0].querySelector('.stat-val').textContent = d.memberCount ?? '—';
+    if (blks[3]) blks[3].querySelector('.stat-val').textContent = d.killCount?.toLocaleString() ?? '—';
+    if (blks[4] && d.dropGp != null) {
+      const gp = d.dropGp;
+      blks[4].querySelector('.stat-val').innerHTML =
+        gp >= 1e9 ? (gp/1e9).toFixed(1) + '<span class="u">B</span>'
+        : gp >= 1e6 ? (gp/1e6).toFixed(0) + '<span class="u">M</span>'
+        : gp.toLocaleString();
+    }
+  } catch (e) { console.warn('Stats fetch failed:', e); }
+}
+
+// ── LEADERBOARD PREVIEW ───────────────────────────────────────
+async function loadLeaderboards() {
+  async function loadCard(cat, containerId, periodId, isKC) {
+    try {
+      const res = await fetch(`${API}/api/leaderboards?category=${cat}&period=weekly`);
+      const { entries, period } = await res.json();
+      if (period?.starts_at) {
+        const d = new Date(period.starts_at * 1000);
+        document.getElementById(periodId).textContent =
+          'W/C ' + d.toLocaleDateString('en-AU', {day:'numeric', month:'short'});
+      }
+      const top = entries?.[0]?.value || 1;
+      const html = (entries || []).slice(0,5).map((r, i) => {
+        const pct = Math.round((r.value / top) * 100);
+        const val = isKC ? r.value.toLocaleString() + ' KC' : fmtXP(r.value);
+        const rankClass = i < 3 ? ` r${i+1}` : '';
+        return `<div class="lb-row${rankClass}" onclick="window.location='profile.html?rsn=${encodeURIComponent(r.rsn)}'" style="cursor:pointer">
+          <div class="lb-rank">${ROMAN[i]}</div>
+          <div class="lb-icon">🐀</div>
+          <div class="lb-name">${r.rsn}</div>
+          <div class="lb-val${isKC ? ' kc' : ''}">${val}</div>
+          <div class="lb-bar-row"><div class="lb-bar${isKC ? ' gold' : ''}" style="width:0%" data-width="${pct}%"></div></div>
+        </div>`;
+      }).join('') || '<div style="padding:20px;font-style:italic;color:var(--text-dim);font-size:14px">No data yet.</div>';
+      document.getElementById(containerId).innerHTML = html;
+      requestAnimationFrame(() => {
+        document.querySelectorAll(`#${containerId} .lb-bar[data-width]`).forEach(b => b.style.width = b.dataset.width);
+      });
+    } catch(e) {
+      document.getElementById(containerId).innerHTML = '<div style="padding:20px;font-style:italic;color:var(--text-dim);font-size:14px">Could not load.</div>';
+    }
+  }
+  loadCard('xp',   'xp-rows',   'xp-period',   false);
+  loadCard('boss', 'boss-rows', 'boss-period',  true);
+}
+
+// ── DROPS (requires auth — show prompt if 401) ────────────────
+async function loadDrops() {
+  const el = document.getElementById('drops-list');
+  try {
+    const res = await fetch(`${API}/api/drops?limit=4`, { credentials: 'include' });
+    if (res.status === 401) {
+      el.innerHTML = `<div style="padding:30px;text-align:center;font-style:italic;color:var(--text-dim)">
+        Sign in with Discord to see recent drops.
+      </div>`;
+      return;
+    }
+    const drops = await res.json();
+    if (!drops.length) {
+      el.innerHTML = `<div style="padding:30px;text-align:center;font-style:italic;color:var(--text-dim)">No drops logged yet.</div>`;
+      return;
+    }
+    el.innerHTML = drops.map(d => {
+      const gp = d.item_value_gp;
+      const gpStr = gp >= 1e9 ? (gp/1e9).toFixed(2)+'B' : gp >= 1e6 ? (gp/1e6).toFixed(0)+'M' : gp?.toLocaleString() ?? '?';
+      const splitTag = d.split_count > 1 ? `<span class="split-tag">${d.split_count}-way split</span>` : '';
+      return `<div class="drop-row">
+        <div>
+          <div class="drop-name">${d.item_name} ${splitTag}</div>
+          <div class="drop-meta"><strong>${d.member_rsn}</strong> · ${d.source ?? 'Unknown'}</div>
+        </div>
+        <div>
+          <div class="drop-gp">${gpStr}</div>
+          <div class="drop-time">${timeAgo(d.dropped_at)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="padding:30px;text-align:center;font-style:italic;color:var(--text-dim)">Could not load drops.</div>`;
   }
 }
 
-// ── REAL RSN CHECK ────────────────────────────────────────────
-const rsnInput  = document.getElementById('rsn');
-const stEl      = document.getElementById('rsn-st');
-const msgEl     = document.getElementById('rsn-msg');
-const subBtn    = document.getElementById('sub-btn');
+// ── RSN CHECK ─────────────────────────────────────────────────
+const rsnInput = document.getElementById('rsn');
+const stEl     = document.getElementById('rsn-st');
+const msgEl    = document.getElementById('rsn-msg');
+const subBtn   = document.getElementById('sub-btn');
 let deb, ok = false;
 
 function setSt(s, m) {
@@ -858,19 +941,13 @@ rsnInput.addEventListener('input', () => {
   deb = setTimeout(async () => {
     try {
       const res = await fetch(`${API}/api/wom/player/${encodeURIComponent(v)}`);
-      if (res.ok) {
-        setSt('valid', '✦ ' + v + ' found on Wise Old Man');
-        ok = true; subBtn.disabled = false;
-      } else {
-        setSt('invalid', 'RSN not found. Have you logged in recently?');
-      }
-    } catch {
-      setSt('invalid', 'Could not reach server. Try again shortly.');
-    }
+      if (res.ok) { setSt('valid', '✦ ' + v + ' found on Wise Old Man'); ok = true; subBtn.disabled = false; }
+      else setSt('invalid', 'RSN not found. Have you logged in recently?');
+    } catch { setSt('invalid', 'Could not reach server. Try again shortly.'); }
   }, 650);
 });
 
-// ── REAL APPLICATION SUBMIT ───────────────────────────────────
+// ── APPLICATION SUBMIT ────────────────────────────────────────
 async function doSub() {
   if (!ok) return;
   subBtn.disabled = true;
@@ -903,7 +980,68 @@ async function doSub() {
   }
 }
 
-// Nav scroll, reveal, LB bars — keep existing code
+// ── NAV AUTH STATE ────────────────────────────────────────────
+async function updateNavAuth() {
+  try {
+    const res = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if (res.ok) {
+      const me = await res.json();
+      const btn = document.getElementById('nav-login');
+      if (btn) {
+        btn.textContent = `🐀 ${me.rsn}`;
+        btn.href = `profile.html?rsn=${encodeURIComponent(me.rsn)}`;
+        btn.style.color = 'var(--parch-lt)';
+      }
+    }
+  } catch(e) {}
+}
+
+// ── OAUTH REDIRECT HANDLING ───────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('apply') === '1') {
+  setTimeout(() => {
+    document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+    // Check session for pending Discord identity
+    fetch(`${API}/auth/me`, { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(me => {
+        if (me) {
+          // Already a full member — go to profile
+          window.location = `profile.html?rsn=${encodeURIComponent(me.rsn)}`;
+          return;
+        }
+        // Show Discord linked status
+        const ds = document.getElementById('discord-status');
+        if (ds) {
+          ds.style.display = 'block';
+          ds.style.borderColor = 'var(--glow-dim)';
+          ds.style.color = 'var(--glow)';
+          ds.style.background = 'rgba(26,58,22,.3)';
+          ds.textContent = '✓ Discord linked — your identity will be attached to this application';
+        }
+      }).catch(() => {
+        // Session check failed — show warning that Discord isn't linked
+        const ds = document.getElementById('discord-status');
+        if (ds) {
+          ds.style.display = 'block';
+          ds.style.borderColor = 'var(--amber-dim)';
+          ds.style.color = 'var(--amber)';
+          ds.style.background = 'rgba(42,26,6,.3)';
+          ds.innerHTML = '⚠ Discord not linked — <a href="https://ratphonk-production.up.railway.app/auth/discord?intent=apply" style="color:inherit">click here to connect Discord</a> before submitting';
+        }
+      });
+  }, 300);
+}
+if (urlParams.get('notfound') === '1') {
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:52px;left:0;right:0;z-index:300;background:rgba(140,58,58,0.95);color:#e8a0a0;font-family:Cinzel,serif;font-size:11px;letter-spacing:.15em;text-align:center;padding:12px;border-bottom:1px solid #8c3a3a;';
+  banner.textContent = 'No account found for that Discord. Apply below to join the clan.';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 6000);
+  setTimeout(() => document.getElementById('apply').scrollIntoView({ behavior: 'smooth' }), 400);
+}
+
+
 window.addEventListener('scroll', () => {
   document.getElementById('main-nav').classList.toggle('solid', window.scrollY > 50);
 });
@@ -912,19 +1050,12 @@ const obs = new IntersectionObserver(
   { threshold: 0.1 }
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-const lbObs = new IntersectionObserver(es => {
-  es.forEach(e => {
-    if (!e.isIntersecting) return;
-    e.target.querySelectorAll('.lb-bar').forEach(b => {
-      const w = b.style.width; b.style.width = '0';
-      requestAnimationFrame(() => { b.style.width = w; });
-    });
-    lbObs.unobserve(e.target);
-  });
-}, { threshold: 0.3 });
-document.querySelectorAll('.lb-grid').forEach(el => lbObs.observe(el));
 
+// ── INIT ──────────────────────────────────────────────────────
 loadStats();
+loadLeaderboards();
+loadDrops();
+updateNavAuth();
 </script>
 </body>
 </html>

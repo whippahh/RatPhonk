@@ -556,13 +556,14 @@
 <div class="page">
 
 <!-- NAV -->
-<nav>
-  <a href="ratphonk_final.html" class="nav-link">Home</a>
-  <a href="leaderboards.html"   class="nav-link">Leaderboards</a>
-  <a href="#"                   class="nav-link active">Bingo &amp; Comps</a>
-  <a href="#"                   class="nav-link">Event Calendar</a>
-  <a href="#"                   class="nav-link">Rat Profiles</a>
-  <a href="ledger.html"         class="nav-link">The Ledger</a>
+<nav id="main-nav">
+  <a href="index.html"        class="nav-link">Home</a>
+  <a href="leaderboards.html" class="nav-link">Leaderboards</a>
+  <a href="bingo.html"        class="nav-link active">Bingo &amp; Comps</a>
+  <a href="#"                 class="nav-link">Event Calendar</a>
+  <a href="profile.html"      class="nav-link">Rat Profiles</a>
+  <a href="ledger.html"       class="nav-link">The Ledger</a>
+  <a href="https://ratphonk-production.up.railway.app/auth/discord" class="nav-link" id="nav-login" style="color:var(--glow);margin-left:auto;border-left:1px solid var(--border)">⚔ Login</a>
 </nav>
 
 <!-- PAGE HEADER -->
@@ -1055,67 +1056,108 @@
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
+const API = 'https://ratphonk-production.up.railway.app';
+
+// ── NAV AUTH ─────────────────────────────────────────────────
+async function updateNavAuth() {
+  try {
+    const res = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if (res.ok) {
+      const me = await res.json();
+      const btn = document.getElementById('nav-login');
+      if (btn) { btn.textContent = `🐀 ${me.rsn}`; btn.href = `profile.html?rsn=${encodeURIComponent(me.rsn)}`; btn.style.color = 'var(--parch-lt)'; }
+      // Show create comp form if admin/officer
+      if (me.role === 'admin' || me.role === 'officer') {
+        document.querySelector('.create-comp-wrap').style.display = 'block';
+      }
+    }
+  } catch(e) {}
+}
+
+// ── LOAD EVENTS STRIP ────────────────────────────────────────
+async function loadEvents() {
+  try {
+    const res = await fetch(`${API}/api/events`);
+    if (!res.ok) return;
+    const events = await res.json();
+    if (!events.length) return;
+
+    const strip = document.querySelector('.event-strip');
+    const now = Math.floor(Date.now() / 1000);
+
+    strip.innerHTML = events.map(e => {
+      const isLive     = e.starts_at <= now && (!e.ends_at || e.ends_at > now);
+      const isUpcoming = e.starts_at > now;
+      const dotClass   = isLive ? 'live' : isUpcoming ? 'upcoming' : 'ended';
+      const meta       = isLive
+        ? `Live · ${e.rsvp_count} going`
+        : isUpcoming
+          ? `Starts ${new Date(e.starts_at*1000).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}`
+          : `Ended`;
+      return `
+        <div class="event-pill ${isLive ? 'active-pill' : ''}">
+          <div class="ep-dot ${dotClass}"></div>
+          <div>
+            <div class="ep-name">${e.title}</div>
+            <div class="ep-meta">${meta}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
 // ══ BINGO TILES DATA ══
 const TILES = [
   // Row 1
-  {name:'Any Pet Drop',       icon:'🐾', diff:'hard',   type:'pet',   done:false, pending:false, team:null,    desc:'Obtain any PvM or Skilling pet.'},
-  {name:'Twisted Bow',        icon:'🏹', diff:'hard',   type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'29 Mar'},  desc:'Drop the Twisted bow from Chambers of Xeric.'},
-  {name:'99 Slayer',          icon:'💀', diff:'medium', type:'level', done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'30 Mar'},  desc:'Reach level 99 Slayer.'},
-  {name:'Zulrah Unique',      icon:'🐍', diff:'medium', type:'drop',  done:false, pending:true,  team:null,    desc:'Obtain any unique drop from Zulrah.'},
-  {name:'500 Vorkath KC',     icon:'🐲', diff:'medium', type:'kc',    done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Reach 500 Vorkath kills.'},
+  {name:'Any Pet Drop',       icon:'🐾', diff:'hard',   done:false, pending:false, team:null,    desc:'Obtain any PvM or Skilling pet.'},
+  {name:'Twisted Bow',        icon:'🏹', diff:'hard',   done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'29 Mar'},    desc:'Drop the Twisted bow from Chambers of Xeric.'},
+  {name:'99 Slayer',          icon:'💀', diff:'medium', done:true,  pending:false, team:'Chaos', completedBy:{name:'R4TKING',date:'30 Mar'},    desc:'Reach level 99 Slayer.'},
+  {name:'Zulrah Unique',      icon:'🐍', diff:'medium', done:false, pending:true,  team:null,    desc:'Obtain any unique drop from Zulrah.'},
+  {name:'500 Vorkath KC',     icon:'🐲', diff:'medium', done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Reach 500 Vorkath kills.'},
   // Row 2
-  {name:'Dragon Warhammer',   icon:'🔨', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Drop the Dragon Warhammer from Lizardman Shamans.'},
-  {name:'GWD Unique',         icon:'⚔',  diff:'medium', type:'drop',  done:true,  pending:false, team:'Anarchy', completedBy:{name:'goblinhuntr',date:'29 Mar'}, desc:'Any unique drop from God Wars Dungeon.'},
-  {name:'Full Barrows Set',   icon:'🪬',  diff:'medium', type:'challenge', done:false, pending:false, team:null, desc:'Complete a full Barrows armour set (any).'},
-  {name:'99 Farming',         icon:'🌾', diff:'easy',   type:'level', done:true,  pending:false, team:'Anarchy', completedBy:{name:'im_sleepy99',date:'28 Mar'}, desc:'Reach level 99 Farming.'},
-  {name:'Cerberus Crystal',   icon:'💎', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a crystal from Cerberus (Primordial, Pegasian, or Eternal).'},
+  {name:'Dragon Warhammer',   icon:'🔨', diff:'hard',   done:false, pending:false, team:null,    desc:'Drop the Dragon Warhammer from Lizardman Shamans.'},
+  {name:'GWD Unique',         icon:'⚔',  diff:'medium', done:true,  pending:false, team:'Anarchy', completedBy:{name:'goblinhuntr',date:'29 Mar'}, desc:'Any unique drop from God Wars Dungeon.'},
+  {name:'Full Barrows Set',   icon:'🪬',  diff:'medium', done:false, pending:false, team:null,    desc:'Complete a full Barrows armour set (any).'},
+  {name:'99 Farming',         icon:'🌾', diff:'easy',   done:true,  pending:false, team:'Anarchy', completedBy:{name:'im_sleepy99',date:'28 Mar'}, desc:'Reach level 99 Farming.'},
+  {name:'Cerberus Crystal',   icon:'💎', diff:'hard',   done:false, pending:false, team:null,    desc:'Obtain a crystal from Cerberus.'},
   // Row 3
-  {name:'100 CoX KC',         icon:'💠', diff:'easy',   type:'kc',    done:true,  pending:false, team:'Chaos', completedBy:{name:'raid_lord',date:'29 Mar'}, desc:'Reach 100 Chambers of Xeric kills.'},
-  {name:'Whip Drop',          icon:'⚡', diff:'easy',   type:'drop',  done:true,  pending:false, team:'Mayhem', completedBy:{name:'phonkmaster',date:'28 Mar'}, desc:'Drop an Abyssal Whip from Abyssal Demons.'},
-  {name:'FREE',               icon:'⭐', diff:'easy',   type:'free',  done:true,  pending:false, team:null,    desc:'Free tile — automatically complete.', free:true},
-  {name:'1200 Total Level',   icon:'📊', diff:'easy',   type:'level', done:true,  pending:false, team:'Anarchy', completedBy:{name:'ratcaller',date:'29 Mar'}, desc:'Reach 1200 Total Level.'},
-  {name:'Elysian Sigil',      icon:'🛡',  diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Drop the Elysian sigil from Corporeal Beast.'},
+  {name:'100 CoX KC',         icon:'💠', diff:'easy',   done:true,  pending:false, team:'Chaos', completedBy:{name:'raid_lord',date:'29 Mar'},   desc:'Reach 100 Chambers of Xeric kills.'},
+  {name:'Whip Drop',          icon:'⚡', diff:'easy',   done:true,  pending:false, team:'Mayhem', completedBy:{name:'phonkmaster',date:'28 Mar'}, desc:'Drop an Abyssal Whip from Abyssal Demons.'},
+  {name:'FREE',               icon:'⭐', diff:'easy',   done:true,  pending:false, team:null,    desc:'Free tile — automatically complete.', free:true},
+  {name:'1200 Total Level',   icon:'📊', diff:'easy',   done:true,  pending:false, team:'Anarchy', completedBy:{name:'ratcaller',date:'29 Mar'},  desc:'Reach 1200 Total Level.'},
+  {name:'Elysian Sigil',      icon:'🛡',  diff:'hard',   done:false, pending:false, team:null,    desc:'Drop the Elysian sigil from Corporeal Beast.'},
   // Row 4
-  {name:'Scythe of Vitur',    icon:'🩸', diff:'hard',   type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'skullcrushr',date:'30 Mar'}, desc:'Obtain a Scythe of vitur from Theatre of Blood.'},
-  {name:'99 Magic',           icon:'🔮', diff:'easy',   type:'level', done:false, pending:false, team:null,    desc:'Reach level 99 Magic.'},
-  {name:'Any Jar',            icon:'🫙',  diff:'easy',   type:'drop',  done:true,  pending:false, team:'Mayhem', completedBy:{name:'theratking',date:'29 Mar'}, desc:'Obtain any "jar" drop from a boss.'},
-  {name:'ToB Unique',         icon:'🔴', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Any unique from Theatre of Blood.'},
-  {name:'200 Zulrah KC',      icon:'🐍', diff:'easy',   type:'kc',    done:true,  pending:false, team:'Anarchy', completedBy:{name:'Ratashasam',date:'30 Mar'}, desc:'Reach 200 Zulrah kills.'},
+  {name:'Scythe of Vitur',    icon:'🩸', diff:'hard',   done:true,  pending:false, team:'Chaos', completedBy:{name:'skullcrushr',date:'30 Mar'}, desc:'Obtain a Scythe of vitur from Theatre of Blood.'},
+  {name:'99 Magic',           icon:'🔮', diff:'easy',   done:false, pending:false, team:null,    desc:'Reach level 99 Magic.'},
+  {name:'Any Jar',            icon:'🫙',  diff:'easy',   done:true,  pending:false, team:'Mayhem', completedBy:{name:'theratking',date:'29 Mar'},  desc:'Obtain any jar drop from a boss.'},
+  {name:'ToB Unique',         icon:'🔴', diff:'hard',   done:false, pending:false, team:null,    desc:'Any unique from Theatre of Blood.'},
+  {name:'200 Zulrah KC',      icon:'🐍', diff:'easy',   done:true,  pending:false, team:'Anarchy', completedBy:{name:'Ratashasam',date:'30 Mar'}, desc:'Reach 200 Zulrah kills.'},
   // Row 5
-  {name:'Clue Scroll Unique', icon:'📜', diff:'medium', type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a unique item worth 5M+ from a clue scroll.'},
-  {name:'Zenyte Shard',       icon:'💜', diff:'hard',   type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a Zenyte shard from Demonic Gorillas.'},
-  {name:'Spirit Seed',        icon:'🌱', diff:'medium', type:'drop',  done:false, pending:false, team:null,    desc:'Obtain a Spirit seed from any boss.'},
-  {name:'1400 Clog Slots',    icon:'📖', diff:'hard',   type:'clog',  done:false, pending:false, team:null,    desc:'Reach 1,400 Collection Log slots.'},
-  {name:'Vorkath Unique',     icon:'🐲', diff:'medium', type:'drop',  done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Obtain any unique drop from Vorkath.'},
+  {name:'Clue Scroll Unique', icon:'📜', diff:'medium', done:false, pending:false, team:null,    desc:'Obtain a unique item worth 5M+ from a clue scroll.'},
+  {name:'Zenyte Shard',       icon:'💜', diff:'hard',   done:false, pending:false, team:null,    desc:'Obtain a Zenyte shard from Demonic Gorillas.'},
+  {name:'Spirit Seed',        icon:'🌱', diff:'medium', done:false, pending:false, team:null,    desc:'Obtain a Spirit seed from any boss.'},
+  {name:'1400 Clog Slots',    icon:'📖', diff:'hard',   done:false, pending:false, team:null,    desc:'Reach 1,400 Collection Log slots.'},
+  {name:'Vorkath Unique',     icon:'🐲', diff:'medium', done:true,  pending:false, team:'Chaos', completedBy:{name:'vorkath_btw',date:'28 Mar'}, desc:'Obtain any unique drop from Vorkath.'},
 ];
 
-// Check which rows/cols/diags are complete bingo lines
 function getBingoLines() {
   const lines = new Set();
-  // Rows
-  for (let r=0;r<5;r++) {
-    if([0,1,2,3,4].every(c=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(c=>lines.add(r*5+c));
-  }
-  // Cols
-  for (let c=0;c<5;c++) {
-    if([0,1,2,3,4].every(r=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(r=>lines.add(r*5+c));
-  }
-  // Diag
+  for (let r=0;r<5;r++) if([0,1,2,3,4].every(c=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(c=>lines.add(r*5+c));
+  for (let c=0;c<5;c++) if([0,1,2,3,4].every(r=>TILES[r*5+c].done)) [0,1,2,3,4].forEach(r=>lines.add(r*5+c));
   if([0,6,12,18,24].every(i=>TILES[i].done)) [0,6,12,18,24].forEach(i=>lines.add(i));
   if([4,8,12,16,20].every(i=>TILES[i].done)) [4,8,12,16,20].forEach(i=>lines.add(i));
   return lines;
 }
 
 function renderBoard() {
-  const grid = document.getElementById('bingo-grid');
   const lines = getBingoLines();
-  grid.innerHTML = TILES.map((t,i) => {
+  document.getElementById('bingo-grid').innerHTML = TILES.map((t,i) => {
     let cls = `tile ${t.diff}`;
-    if (t.free)    cls += ' free';
+    if (t.free)         cls += ' free';
     else if (t.done)    cls += ' done';
     else if (t.pending) cls += ' pending';
     if (lines.has(i))   cls += ' bingo-line';
-    const teamCol = t.team === 'Chaos' ? 'var(--gold)' : t.team === 'Anarchy' ? 'var(--glow)' : 'var(--red)';
+    const teamCol = t.team==='Chaos'?'var(--gold)':t.team==='Anarchy'?'var(--glow)':'var(--red)';
     return `
       <div class="${cls}" onclick="openTile(${i})">
         <div class="tile-icon">${t.icon}</div>
@@ -1129,36 +1171,29 @@ function renderBoard() {
 function openTile(i) {
   const t = TILES[i];
   document.getElementById('tile-modal-title').textContent = t.name;
-  const done = t.done, pending = t.pending;
   const submitBtn = document.getElementById('tile-submit-btn');
-  submitBtn.style.display = (done || t.free) ? 'none' : 'inline-flex';
-
-  let completedHtml = '';
-  if (t.done && t.completedBy) {
-    const teamCol = t.team === 'Chaos' ? 'var(--gold)' : t.team === 'Anarchy' ? 'var(--glow)' : 'var(--red)';
-    completedHtml = `
-      <div class="completed-by">
-        <div class="cb-label">Completed by</div>
-        <div class="cb-entry">
-          <span class="cb-name">${t.completedBy.name}</span>
-          <span class="cb-team" style="color:${teamCol}">Team ${t.team}</span>
-          <span class="cb-date">${t.completedBy.date}</span>
-        </div>
-      </div>`;
-  }
-
+  submitBtn.style.display = (t.done || t.free) ? 'none' : 'inline-flex';
+  const teamCol = t.team==='Chaos'?'var(--gold)':t.team==='Anarchy'?'var(--glow)':'var(--red)';
+  const completedHtml = t.done && t.completedBy ? `
+    <div class="completed-by">
+      <div class="cb-label">Completed by</div>
+      <div class="cb-entry">
+        <span class="cb-name">${t.completedBy.name}</span>
+        <span class="cb-team" style="color:${teamCol}">Team ${t.team}</span>
+        <span class="cb-date">${t.completedBy.date}</span>
+      </div>
+    </div>` : '';
   document.getElementById('tile-modal-body').innerHTML = `
     <div class="tile-detail-icon">${t.icon}</div>
     <div class="tile-detail-name">${t.name}</div>
     <div class="tile-detail-diff"><span class="diff-badge ${t.diff}">${t.diff.charAt(0).toUpperCase()+t.diff.slice(1)}</span></div>
     <div class="tile-desc">${t.desc}</div>
     ${completedHtml}
-    ${pending ? `<div style="font-family:'Cinzel',serif;font-size:11px;color:var(--amber);letter-spacing:.1em;text-align:center;border:1px solid var(--amber-dim);padding:8px;background:var(--amber-dk)">⏳ Proof submitted — awaiting officer review</div>` : ''}
-  `;
+    ${t.pending ? `<div style="font-family:'Cinzel',serif;font-size:11px;color:var(--amber);letter-spacing:.1em;text-align:center;border:1px solid var(--amber-dim);padding:8px;background:var(--amber-dk)">⏳ Proof submitted — awaiting officer review</div>` : ''}`;
   document.getElementById('tile-modal').classList.add('open');
 }
 
-// ══ XP RACE DATA ══
+// ══ XP RACE DATA (static until comp tracking backend is built) ══
 const XP_RACE = [
   {name:'vorkath_btw', val:'148.2M', raw:148200000, sub:'Slayer grind'},
   {name:'R4TKING',     val:'134.8M', raw:134800000, sub:'Mixed skills'},
@@ -1166,7 +1201,6 @@ const XP_RACE = [
   {name:'goblinhuntr', val:'98.4M',  raw:98400000,  sub:'Farming runs'},
   {name:'im_sleepy99', val:'84.2M',  raw:84200000,  sub:'Prayer grind'},
 ];
-
 const KC_RACE_TEAMS = [
   {name:'Team Chaos',   color:'#c9a94c', val:'841', raw:841},
   {name:'Team Anarchy', color:'#5dba4e', val:'612', raw:612},
@@ -1186,7 +1220,6 @@ function renderCompEntries() {
         <div class="ce-bar-wrap"><div class="ce-bar" style="width:0%" data-w="${pct}%"></div></div>
       </div>`;
   }).join('');
-
   const kcTop = KC_RACE_TEAMS[0].raw;
   document.getElementById('kc-race-entries').innerHTML = KC_RACE_TEAMS.map((t,i) => `
     <div class="team-comp-row ${i===0?'t1':i===1?'t2':''}">
@@ -1197,12 +1230,12 @@ function renderCompEntries() {
     </div>`).join('');
 }
 
-// ══ VIEWS ══
+// ══ VIEWS ════════════════════════════════════════════════════
 function setView(v, btn) {
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) { btn.classList.add('active'); btn.classList.add(v==='bingo'?'bingo':'comp'); }
+  if (btn) { btn.classList.add('active'); btn.classList.add(v==='bingo'?'bingo':'comp'); }
   setTimeout(animateBars, 200);
 }
 
@@ -1210,62 +1243,93 @@ function animateBars() {
   document.querySelectorAll('[data-w]').forEach(b=>{ b.style.width=b.dataset.w; });
 }
 
-// ══ MODALS ══
+// ══ MODALS ═══════════════════════════════════════════════════
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-backdrop').forEach(m=>{
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
 });
 
-// ══ CREATE COMP TOGGLE ══
+// ══ CREATE COMP (hits API) ════════════════════════════════════
 function toggleCreate() {
-  const body=document.getElementById('create-body');
-  const arrow=document.getElementById('create-arrow');
-  const open=body.classList.toggle('open');
-  arrow.textContent=open?'▲':'▼';
+  const body = document.getElementById('create-body');
+  const arrow = document.getElementById('create-arrow');
+  const open = body.classList.toggle('open');
+  arrow.textContent = open ? '▲' : '▼';
 }
 
-function createComp() {
-  const name=document.getElementById('cc-name').value.trim();
-  if(!name){toast('Competition name required.','error');return;}
-  toggleCreate();
-  toast('✓ Competition "'+name+'" created.','success');
+async function createComp() {
+  const name = document.getElementById('cc-name').value.trim();
+  if (!name) { toast('Competition name required.', 'error'); return; }
+  try {
+    const res = await fetch(`${API}/api/events`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title:       name,
+        description: document.getElementById('cc-goal').value.trim(),
+        event_type:  document.getElementById('cc-type').value,
+        starts_at:   document.getElementById('cc-start').value
+          ? Math.floor(new Date(document.getElementById('cc-start').value).getTime()/1000)
+          : Math.floor(Date.now()/1000),
+        ends_at: document.getElementById('cc-end').value
+          ? Math.floor(new Date(document.getElementById('cc-end').value).getTime()/1000)
+          : null,
+      }),
+    });
+    if (res.ok) {
+      toggleCreate();
+      toast(`✓ "${name}" created.`, 'success');
+      loadEvents();
+    } else if (res.status === 401) {
+      toast('Log in to create competitions.', 'error');
+    } else {
+      toast('Failed to create. Check admin permissions.', 'error');
+    }
+  } catch(e) {
+    toast('Could not reach server.', 'error');
+  }
 }
 
-// ══ FORMS ══
+// ══ FORMS ════════════════════════════════════════════════════
 function submitSuggestion() {
-  const name=document.getElementById('sug-name').value.trim();
-  if(!name){toast('Tile name required.','error');return;}
-  document.getElementById('sug-name').value='';
-  document.getElementById('sug-notes').value='';
-  toast('✓ Tile suggestion submitted for admin review.','success');
+  const name = document.getElementById('sug-name').value.trim();
+  if (!name) { toast('Tile name required.', 'error'); return; }
+  document.getElementById('sug-name').value = '';
+  document.getElementById('sug-notes').value = '';
+  toast('✓ Tile suggestion submitted for admin review.', 'success');
 }
 
 function submitProof() {
-  const tile=document.getElementById('proof-tile').value;
-  if(tile.startsWith('Select')){toast('Please select a tile.','error');return;}
-  toast('⏳ Proof submitted for "'+tile+'" — officers will review within 24h.','info');
+  const tile = document.getElementById('proof-tile').value;
+  if (tile.startsWith('Select')) { toast('Please select a tile.', 'error'); return; }
+  toast(`⏳ Proof submitted for "${tile}" — officers will review within 24h.`, 'info');
 }
 
-// ══ TOASTS ══
-function toast(msg,type='info') {
-  const wrap=document.getElementById('toast-wrap');
-  const el=document.createElement('div');
-  el.className='toast '+type; el.textContent=msg;
+// ══ TOASTS ═══════════════════════════════════════════════════
+function toast(msg, type='info') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type; el.textContent = msg;
   wrap.appendChild(el);
-  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); },3500);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3500);
 }
 
-// ══ SCROLL REVEAL ══
-const obs=new IntersectionObserver(
+// ══ SCROLL REVEAL ════════════════════════════════════════════
+const obs = new IntersectionObserver(
   es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }),
   {threshold:0.08}
 );
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-// ══ INIT ══
+// ══ INIT ═════════════════════════════════════════════════════
+// Hide create comp by default — shown only if admin/officer
+document.querySelector('.create-comp-wrap').style.display = 'none';
+updateNavAuth();
+loadEvents();
 renderBoard();
 renderCompEntries();
-setTimeout(animateBars,600);
+setTimeout(animateBars, 600);
 </script>
 </body>
 </html>

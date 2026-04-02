@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS applications (
   referral        TEXT,
   playstyle       TEXT,
   notes           TEXT,
+  discord_id      TEXT,
+  discord_tag     TEXT,
   status          TEXT    NOT NULL DEFAULT 'pending'
                           CHECK(status IN ('pending','approved','rejected','expired')),
   submitted_at    INTEGER NOT NULL DEFAULT (unixepoch()),
@@ -278,5 +280,15 @@ CREATE TABLE IF NOT EXISTS comp_participants (
 );
 
 `);
+
+
+// ── MIGRATIONS (safe to run on existing DBs) ──────────────────
+const migrations = [
+  'ALTER TABLE applications ADD COLUMN discord_id TEXT',
+  'ALTER TABLE applications ADD COLUMN discord_tag TEXT',
+];
+for (const sql of migrations) {
+  try { db.exec(sql); } catch(e) { /* column already exists */ }
+}
 
 export default db;

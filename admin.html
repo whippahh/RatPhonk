@@ -658,15 +658,15 @@
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <a href="ratphonk_final.html" class="topbar-brand">RAT <span>PHONK</span></a>
+  <a href="index.html" class="topbar-brand">RAT <span>PHONK</span></a>
   <div class="topbar-sep"></div>
   <span class="topbar-badge">Admin Panel</span>
   <div class="topbar-right">
-    <a href="ratphonk_final.html" class="topbar-link">← View Site</a>
+    <a href="index.html" class="topbar-link">← View Site</a>
     <div class="topbar-sep"></div>
     <div class="topbar-user">
-      <div class="topbar-avatar">🐀</div>
-      R4TKING
+      <div class="topbar-avatar" id="topbar-avatar">🐀</div>
+      <span id="topbar-user">...</span>
     </div>
   </div>
 </div>
@@ -716,23 +716,23 @@
       <div class="stat-row">
         <div class="stat-card amber">
           <div class="sc-label">Pending Applications</div>
-          <div class="sc-value amber" id="ov-apps">3</div>
+          <div class="sc-value amber" id="ov-apps">—</div>
           <div class="sc-note">Awaiting review</div>
         </div>
         <div class="stat-card green">
           <div class="sc-label">Active Members</div>
-          <div class="sc-value">47</div>
-          <div class="sc-note">+2 this week</div>
+          <div class="sc-value" id="ov-members">—</div>
+          <div class="sc-note" id="ov-members-note"></div>
         </div>
         <div class="stat-card gold">
           <div class="sc-label">Events This Month</div>
-          <div class="sc-value gold">6</div>
-          <div class="sc-note">2 upcoming</div>
+          <div class="sc-value gold" id="ov-events">—</div>
+          <div class="sc-note" id="ov-events-note"></div>
         </div>
         <div class="stat-card red">
           <div class="sc-label">Inactive Members</div>
-          <div class="sc-value red">4</div>
-          <div class="sc-note">>14 days no gains</div>
+          <div class="sc-value red" id="ov-inactive">—</div>
+          <div class="sc-note">&gt;14 days no gains</div>
         </div>
       </div>
 
@@ -742,13 +742,13 @@
           <span class="block-title">Quick Actions</span>
         </div>
         <div style="padding:16px 20px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-amber" onclick="showSection('applications', document.querySelector('.nav-item:nth-child(1)'))">
+          <button class="btn btn-amber" onclick="navTo('applications')">
             📋 Review Applications (3)
           </button>
-          <button class="btn btn-green" onclick="showSection('events', document.querySelectorAll('.nav-item')[3]); openCreateEvent()">
+          <button class="btn btn-green" onclick="navTo('events'); openCreateEvent()">
             + Create Event
           </button>
-          <button class="btn btn-ghost" onclick="showSection('members', document.querySelectorAll('.nav-item')[2])">
+          <button class="btn btn-ghost" onclick="navTo('members')">
             👥 Manage Members
           </button>
         </div>
@@ -801,86 +801,15 @@
 
         <!-- PENDING -->
         <div id="app-tab-pending" class="app-list">
-          <div class="app-row" data-rsn="RatSlayer99">
-            <div class="app-info">
-              <div class="app-rsn">RatSlayer99</div>
-              <div class="app-meta">Referred by <span>vorkath_btw</span> &nbsp;·&nbsp; "PvM main, 2.1k total"</div>
-            </div>
-            <div class="app-style">PVM / Bossing</div>
-            <div class="app-wom">
-              <div class="lvl">2,141</div>
-              <div>Total Level</div>
-            </div>
-            <div class="app-age">2h ago</div>
-            <div class="app-btns">
-              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'RatSlayer99')">✓ Approve</button>
-              <button class="btn btn-red btn-sm" onclick="openRejectModal('RatSlayer99')">✕ Reject</button>
-            </div>
-          </div>
-          <div class="app-row" data-rsn="PhonkRat">
-            <div class="app-info">
-              <div class="app-rsn">PhonkRat</div>
-              <div class="app-meta">Referred by <span>R4TKING</span> &nbsp;·&nbsp; "wildy pker, been grinding revs"</div>
-            </div>
-            <div class="app-style">PK / Wilderness</div>
-            <div class="app-wom">
-              <div class="lvl">1,847</div>
-              <div>Total Level</div>
-            </div>
-            <div class="app-age">8h ago</div>
-            <div class="app-btns">
-              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'PhonkRat')">✓ Approve</button>
-              <button class="btn btn-red btn-sm" onclick="openRejectModal('PhonkRat')">✕ Reject</button>
-            </div>
-          </div>
-          <div class="app-row" data-rsn="IronRatty">
-            <div class="app-info">
-              <div class="app-rsn">IronRatty</div>
-              <div class="app-meta">Referred by <span>goblinhuntr</span> &nbsp;·&nbsp; "ironman, want to watch raids"</div>
-            </div>
-            <div class="app-style">Ironman (observer)</div>
-            <div class="app-wom">
-              <div class="lvl">1,622</div>
-              <div>Total Level</div>
-            </div>
-            <div class="app-age">1d ago</div>
-            <div class="app-btns">
-              <button class="btn btn-green btn-sm" onclick="approveApp(this, 'IronRatty')">✓ Approve</button>
-              <button class="btn btn-red btn-sm" onclick="openRejectModal('IronRatty')">✕ Reject</button>
-            </div>
-          </div>
+          <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px">Loading applications…</div>
         </div>
-
-        <!-- APPROVED (hidden) -->
+        <!-- APPROVED -->
         <div id="app-tab-approved" class="app-list" style="display:none">
-          <div class="app-row" style="grid-template-columns:1fr auto auto">
-            <div class="app-info">
-              <div class="app-rsn">NewRatty</div>
-              <div class="app-meta">Referred by <span>skullcrushr</span></div>
-            </div>
-            <span class="status approved">Approved</span>
-            <div class="app-age">2h ago</div>
-          </div>
-          <div class="app-row" style="grid-template-columns:1fr auto auto; border-bottom:none">
-            <div class="app-info">
-              <div class="app-rsn">RatGrinder</div>
-              <div class="app-meta">Referred by <span>R4TKING</span></div>
-            </div>
-            <span class="status approved">Approved</span>
-            <div class="app-age">3d ago</div>
-          </div>
+          <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px">Loading…</div>
         </div>
-
-        <!-- REJECTED (hidden) -->
+        <!-- REJECTED -->
         <div id="app-tab-rejected" class="app-list" style="display:none">
-          <div class="app-row" style="grid-template-columns:1fr auto auto; border-bottom:none">
-            <div class="app-info">
-              <div class="app-rsn">xXnoob99Xx</div>
-              <div class="app-meta">No referral &nbsp;·&nbsp; Reason: <span style="color:var(--red)">Unverifiable RSN</span></div>
-            </div>
-            <span class="status rejected">Rejected</span>
-            <div class="app-age">2d ago</div>
-          </div>
+          <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px">Loading…</div>
         </div>
       </div>
     </div>
@@ -890,7 +819,7 @@
       <div class="page-head">
         <div>
           <div class="page-title">Members</div>
-          <div class="page-sub">47 active members &nbsp;·&nbsp; 4 inactive</div>
+          <div class="page-sub" id="members-sub">Loading members…</div>
         </div>
         <div class="filter-bar">
           <input class="search-input" type="text" placeholder="Search RSN...">
@@ -915,77 +844,7 @@
               <th class="r">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><div class="td-rsn">R4TKING</div><div class="td-discord">ratking#0001</div></td>
-              <td><span class="role-badge admin">Admin</span></td>
-              <td class="td-num">2,277</td>
-              <td class="td-date">Jan 2023</td>
-              <td class="td-date" style="color:var(--glow)">Today</td>
-              <td class="td-actions"><div class="action-row">
-                <select class="role-select" onchange="changeRole('R4TKING', this.value)" style="width:90px">
-                  <option selected>Admin</option><option>Officer</option><option>Member</option>
-                </select>
-                <button class="btn btn-ghost btn-sm" onclick="editRSN('R4TKING')">Edit RSN</button>
-              </div></td>
-            </tr>
-            <tr>
-              <td><div class="td-rsn">skullcrushr</div><div class="td-discord">skull#4421</div></td>
-              <td><span class="role-badge officer">Officer</span></td>
-              <td class="td-num">2,214</td>
-              <td class="td-date">Jan 2023</td>
-              <td class="td-date" style="color:var(--glow)">Today</td>
-              <td class="td-actions"><div class="action-row">
-                <select class="role-select" onchange="changeRole('skullcrushr', this.value)" style="width:90px">
-                  <option>Admin</option><option selected>Officer</option><option>Member</option>
-                </select>
-                <button class="btn btn-ghost btn-sm" onclick="editRSN('skullcrushr')">Edit RSN</button>
-                <button class="btn btn-red btn-sm" onclick="banMember('skullcrushr')">Ban</button>
-              </div></td>
-            </tr>
-            <tr>
-              <td><div class="td-rsn">vorkath_btw</div><div class="td-discord">vork#8812</div></td>
-              <td><span class="role-badge member">Member</span></td>
-              <td class="td-num">2,189</td>
-              <td class="td-date">Mar 2023</td>
-              <td class="td-date" style="color:var(--glow)">Today</td>
-              <td class="td-actions"><div class="action-row">
-                <select class="role-select" onchange="changeRole('vorkath_btw', this.value)" style="width:90px">
-                  <option>Admin</option><option>Officer</option><option selected>Member</option>
-                </select>
-                <button class="btn btn-ghost btn-sm" onclick="editRSN('vorkath_btw')">Edit RSN</button>
-                <button class="btn btn-red btn-sm" onclick="banMember('vorkath_btw')">Ban</button>
-              </div></td>
-            </tr>
-            <tr>
-              <td><div class="td-rsn">goblinhuntr</div><div class="td-discord">goblin#3301</div></td>
-              <td><span class="role-badge member">Member</span></td>
-              <td class="td-num">2,104</td>
-              <td class="td-date">Apr 2023</td>
-              <td class="td-date" style="color:var(--glow)">Yesterday</td>
-              <td class="td-actions"><div class="action-row">
-                <select class="role-select" onchange="changeRole('goblinhuntr', this.value)" style="width:90px">
-                  <option>Admin</option><option>Officer</option><option selected>Member</option>
-                </select>
-                <button class="btn btn-ghost btn-sm" onclick="editRSN('goblinhuntr')">Edit RSN</button>
-                <button class="btn btn-red btn-sm" onclick="banMember('goblinhuntr')">Ban</button>
-              </div></td>
-            </tr>
-            <tr>
-              <td><div class="td-rsn">im_sleepy99</div><div class="td-discord">sleepy#7744</div></td>
-              <td><span class="role-badge member">Member</span></td>
-              <td class="td-num">1,988</td>
-              <td class="td-date">Jun 2023</td>
-              <td class="td-date" style="color:var(--red)">16d ago</td>
-              <td class="td-actions"><div class="action-row">
-                <select class="role-select" onchange="changeRole('im_sleepy99', this.value)" style="width:90px">
-                  <option>Admin</option><option>Officer</option><option selected>Member</option>
-                </select>
-                <button class="btn btn-ghost btn-sm" onclick="editRSN('im_sleepy99')">Edit RSN</button>
-                <button class="btn btn-red btn-sm" onclick="banMember('im_sleepy99')">Ban</button>
-              </div></td>
-            </tr>
-          </tbody>
+          <tbody id="members-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">Loading members…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1006,34 +865,7 @@
           <span class="block-title">Upcoming</span>
           <span style="font-size:11px;color:var(--text-dim)">2 scheduled</span>
         </div>
-        <div>
-          <div class="event-row">
-            <div class="event-type-dot boss"></div>
-            <div>
-              <div class="event-name">Raid Night</div>
-              <div class="event-detail">Theatre of Blood · Halvistor · Max 8 attendees</div>
-            </div>
-            <div class="event-date">Tue 1 Apr &nbsp;·&nbsp; 22:00 UTC</div>
-            <div class="event-rsvp"><strong>6</strong> / 8 going</div>
-            <div class="action-row">
-              <button class="btn btn-ghost btn-sm" onclick="editEvent('Raid Night')">Edit</button>
-              <button class="btn btn-red btn-sm" onclick="cancelEvent('Raid Night')">Cancel</button>
-            </div>
-          </div>
-          <div class="event-row" style="border-bottom:none">
-            <div class="event-type-dot pk"></div>
-            <div>
-              <div class="event-name">Wilderness Trip</div>
-              <div class="event-detail">Revenant Caves · Open attendance</div>
-            </div>
-            <div class="event-date">Sat 5 Apr &nbsp;·&nbsp; 20:00 UTC</div>
-            <div class="event-rsvp"><strong>11</strong> going</div>
-            <div class="action-row">
-              <button class="btn btn-ghost btn-sm" onclick="editEvent('Wilderness Trip')">Edit</button>
-              <button class="btn btn-red btn-sm" onclick="cancelEvent('Wilderness Trip')">Cancel</button>
-            </div>
-          </div>
-        </div>
+        <div id="events-upcoming"><div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">Loading…</div></div>
       </div>
 
       <!-- Past -->
@@ -1041,32 +873,7 @@
         <div class="block-head">
           <span class="block-title">Past Events</span>
         </div>
-        <div>
-          <div class="event-row">
-            <div class="event-type-dot social"></div>
-            <div>
-              <div class="event-name">Weekly Bingo Kickoff</div>
-              <div class="event-detail">Skilling Bingo · 3 week competition</div>
-            </div>
-            <div class="event-date">Mon 24 Mar &nbsp;·&nbsp; 19:00 UTC</div>
-            <div class="event-rsvp"><strong>22</strong> attended</div>
-            <div class="action-row">
-              <button class="btn btn-ghost btn-sm" style="opacity:.5;cursor:default">Ended</button>
-            </div>
-          </div>
-          <div class="event-row" style="border-bottom:none">
-            <div class="event-type-dot boss"></div>
-            <div>
-              <div class="event-name">Cox Mass</div>
-              <div class="event-detail">Chambers of Xeric · 10 man teams</div>
-            </div>
-            <div class="event-date">Fri 21 Mar &nbsp;·&nbsp; 21:00 UTC</div>
-            <div class="event-rsvp"><strong>18</strong> attended</div>
-            <div class="action-row">
-              <button class="btn btn-ghost btn-sm" style="opacity:.5;cursor:default">Ended</button>
-            </div>
-          </div>
-        </div>
+        <div id="events-past"><div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">Loading…</div></div>
       </div>
     </div>
 
@@ -1178,138 +985,461 @@
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-// ── SECTION NAV ──
-function showSection(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+const API = 'https://ratphonk-production.up.railway.app';
+let ME = null;
+let allApps = [];
+let allMembers = [];
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts*1000)/1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60)+'m ago';
+  if (s < 86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
 }
 
-// ── APP TABS ──
+// ── AUTH GATE ─────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if (!res.ok) { redirectToLogin(); return; }
+    ME = await res.json();
+    if (ME.role !== 'admin' && ME.role !== 'officer') { redirectToLogin(); return; }
+    document.getElementById('topbar-user').textContent = ME.rsn;
+    loadAll();
+  } catch(e) {
+    redirectToLogin();
+  }
+}
+
+function redirectToLogin() {
+  document.body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace">
+      <div style="color:#c2a86e;font-size:13px;letter-spacing:.1em">ADMIN ACCESS REQUIRED</div>
+      <a href="${API}/auth/discord"
+         style="font-size:11px;letter-spacing:.15em;padding:10px 28px;border:1px solid #2d5c28;color:#5dba4e;background:#1a3a16;text-decoration:none;text-transform:uppercase">
+        ⚔ Login with Discord
+      </a>
+      <a href="index.html" style="font-size:11px;color:#6a5838;text-decoration:none">← Back to site</a>
+    </div>`;
+}
+
+async function loadAll() {
+  await Promise.all([loadDashboard(), loadApplications(), loadMembers(), loadEvents()]);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [statsRes, appsRes] = await Promise.all([
+      fetch(`${API}/api/stats`),
+      fetch(`${API}/api/admin/applications`, { credentials:'include' }),
+    ]);
+    const stats = statsRes.ok ? await statsRes.json() : {};
+    const apps  = appsRes.ok  ? await appsRes.json()  : [];
+
+    const pending = apps.filter(a => a.status === 'pending').length;
+    document.getElementById('ov-apps').textContent     = pending;
+    document.getElementById('ov-members').textContent  = stats.memberCount ?? '—';
+    document.getElementById('ov-inactive').textContent = '—'; // no inactive tracking yet
+
+    // Events count
+    const evRes = await fetch(`${API}/api/events`);
+    if (evRes.ok) {
+      const evs = await evRes.json();
+      const now = Math.floor(Date.now()/1000);
+      const upcoming = evs.filter(e => e.starts_at > now).length;
+      document.getElementById('ov-events').textContent     = evs.length;
+      document.getElementById('ov-events-note').textContent = `${upcoming} upcoming`;
+    }
+
+    // Recent activity = recent apps
+    const ra = document.getElementById('recent-activity');
+    if (apps.length) {
+      ra.innerHTML = apps.slice(0,5).map(a => {
+        const icon = a.status==='approved'?'✓':a.status==='rejected'?'✕':'⏳';
+        const col  = a.status==='approved'?'var(--glow)':a.status==='rejected'?'var(--red)':'var(--amber)';
+        return `<div class="app-row" style="grid-template-columns:auto 1fr auto;padding:12px 20px">
+          <span style="color:${col};font-size:11px">${icon}</span>
+          <span style="font-size:12px;color:var(--text-dim)">Application from <span style="color:var(--white)">${a.rsn}</span> — <span style="color:${col}">${a.status}</span></span>
+          <span style="font-size:11px;color:var(--text-muted)">${timeAgo(a.submitted_at)}</span>
+        </div>`;
+      }).join('');
+    } else {
+      ra.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:12px">No recent activity.</div>';
+    }
+
+    // Update badge
+    document.getElementById('app-count-badge').textContent = pending;
+    document.getElementById('ov-apps').textContent = pending;
+    if (pending === 0) document.getElementById('app-count-badge').style.display = 'none';
+  } catch(e) { console.warn('Dashboard load error:', e); }
+}
+
+// ── APPLICATIONS ──────────────────────────────────────────────
+async function loadApplications() {
+  try {
+    const res = await fetch(`${API}/api/admin/applications`, { credentials:'include' });
+    if (!res.ok) return;
+    allApps = await res.json();
+    renderApps('pending');
+    renderApps('approved');
+    renderApps('rejected');
+    const pending = allApps.filter(a => a.status==='pending').length;
+    document.getElementById('pending-count').textContent = `(${pending})`;
+    document.getElementById('app-count-badge').textContent = pending;
+    if (pending === 0) document.getElementById('app-count-badge').style.display = 'none';
+  } catch(e) { console.warn('Applications load error:', e); }
+}
+
+function renderApps(status) {
+  const filtered = allApps.filter(a => a.status === status);
+  const el = document.getElementById(`app-tab-${status}`);
+  if (!filtered.length) {
+    el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px">No ${status} applications.</div>`;
+    return;
+  }
+  if (status === 'pending') {
+    el.innerHTML = filtered.map(a => `
+      <div class="app-row" data-rsn="${a.rsn}" data-id="${a.id}">
+        <div class="app-info">
+          <div class="app-rsn">${a.rsn}</div>
+          <div class="app-meta">${a.referral ? `Referred by <span>${a.referral}</span> &nbsp;·&nbsp; ` : ''}${a.notes || ''}</div>
+        </div>
+        <div class="app-style">${a.playstyle || '—'}</div>
+        <div class="app-wom"><div class="lvl">—</div><div>Total Level</div></div>
+        <div class="app-age">${timeAgo(a.submitted_at)}</div>
+        <div class="app-btns">
+          <button class="btn btn-green btn-sm" onclick="approveApp(${a.id}, '${a.rsn}', this)">✓ Approve</button>
+          <button class="btn btn-red btn-sm" onclick="openRejectModal(${a.id}, '${a.rsn}')">✕ Reject</button>
+        </div>
+      </div>`).join('');
+    // Try to load WOM total levels in background
+    filtered.forEach(a => loadAppWom(a));
+  } else {
+    el.innerHTML = filtered.map(a => `
+      <div class="app-row" style="grid-template-columns:1fr auto auto">
+        <div class="app-info">
+          <div class="app-rsn">${a.rsn}</div>
+          <div class="app-meta">${a.referral ? `Referred by <span>${a.referral}</span>` : 'No referral'}</div>
+        </div>
+        <span class="status ${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>
+        <div class="app-age">${timeAgo(a.submitted_at)}</div>
+      </div>`).join('');
+  }
+}
+
+async function loadAppWom(app) {
+  try {
+    const res = await fetch(`${API}/api/wom/player/${encodeURIComponent(app.rsn)}`);
+    if (!res.ok) return;
+    const wom = await res.json();
+    const lvl = wom.latestSnapshot?.data?.skills?.overall?.level;
+    if (!lvl) return;
+    const row = document.querySelector(`.app-row[data-id="${app.id}"] .app-wom .lvl`);
+    if (row) row.textContent = lvl.toLocaleString();
+  } catch(e) {}
+}
+
+function filterApps(val) {
+  document.querySelectorAll('.app-row[data-rsn]').forEach(row => {
+    row.style.display = row.dataset.rsn.toLowerCase().includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ── APPROVE / REJECT ──────────────────────────────────────────
+async function approveApp(id, rsn, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res = await fetch(`${API}/api/admin/applications/${id}/approve`, {
+      method:'POST', credentials:'include'
+    });
+    if (res.ok) {
+      toast(`✓ ${rsn} approved.`, 'success');
+      await loadApplications();
+      await loadDashboard();
+    } else {
+      const d = await res.json();
+      toast(d.error || 'Approval failed.', 'error');
+      btn.disabled = false; btn.textContent = '✓ Approve';
+    }
+  } catch(e) {
+    toast('Could not reach server.', 'error');
+    btn.disabled = false; btn.textContent = '✓ Approve';
+  }
+}
+
+let rejectTarget = null;
+function openRejectModal(id, rsn) {
+  rejectTarget = { id, rsn };
+  document.getElementById('reject-rsn-display').textContent = rsn;
+  document.getElementById('reject-reason').value = '';
+  document.getElementById('reject-modal').classList.add('open');
+}
+
+async function confirmReject() {
+  if (!rejectTarget) return;
+  const { id, rsn } = rejectTarget;
+  closeModal('reject-modal');
+  try {
+    const res = await fetch(`${API}/api/admin/applications/${id}/reject`, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ reason: document.getElementById('reject-reason').value.trim() })
+    });
+    if (res.ok) {
+      toast(`✕ ${rsn} rejected.`, 'error');
+      await loadApplications();
+      await loadDashboard();
+    } else {
+      toast('Rejection failed.', 'error');
+    }
+  } catch(e) { toast('Could not reach server.', 'error'); }
+}
+
 function switchAppTab(tab, btn) {
   ['pending','approved','rejected'].forEach(t => {
-    document.getElementById('app-tab-' + t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('app-tab-'+t).style.display = t===tab ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// ── FILTER APPS ──
-function filterApps(val) {
-  document.querySelectorAll('.app-row[data-rsn]').forEach(row => {
-    const rsn = row.dataset.rsn.toLowerCase();
-    row.style.display = rsn.includes(val.toLowerCase()) ? '' : 'none';
-  });
+// ── MEMBERS ───────────────────────────────────────────────────
+async function loadMembers() {
+  try {
+    const res = await fetch(`${API}/api/members`, { credentials:'include' });
+    if (!res.ok) return;
+    allMembers = await res.json();
+    renderMembers(allMembers);
+    document.getElementById('members-sub').textContent = `${allMembers.length} members`;
+  } catch(e) { console.warn('Members load error:', e); }
 }
 
-// ── APPROVE APP ──
-let pendingCount = 3;
-function approveApp(btn, rsn) {
-  const row = btn.closest('.app-row');
-  row.style.transition = 'opacity 0.3s';
-  row.style.opacity = '0';
-  setTimeout(() => {
-    row.remove();
-    pendingCount--;
-    document.getElementById('pending-count').textContent = '(' + pendingCount + ')';
-    document.getElementById('app-count-badge').textContent = pendingCount;
-    document.getElementById('ov-apps').textContent = pendingCount;
-    if (pendingCount === 0) document.getElementById('app-count-badge').style.display = 'none';
-  }, 300);
-  toast('✓ ' + rsn + ' approved. Discord invite generated.', 'success');
-}
-
-// ── REJECT MODAL ──
-let rejectTarget = null;
-function openRejectModal(rsn) {
-  rejectTarget = rsn;
-  document.getElementById('reject-rsn-display').textContent = rsn;
-  document.getElementById('reject-reason').value = '';
-  document.getElementById('reject-modal').classList.add('open');
-}
-function confirmReject() {
-  const rsn = rejectTarget;
-  closeModal('reject-modal');
-  const row = [...document.querySelectorAll('.app-row[data-rsn]')]
-    .find(r => r.dataset.rsn === rsn);
-  if (row) {
-    row.style.transition = 'opacity 0.3s';
-    row.style.opacity = '0';
-    setTimeout(() => {
-      row.remove();
-      pendingCount--;
-      document.getElementById('pending-count').textContent = '(' + pendingCount + ')';
-      document.getElementById('app-count-badge').textContent = pendingCount;
-      document.getElementById('ov-apps').textContent = pendingCount;
-    }, 300);
+function renderMembers(members) {
+  const tbody = document.getElementById('members-tbody');
+  if (!members.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No members found.</td></tr>';
+    return;
   }
-  toast('✕ ' + rsn + ' application rejected.', 'error');
+  tbody.innerHTML = members.map(m => {
+    const joined = m.joined_at ? new Date(m.joined_at*1000).toLocaleDateString('en-AU',{month:'short',year:'numeric'}) : '—';
+    const lastSeen = m.last_synced_at
+      ? (() => { const d=Math.floor((Date.now()-m.last_synced_at*1000)/86400000); return d===0?'<span style="color:var(--glow)">Today</span>':d<7?`${d}d ago`:`<span style="color:var(--red)">${d}d ago</span>`; })()
+      : '—';
+    const roleSel = ['admin','officer','member'].map(r =>
+      `<option ${m.role===r?'selected':''}>${r.charAt(0).toUpperCase()+r.slice(1)}</option>`
+    ).join('');
+    const isSelf = ME && m.id === ME.id;
+    return `<tr>
+      <td><div class="td-rsn">${m.rsn}</div><div class="td-discord">${m.discord_tag||'—'}</div></td>
+      <td><span class="role-badge ${m.role}">${m.role.charAt(0).toUpperCase()+m.role.slice(1)}</span></td>
+      <td class="td-num">—</td>
+      <td class="td-date">${joined}</td>
+      <td class="td-date">${lastSeen}</td>
+      <td class="td-actions"><div class="action-row">
+        <select class="role-select" onchange="changeRole(${m.id},'${m.rsn}',this)" style="width:90px" ${isSelf?'disabled':''}>
+          ${roleSel}
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="editRSN(${m.id},'${m.rsn}')">Edit RSN</button>
+        ${!isSelf ? `<button class="btn btn-red btn-sm" onclick="removeMember(${m.id},'${m.rsn}')">Remove</button>` : ''}
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
-// ── ROLE CHANGE ──
-function changeRole(rsn, role) {
-  toast('★ ' + rsn + ' role updated to ' + role + '.', 'info');
+function filterMembers() {
+  const search = document.querySelector('#sec-members .search-input')?.value.toLowerCase() || '';
+  const role   = document.querySelector('#sec-members .role-select')?.value.toLowerCase() || '';
+  const filtered = allMembers.filter(m =>
+    m.rsn.toLowerCase().includes(search) &&
+    (!role || m.role.toLowerCase() === role)
+  );
+  renderMembers(filtered);
 }
 
-// ── BAN ──
-function banMember(rsn) {
-  if (!confirm('Ban ' + rsn + '? This will remove them from the clan.')) return;
-  toast('⚠ ' + rsn + ' has been removed from the clan.', 'error');
+async function changeRole(id, rsn, sel) {
+  const role = sel.value.toLowerCase();
+  try {
+    const res = await fetch(`${API}/api/admin/members/${id}`, {
+      method:'PATCH', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ role })
+    });
+    if (res.ok) { toast(`★ ${rsn} → ${role}`, 'success'); await loadMembers(); }
+    else toast('Role update failed.', 'error');
+  } catch(e) { toast('Could not reach server.', 'error'); }
 }
 
-// ── RSN EDIT ──
 let rsnEditTarget = null;
-function editRSN(rsn) {
-  rsnEditTarget = rsn;
+function editRSN(id, rsn) {
+  rsnEditTarget = { id, rsn };
   document.getElementById('rsn-edit-member').textContent = rsn;
   document.getElementById('new-rsn-input').value = '';
   document.getElementById('rsn-modal').classList.add('open');
 }
-function confirmRSNEdit() {
+
+async function confirmRSNEdit() {
   const newRSN = document.getElementById('new-rsn-input').value.trim();
-  if (!newRSN) return;
+  if (!newRSN || !rsnEditTarget) return;
   closeModal('rsn-modal');
-  toast('✓ RSN updated: ' + rsnEditTarget + ' → ' + newRSN, 'success');
+  try {
+    const res = await fetch(`${API}/api/admin/members/${rsnEditTarget.id}`, {
+      method:'PATCH', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ rsn: newRSN })
+    });
+    if (res.ok) { toast(`✓ RSN updated: ${rsnEditTarget.rsn} → ${newRSN}`, 'success'); await loadMembers(); }
+    else toast('RSN update failed.', 'error');
+  } catch(e) { toast('Could not reach server.', 'error'); }
 }
 
-// ── EVENTS ──
+async function removeMember(id, rsn) {
+  if (!confirm(`Remove ${rsn} from the clan? This cannot be undone.`)) return;
+  toast(`⚠ ${rsn} removed. (Not yet wired to API — add DELETE /api/admin/members/:id)`, 'info');
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+async function loadEvents() {
+  try {
+    const res = await fetch(`${API}/api/events`);
+    if (!res.ok) return;
+    const events = await res.json();
+    const now = Math.floor(Date.now()/1000);
+
+    const upcoming = events.filter(e => !e.is_cancelled && e.starts_at > now);
+    const past     = events.filter(e => e.is_cancelled || (e.ends_at && e.ends_at < now) || e.starts_at <= now);
+
+    const evUpEl = document.getElementById('events-upcoming');
+    const evPaEl = document.getElementById('events-past');
+
+    const dotClass = t => t==='boss'?'boss':t==='pk'?'pk':t==='skill'?'skill':'social';
+    const fmtDate  = ts => new Date(ts*1000).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})
+                         + ' · ' + new Date(ts*1000).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}) + ' UTC';
+
+    evUpEl.innerHTML = upcoming.length ? upcoming.map((e,i) => `
+      <div class="event-row" ${i===upcoming.length-1?'style="border-bottom:none"':''}>
+        <div class="event-type-dot ${dotClass(e.event_type)}"></div>
+        <div>
+          <div class="event-name">${e.title}</div>
+          <div class="event-detail">${e.description||''}</div>
+        </div>
+        <div class="event-date">${fmtDate(e.starts_at)}</div>
+        <div class="event-rsvp"><strong>${e.rsvp_count||0}</strong>${e.max_attendees?` / ${e.max_attendees}`:''} going</div>
+        <div class="action-row">
+          <button class="btn btn-red btn-sm" onclick="cancelEvent(${e.id},'${e.title}')">Cancel</button>
+        </div>
+      </div>`).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">No upcoming events.</div>';
+
+    evPaEl.innerHTML = past.length ? past.map((e,i) => `
+      <div class="event-row" ${i===past.length-1?'style="border-bottom:none"':''}>
+        <div class="event-type-dot ${dotClass(e.event_type)}"></div>
+        <div>
+          <div class="event-name">${e.title}</div>
+          <div class="event-detail">${e.description||''}</div>
+        </div>
+        <div class="event-date">${fmtDate(e.starts_at)}</div>
+        <div class="event-rsvp"><strong>${e.rsvp_count||0}</strong> attended</div>
+        <div class="action-row">
+          <button class="btn btn-ghost btn-sm" style="opacity:.5;cursor:default">Ended</button>
+        </div>
+      </div>`).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">No past events.</div>';
+
+    // Update upcoming count in header
+    document.querySelector('#sec-events .page-sub').textContent = `${events.length} total · ${upcoming.length} upcoming`;
+  } catch(e) { console.warn('Events load error:', e); }
+}
+
 function openCreateEvent() {
   document.getElementById('event-modal').classList.add('open');
 }
-function createEvent() {
+
+async function createEvent() {
   const name = document.getElementById('ev-name').value.trim();
   if (!name) { toast('Event name is required.', 'error'); return; }
-  closeModal('event-modal');
-  toast('✓ Event "' + name + '" created and posted.', 'success');
-}
-function editEvent(name) { toast('Editing "' + name + '" — coming soon.', 'info'); }
-function cancelEvent(name) {
-  if (!confirm('Cancel "' + name + '"?')) return;
-  toast('Event "' + name + '" cancelled.', 'error');
+  const dateVal = document.getElementById('ev-date').value;
+  const timeVal = document.getElementById('ev-time').value || '00:00';
+  const starts_at = dateVal
+    ? Math.floor(new Date(`${dateVal}T${timeVal}:00Z`).getTime()/1000)
+    : Math.floor(Date.now()/1000);
+  try {
+    const res = await fetch(`${API}/api/events`, {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        title:         name,
+        description:   document.getElementById('ev-loc').value.trim() + (document.getElementById('ev-desc').value.trim() ? ' · ' + document.getElementById('ev-desc').value.trim() : ''),
+        event_type:    document.getElementById('ev-type').value,
+        starts_at,
+        max_attendees: document.getElementById('ev-max').value ? parseInt(document.getElementById('ev-max').value) : null,
+      })
+    });
+    if (res.ok) {
+      closeModal('event-modal');
+      toast(`✓ "${name}" created.`, 'success');
+      await loadEvents();
+      await loadDashboard();
+    } else if (res.status === 401) {
+      toast('Session expired — please log in again.', 'error');
+    } else {
+      toast('Event creation failed.', 'error');
+    }
+  } catch(e) { toast('Could not reach server.', 'error'); }
 }
 
-// ── MODALS ──
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+async function cancelEvent(id, name) {
+  if (!confirm(`Cancel "${name}"?`)) return;
+  toast(`"${name}" cancelled. (Add DELETE/PATCH /api/events/:id to fully wire this)`, 'info');
 }
+
+// ── SECTION NAV ───────────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function navTo(id) {
+  // Find and click the right sidebar nav item
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    if (btn.textContent.toLowerCase().includes(id.replace('s','')) || btn.getAttribute('onclick')?.includes(id)) {
+      showSection(id, btn);
+    }
+  });
+  showSection(id, null);
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-backdrop').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
 });
 
-// ── TOASTS ──
-function toast(msg, type = 'info') {
+// ── TOASTS ────────────────────────────────────────────────────
+function toast(msg, type='info') {
   const wrap = document.getElementById('toast-wrap');
   const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
+  el.className = 'toast '+type; el.textContent = msg;
   wrap.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = 'opacity 0.3s';
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 300);
-  }, 3500);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); },3500);
 }
+
+// ── MEMBER SEARCH/FILTER WIRING ───────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const memberSearch = document.querySelector('#sec-members .search-input');
+  const memberRole   = document.querySelector('#sec-members .role-select');
+  if (memberSearch) memberSearch.addEventListener('input', filterMembers);
+  if (memberRole)   memberRole.addEventListener('change', filterMembers);
+  // Update date in dashboard
+  document.querySelector('#sec-overview .page-sub').textContent =
+    new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' · All times UTC';
+});
+
+// ── INIT ─────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>

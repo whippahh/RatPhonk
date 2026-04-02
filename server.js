@@ -39,6 +39,8 @@ function requireAdmin(req, reply, done) {
 
 // ── DISCORD OAUTH2 ────────────────────────────────────────────
 app.get('/auth/discord', async (req, reply) => {
+  const intent = req.query.intent || 'login';
+  req.session.oauthIntent = intent;
   const params = new URLSearchParams({
     client_id:     process.env.DISCORD_CLIENT_ID,
     redirect_uri:  process.env.DISCORD_REDIRECT_URI,
@@ -70,16 +72,38 @@ app.get('/auth/discord/callback', async (req, reply) => {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   });
   const discordUser = await userRes.json();
+  const intent = req.session.oauthIntent || 'login';
+  delete req.session.oauthIntent;
 
   const member = db.prepare('SELECT * FROM members WHERE discord_id=?').get(discordUser.id);
 
   if (member) {
+    // Existing member — log them in regardless of intent
     req.session.memberId = member.id;
     req.session.role     = member.role;
-    reply.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(member.rsn)}`);
+  } else if (intent === 'apply') {
+    // New user applying — store Discord identity in session, redirect to apply form
+    req.session.pendingDiscord = { id: discordUser.id, username: discordUser.username, tag: discordUser.username };
+    reply.redirect(`${process.env.FRONTEND_URL}/index.html?apply=1`);
   } else {
-    req.session.pendingDiscord = { id: discordUser.id, username: discordUser.username };
-    reply.redirect(`${process.env.FRONTEND_URL}/link-discord`);
+    // New user tried to log in — check if they have an approved application
+    const approvedApp = db.prepare(
+      "SELECT * FROM applications WHERE discord_id=? AND status='approved'"
+    ).get(discordUser.id);
+
+    if (approvedApp) {
+      // Approved — create member record and log them in
+      const result = db.prepare(
+        'INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)'
+      ).run(discordUser.id, discordUser.username, approvedApp.rsn, approvedApp.wom_player_id);
+      req.session.memberId = result.lastInsertRowid;
+      req.session.role     = 'member';
+      reply.redirect(`${process.env.FRONTEND_URL}/profile.html?rsn=${encodeURIComponent(approvedApp.rsn)}`);
+    } else {
+      // No account, no approved app — send to apply
+      reply.redirect(`${process.env.FRONTEND_URL}/index.html?notfound=1`);
+    }
   }
 });
 
@@ -130,12 +154,17 @@ app.post('/api/applications', async (req, reply) => {
   if (!womRes.ok) return reply.status(400).send({ error: 'RSN not found on Wise Old Man' });
   const womPlayer = await womRes.json();
 
+  // Attach Discord identity if they came via OAuth apply flow
+  const pending = req.session.pendingDiscord || null;
+  const discord_id  = pending?.id       || null;
+  const discord_tag = pending?.username || null;
+
   const refId = 'APP-' + Math.floor(10000 + Math.random() * 90000);
   try {
     db.prepare(
-      'INSERT INTO applications (rsn, wom_player_id, referral, playstyle, notes) VALUES (?,?,?,?,?)'
-    ).run(rsn, womPlayer.id, referral, playstyle, notes);
-    reply.send({ success: true, refId });
+      'INSERT INTO applications (rsn, wom_player_id, referral, playstyle, notes, discord_id, discord_tag) VALUES (?,?,?,?,?,?,?)'
+    ).run(rsn, womPlayer.id, referral, playstyle, notes, discord_id, discord_tag);
+    reply.send({ success: true, refId, hasDiscord: !!discord_id });
   } catch (e) {
     if (e.message.includes('UNIQUE')) return reply.status(409).send({ error: 'Application already exists for this RSN' });
     throw e;
@@ -153,14 +182,25 @@ app.post('/api/admin/applications/:id/approve', { preHandler: requireAdmin }, as
   const application = db.prepare('SELECT * FROM applications WHERE id=?').get(req.params.id);
   if (!application) return reply.status(404).send({ error: 'Not found' });
 
-  const inviteCode = Array.from(crypto.getRandomValues(new Uint8Array(8)))
-    .map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
-
+  // Mark approved
   db.prepare(
-    "UPDATE applications SET status='approved', reviewed_by=?, reviewed_at=unixepoch(), invite_code=? WHERE id=?"
-  ).run(req.session.memberId, inviteCode, req.params.id);
+    "UPDATE applications SET status='approved', reviewed_by=?, reviewed_at=unixepoch() WHERE id=?"
+  ).run(req.session.memberId, req.params.id);
 
-  reply.send({ success: true, inviteCode });
+  // If Discord ID was captured at apply time, create member record immediately
+  if (application.discord_id) {
+    const existing = db.prepare('SELECT id FROM members WHERE discord_id=?').get(application.discord_id);
+    if (!existing) {
+      db.prepare(
+        'INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)'
+      ).run(application.discord_id, application.discord_tag, application.rsn, application.wom_player_id);
+    }
+    return reply.send({ success: true, memberCreated: true });
+  }
+
+  // No Discord ID — they can still log in via OAuth after approval
+  // The callback will create the member record when they authenticate
+  reply.send({ success: true, memberCreated: false });
 });
 
 app.post('/api/admin/applications/:id/reject', { preHandler: requireAdmin }, (req, reply) => {
@@ -319,6 +359,19 @@ app.get('/api/wom/player/:rsn', async (req, reply) => {
 // ── START ─────────────────────────────────────────────────────
 const start = async () => {
   try {
+    // Bootstrap first admin via ADMIN_RSN env var
+    // Set ADMIN_RSN=yourRSN in Railway, log in once, then remove it
+    if (process.env.ADMIN_RSN) {
+      const promoted = db.prepare(
+        "UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE"
+      ).run(process.env.ADMIN_RSN);
+      if (promoted.changes > 0) {
+        console.log(`[bootstrap] Promoted ${process.env.ADMIN_RSN} to admin`);
+      } else {
+        console.log(`[bootstrap] ADMIN_RSN=${process.env.ADMIN_RSN} set but no member found yet — log in first`);
+      }
+    }
+
     await app.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' });
     startBot();
     startCrons();
