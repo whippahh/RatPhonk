@@ -460,7 +460,7 @@
   <a href="#"                 class="nav-link">Event Calendar</a>
   <a href="profile.html"      class="nav-link">Rat Profiles</a>
   <a href="ledger.html"       class="nav-link active">The Ledger</a>
-  <a href="https://ratphonk-production.up.railway.app/auth/discord" class="nav-link" id="nav-login" style="color:var(--glow);margin-left:auto;border-left:1px solid var(--border)">⚔ Login</a>
+  <a href="https://ratphonk-production.up.railway.app/auth/discord" class="nav-link" id="nav-login" class="nav-login">⚔ Login</a>
 </nav>
 
 <!-- PAGE HEADER -->
@@ -896,6 +896,31 @@ const obs = new IntersectionObserver(
   { threshold: 0.08 }
 );
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+async function updateNavAuth() {
+  try {
+    const res = await fetch('https://ratphonk-production.up.railway.app/auth/me', { credentials:'include' });
+    const btn = document.getElementById('nav-login');
+    if (res.ok) {
+      const me = await res.json();
+      if (btn) {
+        btn.textContent = '🐀 ' + me.rsn;
+        btn.href = 'profile.html?rsn=' + encodeURIComponent(me.rsn);
+        btn.style.color = 'var(--parch-lt)';
+      }
+      // Show admin link if admin/officer
+      if ((me.role === 'admin' || me.role === 'officer') && !document.getElementById('nav-admin')) {
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.id = 'nav-admin';
+        adminLink.className = 'nav-link';
+        adminLink.style.cssText = 'color:var(--amber);border-left:1px solid var(--border)';
+        adminLink.textContent = '⚙ Admin';
+        document.getElementById('main-nav').appendChild(adminLink);
+      }
+    }
+  } catch(e) {}
+}
 
 // ── INIT ─────────────────────────────────────────────────────
 (async () => {

@@ -751,6 +751,9 @@
           <button class="btn btn-ghost" onclick="navTo('members')">
             👥 Manage Members
           </button>
+          <button class="btn btn-ghost" id="sync-btn" onclick="triggerSync()">
+            🔄 Sync WOM Now
+          </button>
         </div>
       </div>
 
@@ -1437,6 +1440,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#sec-overview .page-sub').textContent =
     new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' · All times UTC';
 });
+
+// ── SYNC ─────────────────────────────────────────────────────
+async function triggerSync() {
+  const btn = document.getElementById('sync-btn');
+  btn.textContent = '🔄 Syncing...'; btn.disabled = true;
+  try {
+    const res = await fetch('https://ratphonk-production.up.railway.app/api/admin/sync', {
+      method: 'POST', credentials: 'include'
+    });
+    const d = await res.json();
+    if (res.ok) { toast('✓ WOM sync complete. Reload leaderboards to see data.', 'success'); }
+    else toast('Sync failed: ' + (d.error || 'unknown error'), 'error');
+  } catch(e) { toast('Could not reach server.', 'error'); }
+  btn.textContent = '🔄 Sync WOM Now'; btn.disabled = false;
+}
 
 // ── INIT ─────────────────────────────────────────────────────
 init();

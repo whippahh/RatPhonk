@@ -76,6 +76,12 @@
   .nav-link:hover { color:var(--parch); background:rgba(255,200,80,.025); }
   .nav-link.active { color:var(--glow); }
   .nav-link.active::after {
+  .nav-link:last-child { border-right: 1px solid var(--border); }
+  a.nav-login {
+    margin-left: auto;
+    color: var(--glow) !important;
+    border-left: 1px solid var(--border);
+  }
     content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
     background:var(--glow); box-shadow:0 0 8px var(--glow), 0 0 18px var(--glow-dim);
   }
@@ -485,6 +491,8 @@
     .podium { grid-template-columns:1fr; }
     .td-bar, .td-sub, .td-delta { display:none; }
   }
+
+  a.nav-login { margin-left:auto; color:var(--glow) !important; border-left:1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -838,7 +846,24 @@ function updateCountdowns() {
   document.getElementById('monthly-countdown').textContent = `${md}d ${mh}h ${mm}m`;
 }
 
+async function updateNavAuth() {
+  try {
+    const res = await fetch('https://ratphonk-production.up.railway.app/auth/me', { credentials:'include' });
+    const btn = document.getElementById('nav-login');
+    if (res.ok) {
+      const me = await res.json();
+      if (btn) { btn.textContent = '🐀 ' + me.rsn; btn.href = 'profile.html?rsn=' + encodeURIComponent(me.rsn); btn.style.color = 'var(--parch-lt)'; }
+      if ((me.role === 'admin' || me.role === 'officer') && !document.getElementById('nav-admin')) {
+        const a = document.createElement('a'); a.href='admin.html'; a.id='nav-admin';
+        a.className='nav-link'; a.style.cssText='color:var(--amber);border-left:1px solid var(--border)';
+        a.textContent='⚙ Admin'; document.getElementById('main-nav').appendChild(a);
+      }
+    }
+  } catch(e) {}
+}
+
 // ── Init ──
+updateNavAuth();
 render();
 updateCountdowns();
 setInterval(updateCountdowns, 60000);
