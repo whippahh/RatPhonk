@@ -314,7 +314,21 @@ app.get('/api/leaderboards', (req, reply) => {
     "SELECT * FROM leaderboard_periods WHERE period_type=? AND ends_at IS NULL ORDER BY starts_at DESC LIMIT 1"
   ).get(period);
 
-  if (!p) return reply.send({ entries: [], period: null });
+  if (!p) {
+    // No period initialised yet — fall back to alltime
+    const rows = db.prepare(`
+      WITH latest AS (
+        SELECT member_id, MAX(captured_at) as max_ts FROM xp_snapshots GROUP BY member_id
+      )
+      SELECT m.rsn, s.${col} as value
+      FROM xp_snapshots s
+      JOIN latest l ON s.member_id=l.member_id AND s.captured_at=l.max_ts
+      JOIN members m ON m.id=s.member_id
+      WHERE m.is_active=1
+      ORDER BY value DESC LIMIT 15
+    `).all();
+    return reply.send({ entries: rows, period: { label: 'All Time (no period set)' }, fallback: true });
+  }
 
   const rows = db.prepare(`
     WITH

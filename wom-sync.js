@@ -98,6 +98,24 @@ export async function takeSnapshots() {
     }
   }
   console.log(`[WOM] Snapshots done: ${success} success, ${failed} failed`);
+
+  // Auto-initialise leaderboard periods if none exist yet
+  for (const periodType of ['weekly', 'monthly']) {
+    const open = db.prepare(
+      'SELECT id FROM leaderboard_periods WHERE period_type=? AND ends_at IS NULL'
+    ).get(periodType);
+    if (!open) {
+      const startSnap = db.prepare('SELECT id FROM xp_snapshots ORDER BY captured_at ASC LIMIT 1').get();
+      if (startSnap) {
+        const label = periodType === 'weekly'
+          ? `Week of ${new Date().toISOString().slice(0,10)}`
+          : `Month of ${new Date().toISOString().slice(0,7)}`;
+        db.prepare('INSERT INTO leaderboard_periods (label,period_type,starts_at,snapshot_start_id) VALUES (?,?,?,?)')
+          .run(label, periodType, startSnap.captured_at ?? Math.floor(Date.now()/1000), startSnap.id);
+        console.log(`[WOM] Auto-created open ${periodType} period`);
+      }
+    }
+  }
 }
 
 function managePeriodBoundary(periodType) {
