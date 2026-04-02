@@ -156,6 +156,15 @@ app.post('/auth/link-rsn', async (req, reply) => {
   reply.send({ success: true });
 });
 
+// Temporary debug — remove after confirming discord_id
+app.get('/auth/debug', async (req, reply) => {
+  const { code } = req.query;
+  // Show what's in the members table for our known discord_id
+  const member = db.prepare('SELECT id, rsn, discord_id, role FROM members WHERE discord_id=?').get('338327411970277377');
+  const allMembers = db.prepare('SELECT id, rsn, discord_id, role FROM members LIMIT 10').all();
+  reply.send({ looking_for: '338327411970277377', found: member, all_members: allMembers });
+});
+
 app.get('/auth/me', { preHandler: requireAuth }, (req, reply) => {
   const member = db.prepare('SELECT id, rsn, discord_tag, role FROM members WHERE id=?')
     .get(req.session.memberId);
