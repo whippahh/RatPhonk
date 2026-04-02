@@ -95,7 +95,7 @@ app.get('/auth/discord/callback', async (req, reply) => {
     if (approvedApp) {
       // Approved — create member record and log them in
       const result = db.prepare(
-        'INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)'
+        `INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)`
       ).run(discordUser.id, discordUser.username, approvedApp.rsn, approvedApp.wom_player_id);
       req.session.memberId = result.lastInsertRowid;
       req.session.role     = 'member';
@@ -192,7 +192,7 @@ app.post('/api/admin/applications/:id/approve', { preHandler: requireAdmin }, as
     const existing = db.prepare('SELECT id FROM members WHERE discord_id=?').get(application.discord_id);
     if (!existing) {
       db.prepare(
-        'INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)'
+        `INSERT INTO members (discord_id, discord_tag, rsn, wom_player_id, role, is_verified) VALUES (?,?,?,?,'member',1)`
       ).run(application.discord_id, application.discord_tag, application.rsn, application.wom_player_id);
     }
     return reply.send({ success: true, memberCreated: true });
