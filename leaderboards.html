@@ -596,13 +596,13 @@
     <div class="sidebar-section">
       <span class="sidebar-label">Period</span>
       <div class="period-tabs">
-        <button class="period-btn active" onclick="setPeriod('weekly', this)">
+        <button class="period-btn" onclick="setPeriod('weekly', this)">
           Weekly <span class="period-tag">LIVE</span>
         </button>
         <button class="period-btn" onclick="setPeriod('monthly', this)">
           Monthly <span class="period-tag">APR</span>
         </button>
-        <button class="period-btn" onclick="setPeriod('alltime', this)">
+        <button class="period-btn active" onclick="setPeriod('alltime', this)">
           All Time <span class="period-tag">∞</span>
         </button>
       </div>
@@ -665,7 +665,7 @@ const PERIOD_LABELS = {
 const BACKEND_CATS = new Set(['xp','boss','clog']);
 
 let currentCat = 'xp';
-let currentPeriod = 'weekly';
+let currentPeriod = 'alltime';
 let lastFetch = {}; // cache: key = `${cat}-${period}`
 
 function fmtValue(raw, cat) {
