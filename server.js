@@ -379,16 +379,31 @@ app.get('/api/wom/player/:rsn', async (req, reply) => {
 // ── START ─────────────────────────────────────────────────────
 const start = async () => {
   try {
-    // Bootstrap first admin via ADMIN_RSN env var
-    // Set ADMIN_RSN=yourRSN in Railway, log in once, then remove it
-    if (process.env.ADMIN_RSN) {
-      const promoted = db.prepare(
-        "UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE"
-      ).run(process.env.ADMIN_RSN);
+    // Bootstrap first admin via env vars
+    // Set ADMIN_RSN + ADMIN_DISCORD_ID in Railway, then remove after first login
+    if (process.env.ADMIN_RSN && process.env.ADMIN_DISCORD_ID) {
+      const existing = db.prepare('SELECT id FROM members WHERE discord_id=? OR rsn=? COLLATE NOCASE')
+        .get(process.env.ADMIN_DISCORD_ID, process.env.ADMIN_RSN);
+
+      if (existing) {
+        // Member exists — just ensure they are admin
+        db.prepare("UPDATE members SET role='admin' WHERE id=?").run(existing.id);
+        console.log(`[bootstrap] Ensured ${process.env.ADMIN_RSN} is admin`);
+      } else {
+        // No member record yet — create one
+        db.prepare(
+          `INSERT OR IGNORE INTO members (discord_id, discord_tag, rsn, role, is_verified) VALUES (?,?,?,'admin',1)`
+        ).run(process.env.ADMIN_DISCORD_ID, process.env.ADMIN_RSN, process.env.ADMIN_RSN);
+        console.log(`[bootstrap] Created admin member record for ${process.env.ADMIN_RSN}`);
+      }
+    } else if (process.env.ADMIN_RSN) {
+      // Fallback: promote existing member by RSN only
+      const promoted = db.prepare("UPDATE members SET role='admin' WHERE rsn=? COLLATE NOCASE")
+        .run(process.env.ADMIN_RSN);
       if (promoted.changes > 0) {
         console.log(`[bootstrap] Promoted ${process.env.ADMIN_RSN} to admin`);
       } else {
-        console.log(`[bootstrap] ADMIN_RSN=${process.env.ADMIN_RSN} set but no member found yet — log in first`);
+        console.log(`[bootstrap] ADMIN_RSN set but no member found — also set ADMIN_DISCORD_ID to auto-create`);
       }
     }
 
