@@ -68,7 +68,7 @@ export async function takeSnapshots() {
           graardor_kc, zilyana_kc, kreearra_kc, kril_kc,
           abyssal_sire_kc, kraken_kc, callisto_kc,
           venenatis_kc, vetion_kc,
-          collection_log_count, wom_snapshot_id
+          collection_log_count
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       `).run(
         member.id, Math.floor(Date.now() / 1000),
@@ -85,8 +85,7 @@ export async function takeSnapshots() {
         b('general_graardor'), b('commander_zilyana'), b('kreearra'), b('kril_tsutsaroth'),
         b('abyssal_sire'), b('kraken'), b('callisto'),
         b('venenatis'), b('vetion'),
-        player.collectionLogCount ?? 0,
-        player.latestSnapshot?.id ?? null
+        player.collectionLogCount ?? 0
       );
 
       if (player.id && !member.wom_player_id) {
