@@ -64,10 +64,12 @@ export async function takeSnapshots() {
           agility_xp, thieving_xp, slayer_xp, farming_xp,
           runecraft_xp, hunter_xp, construction_xp,
           vorkath_kc, zulrah_kc, cox_kc, tob_kc, toa_kc,
-          cerberus_kc, corp_kc, graardor_kc, kril_kc,
+          cerberus_kc, gauntlet_kc, nightmare_kc, corp_kc,
+          graardor_kc, zilyana_kc, kreearra_kc, kril_kc,
           abyssal_sire_kc, kraken_kc, callisto_kc,
+          venenatis_kc, vetion_kc,
           collection_log_count, wom_snapshot_id
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       `).run(
         member.id, Math.floor(Date.now() / 1000),
         s('overall'), skills.overall?.level ?? 0,
@@ -79,8 +81,10 @@ export async function takeSnapshots() {
         s('runecrafting'), s('hunter'), s('construction'),
         b('vorkath'), b('zulrah'), b('chambers_of_xeric'),
         b('theatre_of_blood'), b('tombs_of_amascut'),
-        b('cerberus'), b('corporeal_beast'), b('general_graardor'),
-        b('kril_tsutsaroth'), b('abyssal_sire'), b('kraken'), b('callisto'),
+        b('cerberus'), b('corrupted_gauntlet'), b('nightmare'), b('corporeal_beast'),
+        b('general_graardor'), b('commander_zilyana'), b('kreearra'), b('kril_tsutsaroth'),
+        b('abyssal_sire'), b('kraken'), b('callisto'),
+        b('venenatis'), b('vetion'),
         player.collectionLogCount ?? 0,
         player.latestSnapshot?.id ?? null
       );

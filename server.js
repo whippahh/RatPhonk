@@ -290,10 +290,19 @@ app.get('/api/leaderboards', (req, reply) => {
   const colMap = {
     xp:     'overall_xp',
     slayer: 'slayer_xp',
-    boss:   'vorkath_kc',
     clog:   'collection_log_count',
   };
-  const col = colMap[category] || 'overall_xp';
+
+  // Boss KC = sum of all tracked boss KC columns
+  const BOSS_KC_SUM = `(
+    vorkath_kc + zulrah_kc + cox_kc + tob_kc + toa_kc +
+    cerberus_kc + gauntlet_kc + nightmare_kc + corp_kc +
+    graardor_kc + zilyana_kc + kreearra_kc + kril_kc +
+    abyssal_sire_kc + kraken_kc + callisto_kc +
+    venenatis_kc + vetion_kc
+  )`;
+
+  const col = category === 'boss' ? BOSS_KC_SUM : (colMap[category] || 'overall_xp');
 
   if (period === 'alltime') {
     const rows = db.prepare(`

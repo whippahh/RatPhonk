@@ -286,6 +286,12 @@ CREATE TABLE IF NOT EXISTS comp_participants (
 const migrations = [
   'ALTER TABLE applications ADD COLUMN discord_id TEXT',
   'ALTER TABLE applications ADD COLUMN discord_tag TEXT',
+  'ALTER TABLE xp_snapshots ADD COLUMN gauntlet_kc INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE xp_snapshots ADD COLUMN nightmare_kc INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE xp_snapshots ADD COLUMN zilyana_kc INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE xp_snapshots ADD COLUMN kreearra_kc INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE xp_snapshots ADD COLUMN venenatis_kc INTEGER NOT NULL DEFAULT 0',
+  'ALTER TABLE xp_snapshots ADD COLUMN vetion_kc INTEGER NOT NULL DEFAULT 0',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch(e) { /* column already exists */ }
