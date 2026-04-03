@@ -9,31 +9,36 @@ import { startCrons, syncMemberList, takeSnapshots } from './wom-sync.js';
 
 const app = Fastify({ logger: true });
 
-// ── AUTH TOKENS (replaces cookie sessions for cross-origin) ──
-// Simple in-memory store: token -> { memberId, role, rsn, expires }
-const authTokens = new Map();
+// ── AUTH TOKENS (DB-persisted, survives restarts) ────────────
+// Stored in auth_tokens table: token -> member data
+db.exec(`CREATE TABLE IF NOT EXISTS auth_tokens (
+  token      TEXT PRIMARY KEY,
+  member_id  INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  expires_at INTEGER NOT NULL
+)`);
+
 function createToken(member) {
   const token = Array.from(crypto.getRandomValues(new Uint8Array(24)))
     .map(b => b.toString(16).padStart(2,'0')).join('');
-  authTokens.set(token, {
-    memberId: member.id,
-    role:     member.role,
-    rsn:      member.rsn,
-    expires:  Date.now() + 7 * 24 * 60 * 60 * 1000,
-  });
+  const expires = Math.floor(Date.now()/1000) + 7 * 24 * 60 * 60;
+  db.prepare('INSERT OR REPLACE INTO auth_tokens (token, member_id, expires_at) VALUES (?,?,?)')
+    .run(token, member.id, expires);
   return token;
 }
 function getTokenData(req) {
   const header = req.headers['x-auth-token'];
   if (!header) return null;
-  const data = authTokens.get(header);
-  if (!data || data.expires < Date.now()) { authTokens.delete(header); return null; }
-  return data;
+  const now = Math.floor(Date.now()/1000);
+  const row = db.prepare(`
+    SELECT t.token, m.id as memberId, m.role, m.rsn
+    FROM auth_tokens t JOIN members m ON m.id=t.member_id
+    WHERE t.token=? AND t.expires_at > ?
+  `).get(header, now);
+  if (!row) return null;
+  return row;
 }
-// Clean up expired tokens every hour
-setInterval(() => {
-  for (const [k,v] of authTokens) { if (v.expires < Date.now()) authTokens.delete(k); }
-}, 3600000);
+// Clean up expired tokens on startup
+db.prepare('DELETE FROM auth_tokens WHERE expires_at < ?').run(Math.floor(Date.now()/1000));
 
 await app.register(cors, {
   origin: [
@@ -294,13 +299,7 @@ app.get('/api/leaderboards', (req, reply) => {
   };
 
   // Boss KC = sum of all tracked boss KC columns
-  const BOSS_KC_SUM = `(
-    vorkath_kc + zulrah_kc + cox_kc + tob_kc + toa_kc +
-    cerberus_kc + gauntlet_kc + nightmare_kc + corp_kc +
-    graardor_kc + zilyana_kc + kreearra_kc + kril_kc +
-    abyssal_sire_kc + kraken_kc + callisto_kc +
-    venenatis_kc + vetion_kc
-  )`;
+  const BOSS_KC_SUM = '(vorkath_kc + zulrah_kc + cox_kc + tob_kc + toa_kc + cerberus_kc + corp_kc + graardor_kc + kril_kc + abyssal_sire_kc + kraken_kc + callisto_kc)';
 
   const col = category === 'boss' ? BOSS_KC_SUM : (colMap[category] || 'overall_xp');
 
